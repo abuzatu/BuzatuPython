@@ -1,0 +1,73 @@
+Adrian Buzatu (adrian.buzatu@glasgow.ac.uk)
+18 Sept 2014
+
+Tag 00-00-01:
+o Moved here as part of a package developed for the past 1.5 years
+o This has Python helper functions and PyRoot functionsn to actually do a full physics analysis, such as creating histograms, staking them, etc. 
+o The actual data analysis will be done in a different software package, 
+one for each analysis
+o This code is therefore generic and can be used for many analyses
+including to be ported easily when/if I move to another HEP experiment
+
+Tag 00-00-02:
+o Added tar.sh, new.sh, improved clean.sh
+
+Tag 00-00-03:
+o Added to write "ATLAS Simulation Internal"
+
+Tag 00-00-04:
+o Add NeuralNetwork.py but removing the functions that are specific to the user. Choosing Train and Test lists by reading Train variable from perevent and perjet trees.
+o Tagged Feb 05, before running for final Run I paper.
+
+Tag 00-00-05
+o On Mar 14-20, added formulas for sensitivity and significance in HelperPython.py
+o Tagged March 20
+	
+Tag 00-00-06
+o March 22 removed HelperPythonWH, as moved to BuzatuWH/Helper/ where it is better located.
+o Tag 06 on March 30
+
+Tag 00-00-07
+o 03 April Added function to compute duration of run HelperPython.py.
+o Tagged on 06 April 
+	
+Tag 00-00-08
+o 06 May 2015, I added checks if a ROOT file exists, and from it a tree or a histogram exist. The old exists() method did not work. 
+o On 07 May 2015 I replace "exit()" with "assert(False)" everywhere, so that we know when it crashes also the line and the file where this is done. It helps dramatically with debugging. 
+o 06 Sept, added values of fits in overlayHistogram in the legend.
+o Tagged on 16 Oct 2015
+
+Tag 00-00-09
+o changed the order of arguments to some functions
+o reintroduced to show just the fits 
+o tag added on 27 Nov, used in giving the talk then.
+
+Tag 00-00-10
+
+Tag 00-00-11:
+o 13 March, introduce ratio pad in histogramOverlay() function
+o tag on 13 March
+
+Tag 00-00-12:
+o March 17: introduced min and max values for ratios in overlay as arguments in overlayHistogam. It works for overlayOR(), but all other cases will crash, so code needs to be updated accordingly when I use it. Also fixed some bugs that were making the code to crash, culprit was c.cd().
+o tag on March 17
+
+Tag 00-00-13:
+o March 18: introduced a separate option to plot for ratio plot under.
+o March 19: introduced function get_histogram_with_its_statistical_variation(ho,factor,debug)
+o Tag March 19
+
+Tag 00-00-14:
+o March 25: added stat error as band on ratio plots; improved plotting style.
+o March 26: TH1::Divide overestimates the stat error on ratio, so introduced my own function divideHistograms. Used it in overlayHistogram. Also removed the shade, as the information already in the error bars of the other things in the ratio.
+o 07-10 April: remove concatenate collection, improve code to deal with a list of any bins I want from a tree reading.
+o many small changes, tagging on July 13, when presenting PtReco public plots in JetEtMiss. 
+	
+Tag 00-00-15:
+	o Version used for AZH talk on Oct 07. 
+
+Tag 00-00-16:
+Oct 20,last version inSVN, first version in GitLab.
+
+Tag 00-00-17:
+	[work in progress]
