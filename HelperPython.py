@@ -979,9 +979,9 @@ def significanceError(s,se,b,be,debug=False):
         else:
             # slide 39 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
             # for s<<b, it reduced to s/sqrt(b)
-            result=math.sqrt(2*((s+b)*math.log(1+1.0*s/b)-s))
-            dfds=math.log(1+1.0*s/b)*math.pow((s+b)*math.log(1+1.0*s/b)-s,3.0/2.0)
-            dfdb=(1.0*s/b+math.log(1+1.0*s/b))*math.pow((s+b)*math.log(1+1.0*s/b)-s,3.0/2.0)
+            result=math.sqrt(2.0*((s+b)*math.log(1.0+1.0*s/b)-s))
+            dfds=math.log(1.0+1.0*s/b)*math.pow((s+b)*math.log(1.0+1.0*s/b)-s,3.0/2.0)
+            dfdb=(1.0*s/b+math.log(1.0+1.0*s/b))*math.pow((s+b)*math.log(1.0+1.0*s/b)-s,3.0/2.0)
             error=math.sqrt(math.pow(dfds,2)*math.pow(se,2)+math.pow(dfdb,2)*math.pow(be,2))
     return (result,error)
 # done function

@@ -2606,6 +2606,17 @@ def resize_h1D(old,new_xmin,new_xmax,new_bin_width,debug):
     return new
 # done function
 
+def get_histo_integral_error(histo,myrange=0,debug=False):
+    if myrange==0:
+        myrange=[0,histo.GetNbinsX()+2]
+    array_error=array("d",[0])
+    option=""
+    integral=histo.IntegralAndError(myrange[0],myrange[1],array_error,option)
+    error=array_error[0]
+    if debug:
+        print "integral +- error: %-.3f +- %-.3f" % (integral,error)
+    return (integral,error)
+# done function
 
 def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,WhatToCompute="sensitivity",debug=False):
     if debug:
@@ -2626,32 +2637,40 @@ def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,Wh
     if AddInQuadrature:
         if debug:
             "We will AddInQuadrature"
-        total_squared=0.0
+        totalContent_squared=0.0
+        totalError_squared=0.0
         # need to loop over the bins first
         # done if about my range of bins 
         for i in xrange(myrange[0],myrange[-1]):
             if debug:
                 print "Starting new bin"
-            S=h_S.Integral(i,i)
-            B=h_B.Integral(i,i)
+            #S=h_S.Integral(i,i)
+            #B=h_B.Integral(i,i)
+            S=h_S.GetBinContent(i)
+            errS=h_S.GetBinError(i)
+            B=h_B.GetBinContent(i)
+            errB=h_B.GetBinError(i)
             if debug:
-                print "i",i,"S","%-.2f" % S,"B","%-.2f" % B
+                print "i",i,"S +- errS","%-.5f +- %-5f" % (S,errS),"B +- errB","%-.5f +- %-.5f" % (B,errB)
             if WhatToCompute=="signaloverbackground":
-                current=ratio(S,B)
+                currentContent,currentError=ratioError(S,errS,B,errB)
             elif WhatToCompute=="sensitivity":
-                current=sensitivity(S,B)
+                currentContent,currentError=sensitivityError(S,errS,B,errB)
             elif WhatToCompute=="significance":
-                current=significance(S,B)
+                currentContent,currentError=significanceError(S,errS,B,errB)
             else:
                 print "WhatToCompute",WhatToCompute,"now known. Choose between signaloverbackground, sensitivity, significance. Will ABORT!!!"
                 assert(False)
             # done if on WhatToCompute
             # add in quadrature
-            total_squared+=current*current
+            totalContent_squared+=currentContent*currentContent
+            totalError_squared+=currentError*currentError
         # done loop over all the bins in the histogram
         if debug:
-            print "total_squared",total_squared
-        total=math.sqrt(total_squared)
+            print "totalContent_squared",totalContent_squared
+            print "totalError_squared",totalError_squared
+        total=math.sqrt(totalContent_squared)
+        error=math.sqrt(totalError_squared)
         if debug:
             print "total",total
     else:
@@ -2660,27 +2679,21 @@ def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,Wh
             print "We will not add AddInQuadrature, so add bins one by one"
         S=h_S.Integral(*myrange)
         B=h_B.Integral(*myrange)
+        S,errS=get_histo_integral_error(h_S,0,debug)
+        B,errB=get_histo_integral_error(h_B,0,debug)
         if WhatToCompute=="signaloverbackground":
-            total=ratio(S,B)
+            total,error=ratioError(S,errS,B,errB)
         elif WhatToCompute=="sensitivity":
-            total=sensitivity(S,B)
+            total,error=sensitivityError(S,errS,B,errB)
         elif WhatToCompute=="significance":
-            total=significance(S,B)
+            total,error=significanceError(S,errS,B,errB)
         else:
             print "WhatToCompute",WhatToCompute,"now known. Choose between signaloverbackground, sensitivity, significance. Will ABORT!!!"
             assert(False)
         # done if on WhatToCompute
     # done if AddInQuadrature, so let's write the total
     # which was able to be computed in two ways
-    print "IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins,"AddInQuadrature",AddInQuadrature,"WhatToCompute",WhatToCompute,"%-.4f" % total
-    return total
+    print "IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins,"AddInQuadrature",AddInQuadrature,"WhatToCompute",WhatToCompute,"%-.4f +- %-.4f" % (total,error)
+    return total,error
 # done function
 
-def get_histo_integral_error(histo,debug):
-    array_error=array("d",[0])
-    integral=histo.IntegralAndError(0,histo.GetNbinsX()+2,array_error,"")
-    error=array_error[0]
-    if debug:
-        print "integral +- error: %-.3f +- %-.3f" % (integral,error)
-    return (integral,error)
-# done function
