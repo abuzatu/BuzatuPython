@@ -595,15 +595,22 @@ def retrieveHistogram(fileName="",histoPath="",histoName="",name="",debug=False)
         print "histoName",histoName
         print "name",name
     file=TFile(fileName,"READ")
+    if debug:
+        print "file",file,"type(file)",type(file)
     if not file.IsOpen():
         print "File",fileName,"does not exist, so will abort"
         assert(False)
     #if debug:
     #    file.ls()
     gDirectory.cd(histoPath)
-    #if debug:
-    #    gDirectory.ls()
+    if False:
+        print "histoPath",histoPath
+        print "gDirectory.ls()"
+        gDirectory.ls()
+        print "histoName",histoName
     histo=gDirectory.Get(histoName)
+    if debug:
+        print "histo",histo,"type(histo)",type(histo)
     if histo==None:
         print "histo",histoName,"doesn't exist in file",fileName,"at path",histoPath,". We will ABORT!!!!"
         assert(False)
@@ -953,8 +960,8 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
             xmin=mean-3*rms
             xmax=mean+3*rms
             # hack for Mbb mass fit like Manuel between 20 and 200
-            #xmin=20.0
-            #xmax=200.0
+            #xmin=70.0
+            #xmax=145.0
             function=TF1("bukin",Bukin(),xmin,xmax,6)
             function.SetParName(0,"height")
             function.SetParName(1,"peak") # actually the peak, as it may be asymmetric
@@ -2600,7 +2607,7 @@ def resize_h1D(old,new_xmin,new_xmax,new_bin_width,debug):
 # done function
 
 
-def computeSB(h_S,h_B,IncludeUnderflowOverflowBins="True",AddInQuadrature="True",WhatToCompute="sensitivity",debug=False):
+def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,WhatToCompute="sensitivity",debug=False):
     if debug:
         print "Start computeSB()"
         print "h_S",type(h_S), h_S
@@ -2654,7 +2661,7 @@ def computeSB(h_S,h_B,IncludeUnderflowOverflowBins="True",AddInQuadrature="True"
         S=h_S.Integral(*myrange)
         B=h_B.Integral(*myrange)
         if WhatToCompute=="signaloverbackground":
-            total=significance(S,B)
+            total=ratio(S,B)
         elif WhatToCompute=="sensitivity":
             total=sensitivity(S,B)
         elif WhatToCompute=="significance":
@@ -2669,3 +2676,11 @@ def computeSB(h_S,h_B,IncludeUnderflowOverflowBins="True",AddInQuadrature="True"
     return total
 # done function
 
+def get_histo_integral_error(histo,debug):
+    array_error=array("d",[0])
+    integral=histo.IntegralAndError(0,histo.GetNbinsX()+2,array_error,"")
+    error=array_error[0]
+    if debug:
+        print "integral +- error: %-.3f +- %-.3f" % (integral,error)
+    return (integral,error)
+# done function
