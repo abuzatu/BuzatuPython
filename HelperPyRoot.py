@@ -457,8 +457,10 @@ def getNrEntries(fileName,treeName,debug=False):
         assert(False)
     tree=file.Get(treeName)
     if tree==None:
-        print "tree",treeName,"doesn't exist in file",fileName
-        assert(False)
+        print "ERROR tree",treeName,"doesn't exist in file",fileName
+        #assert(False)
+        return -1
+    # end if
     nrEntries=tree.GetEntries()
     if debug:
         print "Number of entries in file",fileName,"in tree",treeName,"is",nrEntries
