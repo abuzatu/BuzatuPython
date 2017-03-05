@@ -1388,7 +1388,7 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
                 titleLegend="Bukin: peak/width/ratio"
         else:
             print "option",option,"not known in setting LegendTitle of addfitinfo is True. Will ABORT!!"
-            assert(false)
+            assert(False)
         # done if option
         #legend.AddEntry(None,"#bf{"+titleLegend+"}","")
         legend.SetHeader("#bf{"+titleLegend+"}")
