@@ -1255,14 +1255,18 @@ def getBinValues(histo,debug):
     return (nparray_value,list_line,list_binInfo)
 # done function
 
-def getBinInfo(histo,debug):
+def getBinInfo(histo,doRescaleMeVtoGeV=False,debug=False):
     list_bin=[]
     list_content=[]
     # loop over each bin and for each bin write the cross section on a different line
     for i in xrange(histo.GetNbinsX()+2):
         binContent=histo.GetBinContent(i)
-        binLowEdge=histo.GetBinLowEdge(i)*0.001 # MeV to GeV
-        binWidth=histo.GetBinWidth(i)*0.001     # MeV to GeV
+        binLowEdge=histo.GetBinLowEdge(i)
+        if doRescaleMeVtoGeV:
+            binLowEdge*=0.001 # MeV to GeV
+        binWidth=histo.GetBinWidth(i)
+        if doRescaleMeVtoGeV:
+            binWidth*=0.001     # MeV to GeV
         binHighEdge=binLowEdge+binWidth
         binIntegral=binContent#*binWidth
         binError=histo.GetBinError(i)
