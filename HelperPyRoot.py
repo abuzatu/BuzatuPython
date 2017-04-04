@@ -1327,7 +1327,7 @@ def get_interpolated_graph_for_histo(h,debug):
 # done function
 
 
-def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=True,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=True,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,doRatioPad=False,min_value_ratio=-1,max_value_ratio=-1,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",legend_info=[0.60,0.50,0.88,0.72,72,0.037,0],plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{b-tagged jet}",0.04,13,0.60,0.88,0.05),line_option=([0,0.5,1,0.5],2),debug=False):
+def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=True,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=True,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=False,min_value_ratio=-1,max_value_ratio=-1,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",legend_info=[0.60,0.50,0.88,0.72,72,0.037,0],plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{b-tagged jet}",0.04,13,0.60,0.88,0.05),line_option=([0,0.5,1,0.5],2),debug=False):
     if debug:
         print "Start overlayHistograms(...)"
         print "option",option
@@ -1416,6 +1416,17 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
         tuple_h1D=list_tuple_h1D[i]
         h1D=tuple_h1D[0]
         shortname=tuple_h1D[1]
+        
+        # set Y axis title offset
+        #h1D.GetYaxis().SetTitleOffset(YTitleOffset)
+        #h1D.SetTitleOffset(YTitleOffset,"Y");
+        #h1D.SetTitleOffset(10.0,"Y");
+        ##h1D.GetYaxis().SetLabelSize(0.001)
+        #h1D.GetYaxis().SetTitleSize(0.20)
+        #h1D.GetYaxis().SetTitleOffset(1.45)
+        #h1D.GetYaxis().SetLabelOffset(1000)
+        #h1D.GetXaxis().SetLabelSize(0.00)
+        #h1D.GetYaxis().SetLabelSize(0.00)
 
         if debug:
             print "D","i",i,"type(p_main)",type(p_main)
