@@ -1635,21 +1635,21 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
             ratio_h1D.SetLineWidth(2)
             ratio_h1D.SetMarkerStyle(0)
             #ratio_h1D.Draw(plot_option_ratio+" E4")
-            #ratio_h1D.Draw(plot_option_ratio)
+            ratio_h1D.Draw(plot_option_ratio)
 
         else:
-            if i==1:
-                ratio_h1D.SetFillColor(statColor)
-            elif i==2:
-                ratio_h1D.SetFillColor(0)  
-            ratio_h1D.SetFillStyle(1001)
+            #if i==1:
+            #    ratio_h1D.SetFillColor(statColor)
+            #elif i==2:
+            #    ratio_h1D.SetFillColor(0)  
+            #ratio_h1D.SetFillStyle(1001)
             ratio_h1D.SetLineWidth(2)
             ratio_h1D.SetMarkerStyle(0)
             #ratio_h1D.Draw("E6 SAME") # stat errors on the ratios of systematics as curved shape
             #ratio_h1D.Draw("E1 SAME") # stat errors on the ratios of systematics as crosses
             #ratio_h1D.Draw("HIST SAME") # no errors but it draws the line also horizontally when the bins have zero value at start and vertically for the first non zero bin
-            #ratio_h1D.Draw(plot_option_ratio+" SAME")
-            ratio_h1D.Draw("HIST E3")
+            ratio_h1D.Draw(plot_option_ratio+" SAME")
+            #ratio_h1D.Draw("HIST E3")
             None
 
     # done loop over ratio histogram
