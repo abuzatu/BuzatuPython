@@ -1276,6 +1276,24 @@ def getBinInfo(histo,doRescaleMeVtoGeV=False,debug=False):
     return list_bin,list_content
 # done function
 
+def rescaleHistogramFromContentToDensity(histo,doRescaleMeVtoGeV=False,debug=False):
+    # loop over each bin and divide bin content and error by the width of each bin
+    # except underflow and overflow, for which there is an infinity to divide with
+    for i in xrange(1,histo.GetNbinsX()+1):
+        print "bin",i
+        binContent=histo.GetBinContent(i)
+        binError=histo.GetBinError(i)
+        binWidth=histo.GetBinWidth(i)
+        if doRescaleMeVtoGeV:
+            binWidth*=0.001     # MeV to GeV
+        binContentNew=ratio(binContent,binWidth)
+        binErrorNew=ratio(binError,binWidth)
+        histo.SetBinContent(i,binContentNew)
+        histo.SetBinError(i,binErrorNew)
+    # done for loop
+    #return histo
+# done function
+
 # replace function with its value varied by the statistical variation
 def get_histogram_with_its_statistical_variation(ho,factor,debug):
     h=ho.Clone()
@@ -1327,6 +1345,9 @@ def get_interpolated_graph_for_histo(h,debug):
 # done function
 
 
+# for statistical error band
+# code example: https://www.desy.de/~stanescu/my-tmp/plotUpDownSys.C
+# its plot:https://www.desy.de/~stanescu/my-tmp/AFII/Nom-Up-Down-A500-tb050/jes1_h_ttbar_chi2_m_inc_res_mu.png
 def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=True,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=True,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=False,min_value_ratio=-1,max_value_ratio=-1,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",legend_info=[0.60,0.50,0.88,0.72,72,0.037,0],plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{b-tagged jet}",0.04,13,0.60,0.88,0.05),line_option=([0,0.5,1,0.5],2),debug=False):
     if debug:
         print "Start overlayHistograms(...)"
@@ -1613,16 +1634,22 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
             #ratio_h1D.SetFillStyle(1001)
             ratio_h1D.SetLineWidth(2)
             ratio_h1D.SetMarkerStyle(0)
-            #ratio_h1D.Draw(plot_option_ratio+" E2")
-            ratio_h1D.Draw(plot_option_ratio)
+            #ratio_h1D.Draw(plot_option_ratio+" E4")
+            #ratio_h1D.Draw(plot_option_ratio)
 
         else:
+            if i==1:
+                ratio_h1D.SetFillColor(statColor)
+            elif i==2:
+                ratio_h1D.SetFillColor(0)  
+            ratio_h1D.SetFillStyle(1001)
             ratio_h1D.SetLineWidth(2)
             ratio_h1D.SetMarkerStyle(0)
             #ratio_h1D.Draw("E6 SAME") # stat errors on the ratios of systematics as curved shape
             #ratio_h1D.Draw("E1 SAME") # stat errors on the ratios of systematics as crosses
             #ratio_h1D.Draw("HIST SAME") # no errors but it draws the line also horizontally when the bins have zero value at start and vertically for the first non zero bin
-            ratio_h1D.Draw(plot_option_ratio+" SAME")
+            #ratio_h1D.Draw(plot_option_ratio+" SAME")
+            ratio_h1D.Draw("HIST E3")
             None
 
     # done loop over ratio histogram
