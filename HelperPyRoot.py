@@ -1280,12 +1280,15 @@ def rescaleHistogramFromContentToDensity(histo,doRescaleMeVtoGeV=False,debug=Fal
     # loop over each bin and divide bin content and error by the width of each bin
     # except underflow and overflow, for which there is an infinity to divide with
     for i in xrange(1,histo.GetNbinsX()+1):
-        print "bin",i
+        if debug:
+            print "bin",i
         binContent=histo.GetBinContent(i)
         binError=histo.GetBinError(i)
         binWidth=histo.GetBinWidth(i)
         if doRescaleMeVtoGeV:
             binWidth*=0.001     # MeV to GeV
+        if debug:
+            print "binWidth",binWidth,"binContent",binContent,"binWidth",binWidth,"ratio(binContent,binWidth)",ratio(binContent,binWidth)
         binContentNew=ratio(binContent,binWidth)
         binErrorNew=ratio(binError,binWidth)
         histo.SetBinContent(i,binContentNew)

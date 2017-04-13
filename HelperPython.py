@@ -894,7 +894,7 @@ def get_string_scale_resolution(fit_name,scale_value,resolution_value):
 def ratio(s,b,debug=False):
     if debug:
         print "s",s,"b",b
-    if -0.0001<b<0.0001:
+    if -0.00001<b<0.00001:
         result=0
     else:
         result=s/b
