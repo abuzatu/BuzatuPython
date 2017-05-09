@@ -1363,7 +1363,7 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
         print "Start set_min_max_title_list_tuple_h1D()"
         for tuple_h1D in list_tuple_h1D:
             print "legend",tuple_h1D[1],"min",tuple_h1D[0].GetMinimum(),"max",tuple_h1D[0].GetMaximum()
-    set_min_max_title_list_tuple_h1D(list_tuple_h1D,max_value,min_value,ignorezero,1.3,0.9,debug)
+    set_min_max_title_list_tuple_h1D(list_tuple_h1D,max_value,min_value,ignorezero,1.5,0.9,debug)
     if debug:
         print "End set_min_max_title_list_tuple_h1D()"
         for tuple_h1D in list_tuple_h1D:
