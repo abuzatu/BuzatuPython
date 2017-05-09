@@ -891,6 +891,7 @@ def get_string_scale_resolution(fit_name,scale_value,resolution_value):
     return result
 # done function
 
+# ratio, or s/b
 def ratio(s,b,debug=False):
     if debug:
         print "s",s,"b",b
@@ -904,6 +905,7 @@ def ratio(s,b,debug=False):
 # http://ipl.physics.harvard.edu/wp-uploads/2013/03/PS3_Error_Propagation_sp13.pdf
 # https://en.wikipedia.org/wiki/Propagation_of_uncertainty
 
+# ratio or s/b
 def ratioError(s,se,b,be,debug=False):
     if debug:
         print "s",s,"se",se,"b",b,"be",be
@@ -919,6 +921,7 @@ def ratioError(s,se,b,be,debug=False):
     return (result,error)
 # done function
 
+# sensitivity, or s over sqrt(b)
 def sensitivity(s,b,debug=False):
     if debug:
         print "s",s,"b",b
@@ -929,6 +932,7 @@ def sensitivity(s,b,debug=False):
     return result
 # done function
 
+# sensitivity, or s over sqrt(b)
 def sensitivityError(s,se,b,be,debug=False):
     if debug:
         print "s",s,"se",se,"b",b,"be",be
@@ -944,7 +948,8 @@ def sensitivityError(s,se,b,be,debug=False):
     return (result,error)
 # done function
 
-def significance(s,b,debug=False):
+# significance, or DLLR, the longer formula which becomes s/sqrt(b) in the limit when s/b -> 0
+def significance(s,b,debug=False): 
     if debug:
         print "s",s,"b",b
     if b<0.001:
@@ -963,6 +968,7 @@ def significance(s,b,debug=False):
     return result
 # done function
 
+# significance, or DLLR, the longer formula which becomes s/sqrt(b) in the limit when s/b -> 0
 def significanceError(s,se,b,be,debug=False):
     if debug:
         print "s",s,"se",se,"b",b,"be",be
