@@ -590,7 +590,7 @@ def divideHistograms(h_numerator,h_denominator,debug):
 # done function
 
 # retrieve histogram from file
-def retrieveHistogram(fileName="",histoPath="",histoName="",name="",debug=False):
+def retrieveHistogram(fileName="",histoPath="",histoName="",name="",returnDummyIfNotFound=False,debug=False):
     if debug:
         print "fileName",fileName
         print "histoPath",histoPath
@@ -614,8 +614,12 @@ def retrieveHistogram(fileName="",histoPath="",histoName="",name="",debug=False)
     if debug:
         print "histo",histo,"type(histo)",type(histo)
     if histo==None:
-        print "histo",histoName,"doesn't exist in file",fileName,"at path",histoPath,". We will ABORT!!!!"
-        assert(False)
+        if returnDummyIfNotFound==True:
+            print "WARNING!!!! histo",histoName,"doesn't exist in file",fileName,"at path",histoPath,". We will return a string called dummy!!!"
+            return "dummy" # return a dummy string
+        else:
+            print "histo",histoName,"doesn't exist in file",fileName,"at path",histoPath,". We will ABORT!!!!"
+            assert(False)
     if name!="":
         histo.SetName(name)
         histo.SetTitle(name)
