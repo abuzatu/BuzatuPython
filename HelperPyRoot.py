@@ -4,7 +4,7 @@
 
 from HelperPython import *#import math
 import ROOT
-from ROOT import TLatex,TPad,TList,TH1,TH1F,TH2F,TH1D,TH2D,TFile,TTree,TChain,TCanvas,TLegend,SetOwnership,gDirectory,TObject,gStyle,gROOT,TLorentzVector,TGraph,TMultiGraph,TColor,TAttMarker,TLine,TDatime,TGaxis,TF1,THStack,TAxis,TStyle,TPaveText,TAttFill,TCutG,TMath
+from ROOT import TLatex,TPad,TList,TH1,TH1F,TH2F,TH1D,TH2D,TFile,TTree,TChain,TCanvas,TLegend,SetOwnership,gDirectory,TObject,gStyle,gROOT,TLorentzVector,TGraph,TMultiGraph,TColor,TAttMarker,TLine,TDatime,TGaxis,TF1,THStack,TAxis,TStyle,TPaveText,TAttFill,TCutG,TMath,TNamed
 
 #list_color=[1,2,4,3,6,ROOT.kOrange,6,7,8,9,14,29,38,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
 list_color=[7,1,4,2,3,12,9,14,29,38,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
@@ -1231,15 +1231,20 @@ def get_histo_smoothed(h,debug):
     return result
 # done
 
-def getBinValues(histo,debug):
+def getBinValues(histo,doRescaleMeVtoGeV=False,debug=False):
+    print "Printing bin values for histogram of name",histo.GetName(),":"
     list_value=[]
     list_line=[]
     list_binInfo=[]
     # loop over each bin and for each bin write the cross section on a different line
     for i in xrange(histo.GetNbinsX()+2):
         binContent=histo.GetBinContent(i)
-        binLowEdge=histo.GetBinLowEdge(i)*0.001 # MeV to GeV
-        binWidth=histo.GetBinWidth(i)*0.001     # MeV to GeV
+        binLowEdge=histo.GetBinLowEdge(i)
+        if doRescaleMeVtoGeV:
+            binLowEdge*=0.001 # MeV to GeV
+        binWidth=histo.GetBinWidth(i)
+        if doRescaleMeVtoGeV:
+            binWidth*=0.001 # MeV to GeV
         binHighEdge=binLowEdge+binWidth
         binIntegral=binContent#*binWidth
         binError=histo.GetBinError(i)
