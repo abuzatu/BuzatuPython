@@ -758,12 +758,21 @@ def get_median_histogram(h,debug):
 
 
 # ex: fit_hist(h,"None",False,"","canvasname",false)
-def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValidationPlot=True,canvasname="canvasname",debug=False):
+def fit_hist(h=TH1F(),fitRange=[-1,-1],fit="None",addMedianInFitInfo=False,plot_option="",doValidationPlot=True,canvasname="canvasname",debug=False):
     if debug:
         print "Start fit_hist"
         print "h",type(h),h
+        print "fitRange",fitRange
         print "fit",fit
         print "plot_option",plot_option
+    if fitRange[0]==-1 and fitRange[1]==-1 or fitRange[1]<fitRange[0]:
+        fitRangeDefault=True
+    else:
+        fitRangeDefault=False
+        xmin=fitRange[0]
+        xmax=fitRange[1]
+    #
+
     if doValidationPlot:
         ROOT.gStyle.SetOptFit(1011)
         c=TCanvas("c","c",800,600)
@@ -792,8 +801,9 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
         None
     elif fit=="Sigmoid":
         if True:
-            xmin=20
-            xmax=300
+            if fitRangeDefault==True:
+                xmin=20
+                xmax=300
             function=TF1("sigmoid",Sigmoid(),xmin,xmax,2)
             h.Fit("sigmoid","RQ",plot_option+"same",xmin,xmax)
             f=h.GetFunction("sigmoid")
@@ -807,8 +817,9 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
             None
     elif fit=="Linear":
         if True:
-            xmin=20
-            xmax=300
+            if fitRangeDefault==True:
+                xmin=30
+                xmax=230
             function=TF1("linear",Linear(),xmin,xmax,2)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -824,8 +835,9 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
             None
     elif fit=="Parabolic":
         if True:
-            xmin=20
-            xmax=300
+            if fitRangeDefault==True:
+                xmin=20
+                xmax=300
             function=TF1("parabolic",Parabolic(),xmin,xmax,3)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -842,8 +854,9 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
             None
     elif "pol" in fit:
         if True:
-            xmin=20
-            xmax=300
+            if fitRangeDefault==True:
+                xmin=20
+                xmax=300
             h.Fit(fit,"Q",plot_option+"same",xmin,xmax)
             f=h.GetFunction(fit)
             if addMedianInFitInfo==True:
@@ -856,8 +869,9 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
             None
     elif fit=="Polynomial3":
         if True:
-            xmin=20
-            xmax=300
+            if fitRangeDefault==True:
+                xmin=20
+                xmax=300
             function=TF1("polynomial3",Polynomial3(),xmin,xmax,4)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -875,8 +889,9 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
             None
     elif fit=="Polynomial4":
         if True:
-            xmin=20
-            xmax=300
+            if fitRangeDefault==True:
+                xmin=20
+                xmax=300
             function=TF1("polynomial4",Polynomial4(),xmin,xmax,5)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -895,8 +910,9 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
             None
     elif fit=="Polynomial5":
         if True:
-            xmin=20
-            xmax=300
+            if fitRangeDefault==True:
+                xmin=20
+                xmax=300
             function=TF1("polynomial5",Polynomial5(),xmin,xmax,6)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -916,8 +932,9 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
             None
     elif fit=="Polynomial6":
         if True:
-            xmin=20
-            xmax=300
+            if fitRangeDefault==True:
+                xmin=20
+                xmax=300
             function=TF1("polynomial6",Polynomial6(),xmin,xmax,7)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -938,8 +955,9 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
             None
     elif fit=="Gauss":
         if entries>cutnentries and rms>0.02:
-            xmin=mean-2*rms
-            xmax=mean+2*rms
+            if fitRangeDefault==True:
+                xmin=mean-2*rms
+                xmax=mean+2*rms
             function=TF1("gauss",Gauss(),xmin,xmax,3)
             function.SetParName(0,"height")
             function.SetParName(1,"mean")
@@ -963,8 +981,9 @@ def fit_hist(h=TH1F(),fit="None",addMedianInFitInfo=False,plot_option="",doValid
         if entries>cutnentries and rms>0.02:
             if debug:
                 print "we do the fit, as entries>cutnentries and rms>0.02"
-            xmin=mean-3*rms
-            xmax=mean+3*rms
+            if fitRangeDefault==True:
+                xmin=mean-3*rms
+                xmax=mean+3*rms
             # hack for Mbb mass fit like Manuel between 20 and 200
             #xmin=70.0
             #xmax=145.0
