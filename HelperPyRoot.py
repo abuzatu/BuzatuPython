@@ -778,6 +778,11 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
         c=TCanvas("c","c",800,600)
         h.Draw()
     #SetOwnership(h,0)
+    if debug:
+        print "****************** Start getBinvalues in fit ************"
+        print "GetEntries",h.GetEntries()
+        getBinValues(h,doRescaleMeVtoGeV=False,debug=debug)
+        print "****************** End getBinvalues in fit ************"
     entries=h.GetEntries()
     height=h.GetMaximum()
     mean=h.GetMean()
@@ -816,7 +821,8 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
         else:
             None
     elif fit=="Linear":
-        if entries>cutnentries and rms>0.02:
+        #if entries>cutnentries and rms>0.02:
+        if rms>0.02:
             if debug:
                 print "we do the fit, as entries>cutnentries and rms>0.02"
             if fitRangeDefault==True:
@@ -834,6 +840,7 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             f.SetLineColor(color)
             f.Draw("SAME")
         else:
+            print "WARNING! No fit done, as entries=",entries,"rms=",rms
             None
     elif fit=="Parabolic":
         if True:
@@ -2693,6 +2700,35 @@ def get_histo_integral_error(histo,myrange=0,debug=False):
     if debug:
         print "integral +- error: %-.3f +- %-.3f" % (integral,error)
     return (integral,error)
+# done function
+
+def isHistoConsitentWithOne(histo,debug=False):
+    result=False
+    counterNonZeroBins=0
+    counterNonZeroBinsConsistentWithOne=0
+    # if consider consider underflow and overflow
+    # for i in xrange(histo.GetNbinsX()+2):
+    # do not consider underflow and overflow
+    for i in xrange(1,histo.GetNbinsX()+1):
+        if debug:
+            print "bin ",i
+        content=histo.GetBinContent(i)
+        error=histo.GetBinError(i)
+        if debug:
+            print "bin",i,"content +/- error",content,"+/-",error
+        if content<=0:
+            continue
+        counterNonZeroBins+=1
+        if content-error<=1.0<=content+error:
+            #bin consistent with one
+            counterNonZeroBinsConsistentWithOne+=1
+    # done loop over bins
+    fractionOfBinsConsistentWithOne=ratio(float(counterNonZeroBinsConsistentWithOne),float(counterNonZeroBins))
+    if fractionOfBinsConsistentWithOne>0.6666:
+        result=True
+    if True:
+        print "statisticallyConsistentWithOne",result,"fractionOfBinsConsistentWithOne",fractionOfBinsConsistentWithOne,"counterNonZeroBinsConsistentWithOne",counterNonZeroBinsConsistentWithOne,"counterNonZeroBins",counterNonZeroBins
+    return result
 # done function
 
 def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,WhatToCompute="sensitivity",debug=False):
