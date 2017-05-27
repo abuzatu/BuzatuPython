@@ -2690,12 +2690,39 @@ def resize_h1D(old,new_xmin,new_xmax,new_bin_width,debug):
     return new
 # done function
 
-def get_histo_integral_error(histo,myrange=0,debug=False):
-    if myrange==0:
-        myrange=[0,histo.GetNbinsX()+2]
+def do_error_myRange(myRange):
+    print "Range",myRange,"not in a good format to calculate integral with errors. Will ABORT!!!"
+    assert(False)
+# done function
+
+def get_histo_integral_error(histo,myRange=-1,debug=False):
+    if myRange==-1:
+        myRange=[0,histo.GetNbinsX()+2]
+    elif myRange==0:
+        myRange=[1,histo.GetNbinsX()+1]
+    else:
+        # check if it is in a good format
+        if isinstance(myRange, list)==False:
+            do_error_myRange(myRange)
+        # if here, it means we have a list
+        if len(myRange)!=2:
+            do_error_myRange(myRange)
+        # if here, it means lists has two elements
+        if isinstance(myRange[0], int)==False:
+            do_error_myRange(myRange)
+        if isinstance(myRange[1], int)==False:
+            do_error_myRange(myRange)
+        # if here both elements behave like an int
+        if myRange[0]<0 or myRange[1]>histo.GetNbinsX()+2 or myRange[0]>myRange[1]:
+            do_error_myRange(myRange)
+        # if here both elements are within the allowed range 0 through N+2
+        # and the first is smaller or equal to the second
+        # so we are good to go
+        None
+    # range is good and defined, we can move on
     array_error=array("d",[0])
     option=""
-    integral=histo.IntegralAndError(myrange[0],myrange[1],array_error,option)
+    integral=histo.IntegralAndError(myRange[0],myRange[1],array_error,option)
     error=array_error[0]
     if debug:
         print "integral +- error: %-.3f +- %-.3f" % (integral,error)
@@ -2726,7 +2753,7 @@ def isHistoConsitentWithOne(histo,debug=False):
     fractionOfBinsConsistentWithOne=ratio(float(counterNonZeroBinsConsistentWithOne),float(counterNonZeroBins))
     if fractionOfBinsConsistentWithOne>0.6666:
         result=True
-    if True:
+    if debug:
         print "statisticallyConsistentWithOne",result,"fractionOfBinsConsistentWithOne",fractionOfBinsConsistentWithOne,"counterNonZeroBinsConsistentWithOne",counterNonZeroBinsConsistentWithOne,"counterNonZeroBins",counterNonZeroBins
     return result
 # done function
@@ -2792,8 +2819,8 @@ def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,Wh
             print "We will not add AddInQuadrature, so add bins one by one"
         S=h_S.Integral(*myrange)
         B=h_B.Integral(*myrange)
-        S,errS=get_histo_integral_error(h_S,0,debug)
-        B,errB=get_histo_integral_error(h_B,0,debug)
+        S,errS=get_histo_integral_error(h_S,myRange=-1,debug=debug)
+        B,errB=get_histo_integral_error(h_B,myRange=-1,debug=debug)
         if WhatToCompute=="signaloverbackground":
             total,error=ratioError(S,errS,B,errB)
         elif WhatToCompute=="sensitivity":
