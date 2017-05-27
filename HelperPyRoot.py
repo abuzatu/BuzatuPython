@@ -1246,6 +1246,64 @@ def get_histo_subRange(h,subRange,debug=False):
     return h_subRange
 # done
 
+def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False):
+    if option!="sum" and option!="average":
+        print "option",option,"not known. Choose sum, average. Will ABORT!!!"
+        assert(False)
+    # evaluate the desired binning
+    nparray_binRange=get_numpyarray_from_listString(binRange.split(","),debug)
+    if debug:
+        print "nparray_binRange",nparray_binRange
+    histoName=h.GetName()
+    histoTitle=h.GetTitle()
+    histoNrBins=len(nparray_binRange)-1
+    if debug:
+        print "histoName",histoName,"histoTitle",histoTitle,"histoNrBins",histoNrBins
+    # create a histogram with this binning
+    result=TH1F(histoName,histoTitle,histoNrBins, nparray_binRange)
+    # loop over each bin of the new histogram
+    for i in xrange(1,result.GetNbinsX()+1):
+        low=result.GetBinLowEdge(i)
+        width=result.GetBinWidth(i)
+        high=low+width
+        if debug:
+            print "bin", i,"low",low,"high",high
+        # find all the bins of the initial histogram that are between low and high
+        # and then sum them together and calculate their combined statistical error
+        # and set them here
+        value=0.0
+        error_squared=0.0
+        for j in xrange(1,h.GetNbinsX()+1):
+            current_low=h.GetBinLowEdge(j)
+            current_width=h.GetBinWidth(j)
+            current_high=current_low+current_width
+            # skip the bins that not in our range
+            if current_high<=low or current_low>=high:
+                continue                
+            current_value=h.GetBinContent(j)
+            current_error=h.GetBinError(j)
+            if debug:
+                print "bin initial histogram", j,"current_low",current_low,"current_high",current_high,"value",current_value,"error",current_error
+            value+=current_value
+            # error propagation: error of on bin is the sqrt of sum of weights
+            # https://root.cern.ch/doc/master/classTH1.html Associated errors Sumw2
+            error_squared+=current_error*current_error
+        # done loop over the bins of the initial histogram
+        # we need the average value, so divide by the bin width
+        error=math.sqrt(error_squared)
+        if option=="average":
+            value/=width
+            error/=width
+        elif option=="sum":
+            None
+        # set the value and error of our histogram
+        result.SetBinContent(i,value)
+        result.SetBinError(i,error)
+    # all done
+    getBinValues(result,doRescaleMeVtoGeV=False,debug=debug)
+    return result
+# done function
+
 def get_histo_smoothed(h,debug):
     #for i in xrange(h.GetNbinsX()+1):
     result=h.Clone()
@@ -1260,7 +1318,8 @@ def get_histo_smoothed(h,debug):
 # done
 
 def getBinValues(histo,doRescaleMeVtoGeV=False,debug=False):
-    print "Printing bin values for histogram of name",histo.GetName(),":"
+    if debug:
+        print "Printing bin values for histogram of name",histo.GetName(),":"
     list_value=[]
     list_line=[]
     list_binInfo=[]
@@ -1388,7 +1447,7 @@ def get_interpolated_graph_for_histo(h,debug):
 # for statistical error band
 # code example: https://www.desy.de/~stanescu/my-tmp/plotUpDownSys.C
 # its plot:https://www.desy.de/~stanescu/my-tmp/AFII/Nom-Up-Down-A500-tb050/jes1_h_ttbar_chi2_m_inc_res_mu.png
-def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=True,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=True,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=False,min_value_ratio=-1,max_value_ratio=-1,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",legend_info=[0.60,0.50,0.88,0.72,72,0.037,0],plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{b-tagged jet}",0.04,13,0.60,0.88,0.05),line_option=([0,0.5,1,0.5],2),debug=False):
+def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",legend_info=[0.60,0.50,0.88,0.72,72,0.037,0],plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{Hinv analysis}",0.04,13,0.60,0.88,0.05),line_option=([0,0.5,0,0.5],2),debug=False):
     if debug:
         print "Start overlayHistograms(...)"
         print "option",option
