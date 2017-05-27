@@ -758,7 +758,7 @@ def get_median_histogram(h,debug):
 
 
 # ex: fit_hist(h,"None",False,"","canvasname",false)
-def fit_hist(h=TH1F(),fitRange=[-1,-1],fit="None",addMedianInFitInfo=False,plot_option="",doValidationPlot=True,canvasname="canvasname",debug=False):
+def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedianInFitInfo=False,plot_option="",doValidationPlot=True,canvasname="canvasname",debug=False):
     if debug:
         print "Start fit_hist"
         print "h",type(h),h
@@ -788,7 +788,7 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],fit="None",addMedianInFitInfo=False,plot_
         result=((median,0.0),(height,0.0),(mean,0.0),(rms,0.0))
     else:
          result=((0.0,0.0),(height,0.0),(mean,0.0),(rms,0.0))
-    f=TF1()
+    f=defaultFunction
     if debug:
         print "initially as dummy values"
         print "entries",entries
@@ -816,7 +816,9 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],fit="None",addMedianInFitInfo=False,plot_
         else:
             None
     elif fit=="Linear":
-        if True:
+        if entries>cutnentries and rms>0.02:
+            if debug:
+                print "we do the fit, as entries>cutnentries and rms>0.02"
             if fitRangeDefault==True:
                 xmin=30
                 xmax=230
