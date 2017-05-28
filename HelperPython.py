@@ -914,8 +914,8 @@ def ratioError(s,se,b,be,debug=False):
     if -0.0001<b<0.0001:
         if True:
             print "WARNING! -0.0001<b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
-        result=0
-        error=0
+        result=0.0
+        error=0.0
     else:
         result=s/b
         #error1=result*math.sqrt(math.pow(se/s,2)+math.pow(be/b,2))
@@ -932,7 +932,7 @@ def sensitivity(s,b,debug=False):
     if b<0.0001:
         if True:
             print "WARNING! b<0.0001, returning result 0! s=",str(s)," b=",str(b) 
-        result=0
+        result=0.0
     else:
         result=s/math.sqrt(b)
     return result
@@ -963,9 +963,9 @@ def sensitivityError(s,se,b,be,debug=False):
 # done function
 
 # sensitivity, or s over sqrt(b+be*be)
-def sensitivityErrorSigmaB(s,se,b,be,debug=False):
+def sensitivitySigmaB(s,se,b,be,debug=False):
     if debug:
-        print "sensitivityErrorSigmaB ","s",s,"se",se,"b",b,"be",be
+        print "sensitivitySigmaB ","s",s,"se",se,"b",b,"be",be
     if b<0.0001:
         if True:
             print "WARNING! b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
@@ -1025,13 +1025,61 @@ def significanceError(s,se,b,be,debug=False):
             # slide 39 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
             # for s<<b, it reduced to s/sqrt(b)
             result=math.sqrt(2.0*((s+b)*math.log(1.0+1.0*s/b)-s))
-            dfds=math.log(1.0+1.0*s/b)*math.pow((s+b)*math.log(1.0+1.0*s/b)-s,3.0/2.0)
+            # error formula works only if dfds<<se and dfdb<<sb, otherwise get very large value
+            # so return an error of zero
+            error=0.0
+            #dfds=math.log(1.0+1.0*s/b)*math.pow((s+b)*math.log(1.0+1.0*s/b)-s,3.0/2.0)
+            #if debug:
+            #    print "dfds",dfds
+            #dfdb=(1.0*s/b+math.log(1.0+1.0*s/b))*math.pow((s+b)*math.log(1.0+1.0*s/b)-s,3.0/2.0)
+            #if debug:
+            #    print "dfdb",dfdb
+            #error=math.sqrt(math.pow(dfds,2)*math.pow(se,2)+math.pow(dfdb,2)*math.pow(be,2))
+    if debug:
+        print "significance","content +/-error","%-.5f +/- %-.5f" % (result,error) 
+    return (result,error)
+# done function
+
+# significance, or DLLR, the longer formula which becomes s/sqrt(b+be*be) in the limit when s/b -> 0 and when be*be/b -> 0
+def significanceSigmaB(s,se,b,be,debug=False):
+    if debug:
+        print "significanceSigmaB","s",s,"se",se,"b",b,"be",be,"s/b",s/b,"be*be/b",be*be/b
+    if b<0.001:
+        result=0
+        error=0
+        if True:
+            print "WARNING! b<0.001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
+    else:
+        # for very low numbers, the sensitivity is a very good approximation
+        # of the significance, but the code runs out of digits and approximates
+        # the log(1+s/b) with zero, which makes it have negative values 
+        # under the square root and then it crashes
+        if s/b<0.000001:
+            if True:
+                print "WARNING! s/b<0.000001, returning sensitivityErrorSigmaB s=",str(s)," b=",str(b),"s/b",str(s/b) 
+            (result,error)=sensitivitySigmaB(s,se,b,be,debug) # sensitivity
+        else:
+            # slide 45 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
+            # for s<<b and be*be<<b, it reduced to s/sqrt(b+be*be)
+            #result2=math.sqrt(2.0*((s+b)*math.log(((s+b)*(b+be*be))/(b*b+(s+b)*(be*be)))-((b*b)/(be*be))*math.log(1.0+(be*be*s)/(b*(b+be*be)))))
+            #if debug:
+            #    print "result2",result2
+            # result 2 has the same shape as below, where the terms are separate
+            x=s/b
+            y=be*be/b
             if debug:
-                print "dfds",dfds
-            dfdb=(1.0*s/b+math.log(1.0+1.0*s/b))*math.pow((s+b)*math.log(1.0+1.0*s/b)-s,3.0/2.0)
+                print "x",x,"y",y
+            alpha=(1.0+x)*math.log((1.0+x)*(1.0+y)/(1.0+(1.0+x)*y))
             if debug:
-                print "dfdb",dfdb
-            error=math.sqrt(math.pow(dfds,2)*math.pow(se,2)+math.pow(dfdb,2)*math.pow(be,2))
+                print "alpha",alpha
+            beta=(1.0/y)*math.log(1.0+x*y/(1.0+y))
+            if debug:
+                print "beta",beta
+            result=math.sqrt(2.0*b*(alpha-beta))
+            if debug:
+                print "result",result
+            # trial and error has shown that the signal error on the ratio is the same percentage than the signal error
+            error=result*ratio(se,s)
     if debug:
         print "significance","content +/-error","%-.5f +/- %-.5f" % (result,error) 
     return (result,error)

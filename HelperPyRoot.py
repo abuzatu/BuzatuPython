@@ -2851,16 +2851,33 @@ def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,Wh
             errB=h_B.GetBinError(i)
             if debug:
                 print "i",i,"S +- errS","%-.5f +- %-5f" % (S,errS),"B +- errB","%-.5f +- %-.5f" % (B,errB)
-            if WhatToCompute=="signaloverbackground":
-                currentContent,currentError=ratioError(S,errS,B,errB,debug=True)
-            elif WhatToCompute=="sensitivity":
-                currentContent,currentError=sensitivityError(S,errS,B,errB,debug=True)
-            elif WhatToCompute=="sensitivitySigmaB":
-                currentContent,currentError=sensitivityErrorSigmaB(S,errS,B,errB,debug=True)
-            elif WhatToCompute=="significance":
-                currentContent,currentError=significanceError(S,errS,B,errB,debug=True)
+            if WhatToCompute=="SignalOverBackground":
+                currentContent=ratio(S,B,debug=debug)
+                currentError=0.0
+            elif WhatToCompute=="SignalOverBackgroundError":
+                currentContent,currentError=ratioError(S,errS,B,errB,debug=debug)
+            elif WhatToCompute=="Sensitivity":
+                currentContent=sensitivity(S,B,debug=debug)
+                currentError=0.0
+            elif WhatToCompute=="SensitivityError":
+                currentContent,currentError=sensitivityError(S,errS,B,errB,debug=debug)
+            elif WhatToCompute=="SensitivitySigmaB":
+                currentContent,currentError=sensitivitySigmaB(S,errS,B,errB,debug=debug)
+                currentContentHi,currentErrorHi=sensitivitySigmaB(S+errS,errS,B,errB,debug=debug)
+                currentContentLo,currentErrorLo=sensitivitySigmaB(S-errS,errS,B,errB,debug=debug)
+                print "currentContent",currentContent,"currentContentHi",currentContentHi,"currentContentLo",currentContentLo
+            elif WhatToCompute=="Significance":
+                currentContent=significance(S,B,debug=debug)
+                currentError=0.0
+            elif WhatToCompute=="SignificanceError":
+                currentContent,currentError=significanceError(S,errS,B,errB,debug=debug)
+            elif WhatToCompute=="SignificanceSigmaB":
+                currentContent,currentError=significanceSigmaB(S,errS,B,errB,debug=debug)
+                #currentContentHi,currentErrorHi=significanceSigmaB(S+errS,errS,B,errB,debug=debug)
+                #currentContentLo,currentErrorLo=significanceSigmaB(S-errS,errS,B,errB,debug=debug)
+                #print "currentContent",currentContent,"currentContentHi",currentContentHi,"currentContentLo",currentContentLo
             else:
-                print "WhatToCompute",WhatToCompute,"now known. Choose between signaloverbackground, sensitivity, sensitivitySigmaB, significance. Will ABORT!!!"
+                print "WhatToCompute",WhatToCompute,"not known! Choose between SignalOverBackground, Sensitivity, SensitivityError, SensitivityErrorSigmaB, Significance, SignificanceError, SignificanceErrorSigmaB. Will ABORT!!!"
                 assert(False)
             if debug:
                 print "currentContent +/- currentError", "%-.5f +- %-.5f" % (currentContent,currentError)
