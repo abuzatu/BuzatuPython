@@ -1216,7 +1216,9 @@ def get_histo_subRange(h,subRange,debug=False):
         if debug:
             print i, low,high,value,error
     # done for loop
-    h_subRange=TH1F(h.GetName()+"_",h.GetTitle(),counter,xmin,xmax)
+    # make string from xrange
+    stringSubRange=str(xmin)+"_"+str(xmax)
+    h_subRange=TH1F(h.GetName()+"_"+stringSubRange,h.GetTitle()+"_"+stringSubRange,counter,xmin,xmax)
     #
     counter=0
     if debug:

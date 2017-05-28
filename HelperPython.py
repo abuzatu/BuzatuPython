@@ -928,7 +928,7 @@ def ratioError(s,se,b,be,debug=False):
 # sensitivity, or s over sqrt(b)
 def sensitivity(s,se,b,be,debug=False):
     if debug:
-        print "sensitivityError ","s",s,"se",se,"b",b,"be",be
+        print "sensitivity ","s",s,"se",se,"b",b,"be",be
     if b<0.0001:
         if True:
             print "WARNING! b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
@@ -973,7 +973,7 @@ def sensitivitySigmaB(s,se,b,be,debug=False):
 # significance, or DLLR, the longer formula which becomes s/sqrt(b) in the limit when s/b -> 0
 def significance(s,se,b,be,debug=False):
     if debug:
-        print "significanceError","s",s,"se",se,"b",b,"be",be
+        print "significance","s",s,"se",se,"b",b,"be",be
     if b<0.001:
         result=0
         error=0
@@ -986,8 +986,8 @@ def significance(s,se,b,be,debug=False):
         # under the square root and then it crashes
         if s/b<0.000001:
             if True:
-                print "WARNING! s/b<0.000001, returning sensitivityError s=",str(s)," b=",str(b),"s/b",str(s/b) 
-            (result,error)=sensitivityError(s,se,b,be,debug) # sensitivity
+                print "WARNING! s/b<0.000001, returning sensitivity s=",str(s)," b=",str(b),"s/b",str(s/b) 
+            (result,error)=sensitivity(s,se,b,be,debug) # sensitivity
         else:
             # slide 39 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
             # for s<<b, it reduced to s/sqrt(b)
@@ -1028,7 +1028,7 @@ def significanceSigmaB(s,se,b,be,debug=False):
         # under the square root and then it crashes
         if s/b<0.0000001:
             if True:
-                print "WARNING! s/b<0.000001, returning sensitivityErrorSigmaB s=",str(s)," b=",str(b),"s/b",str(s/b) 
+                print "WARNING! s/b<0.000001, returning sensitivitySigmaB s=",str(s)," b=",str(b),"s/b",str(s/b) 
             (result,error)=sensitivitySigmaB(s,se,b,be,debug) # sensitivity
         else:
             # slide 45 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
