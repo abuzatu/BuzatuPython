@@ -1335,7 +1335,7 @@ def getBinValues(histo,doRescaleMeVtoGeV=False,debug=False):
         binHighEdge=binLowEdge+binWidth
         binIntegral=binContent#*binWidth
         binError=histo.GetBinError(i)
-        line="bin number %.0f bin values [%.1f,%.1f] bin content %.4f bin integral %.4f bin error %.4f" % (i,binLowEdge,binHighEdge,binContent,binIntegral,binError)
+        line="bin number %.0f bin values [%.1f,%.1f] bin content %.4f bin integral %.8f bin error %.8f" % (i,binLowEdge,binHighEdge,binContent,binIntegral,binError)
         if debug:
             print "line",line
         list_line.append(line)
@@ -2817,9 +2817,9 @@ def isHistoConsitentWithOne(histo,debug=False):
     return result
 # done function
 
-def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,WhatToCompute="sensitivity",debug=False):
+def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,WhatToCompute="sensitivity",output=True,debug=False):
     if debug:
-        print "Start computeSB()"
+        print "Start computeSB() with IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins,"AddInQuadrature",AddInQuadrature,"WhatToCompute",WhatToCompute,"output",output
         print "h_S",type(h_S), h_S
         print "h_B",type(h_B), h_B
     NbinsX=h_S.GetNbinsX()
@@ -2852,14 +2852,18 @@ def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,Wh
             if debug:
                 print "i",i,"S +- errS","%-.5f +- %-5f" % (S,errS),"B +- errB","%-.5f +- %-.5f" % (B,errB)
             if WhatToCompute=="signaloverbackground":
-                currentContent,currentError=ratioError(S,errS,B,errB)
+                currentContent,currentError=ratioError(S,errS,B,errB,debug=True)
             elif WhatToCompute=="sensitivity":
-                currentContent,currentError=sensitivityError(S,errS,B,errB)
+                currentContent,currentError=sensitivityError(S,errS,B,errB,debug=True)
+            elif WhatToCompute=="sensitivitySigmaB":
+                currentContent,currentError=sensitivityErrorSigmaB(S,errS,B,errB,debug=True)
             elif WhatToCompute=="significance":
-                currentContent,currentError=significanceError(S,errS,B,errB)
+                currentContent,currentError=significanceError(S,errS,B,errB,debug=True)
             else:
-                print "WhatToCompute",WhatToCompute,"now known. Choose between signaloverbackground, sensitivity, significance. Will ABORT!!!"
+                print "WhatToCompute",WhatToCompute,"now known. Choose between signaloverbackground, sensitivity, sensitivitySigmaB, significance. Will ABORT!!!"
                 assert(False)
+            if debug:
+                print "currentContent +/- currentError", "%-.5f +- %-.5f" % (currentContent,currentError)
             # done if on WhatToCompute
             # add in quadrature
             totalContent_squared+=currentContent*currentContent
@@ -2892,7 +2896,8 @@ def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,Wh
         # done if on WhatToCompute
     # done if AddInQuadrature, so let's write the total
     # which was able to be computed in two ways
-    print "IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins,"AddInQuadrature",AddInQuadrature,"WhatToCompute",WhatToCompute,"%-.4f +- %-.4f" % (total,error)
+    if output:
+        print "IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins,"AddInQuadrature",AddInQuadrature,"WhatToCompute",WhatToCompute,"%-.4f +- %-.4f" % (total,error)
     return total,error
 # done function
 

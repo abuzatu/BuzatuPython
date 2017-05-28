@@ -894,8 +894,10 @@ def get_string_scale_resolution(fit_name,scale_value,resolution_value):
 # ratio, or s/b
 def ratio(s,b,debug=False):
     if debug:
-        print "s",s,"b",b
+        print "ratio","s",s,"b",b
     if -0.00001<b<0.00001:
+        if True:
+            print "WARNING! -0.0001<b<0.0001, returning result 0! s=",str(s)," b=",str(b) 
         result=0
     else:
         result=s/b
@@ -908,8 +910,10 @@ def ratio(s,b,debug=False):
 # ratio or s/b
 def ratioError(s,se,b,be,debug=False):
     if debug:
-        print "s",s,"se",se,"b",b,"be",be
+        print "ratioError","s",s,"se",se,"b",b,"be",be
     if -0.0001<b<0.0001:
+        if True:
+            print "WARNING! -0.0001<b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
         result=0
         error=0
     else:
@@ -924,8 +928,10 @@ def ratioError(s,se,b,be,debug=False):
 # sensitivity, or s over sqrt(b)
 def sensitivity(s,b,debug=False):
     if debug:
-        print "s",s,"b",b
+        print "sensitivity","s",s,"b",b
     if b<0.0001:
+        if True:
+            print "WARNING! b<0.0001, returning result 0! s=",str(s)," b=",str(b) 
         result=0
     else:
         result=s/math.sqrt(b)
@@ -935,31 +941,60 @@ def sensitivity(s,b,debug=False):
 # sensitivity, or s over sqrt(b)
 def sensitivityError(s,se,b,be,debug=False):
     if debug:
-        print "s",s,"se",se,"b",b,"be",be
+        print "sensitivityError ","s",s,"se",se,"b",b,"be",be
     if b<0.0001:
+        if True:
+            print "WARNING! b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
         result=0
         error=0
     else:
         result=s/math.sqrt(b)
-        #error1=result*math.sqrt( math.pow(se/s,2)+math.pow(-0.5*be/b,2) )
+        #error=result*math.sqrt( math.pow(se/s,2)+math.pow(-0.5*be/b,2) )
         dfds=1.0/math.sqrt(b)
+        if debug:
+            print "dfds",dfds
         dfdb=-s/(2.0*math.pow(b,3.0/2.0))
+        if debug:
+            print "dfdb",dfdb
         error=math.sqrt(math.pow(dfds,2)*math.pow(se,2)+math.pow(dfdb,2)*math.pow(be,2))
+    if debug:
+        print "sensitivity ","content +/-error","%-.5f +/- %-.5f" % (result,error) 
+    return (result,error)
+# done function
+
+# sensitivity, or s over sqrt(b+be*be)
+def sensitivityErrorSigmaB(s,se,b,be,debug=False):
+    if debug:
+        print "sensitivityErrorSigmaB ","s",s,"se",se,"b",b,"be",be
+    if b<0.0001:
+        if True:
+            print "WARNING! b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
+        result=0
+        error=0
+    else:
+        result=s/math.sqrt(b+be*be)
+        error=0 # not sure how to calculate the error in this case
+    if debug:
+        print "sensitivity ","content +/-error","%-.5f +/- %-.5f" % (result,error) 
     return (result,error)
 # done function
 
 # significance, or DLLR, the longer formula which becomes s/sqrt(b) in the limit when s/b -> 0
 def significance(s,b,debug=False): 
     if debug:
-        print "s",s,"b",b
+        print "signifiance","s",s,"b",b
     if b<0.001:
         result=0
+        if True:
+            print "WARNING! b<0.001, returning result 0! s=",str(s)," b=",str(b) 
     else:
         # for very low numbers, the sensitivity is a very good approximation
         # of the significance, but the code runs out of digits and approximates
         # the log(1+s/b) with zero, which makes it have negative values 
         # under the square root and then it crashes
         if s/b<0.000001:
+            if True:
+                print "WARNING! s/b<0.000001, returning sensitivity s=",str(s)," b=",str(b),"s/b",str(s/b) 
             result=sensitivity(s,b,debug) # sensitivity
         else:
             # slide 39 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
@@ -971,24 +1006,34 @@ def significance(s,b,debug=False):
 # significance, or DLLR, the longer formula which becomes s/sqrt(b) in the limit when s/b -> 0
 def significanceError(s,se,b,be,debug=False):
     if debug:
-        print "s",s,"se",se,"b",b,"be",be
+        print "significanceError","s",s,"se",se,"b",b,"be",be
     if b<0.001:
         result=0
         error=0
+        if True:
+            print "WARNING! b<0.001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
     else:
         # for very low numbers, the sensitivity is a very good approximation
         # of the significance, but the code runs out of digits and approximates
         # the log(1+s/b) with zero, which makes it have negative values 
         # under the square root and then it crashes
         if s/b<0.000001:
+            if True:
+                print "WARNING! s/b<0.000001, returning sensitivityError s=",str(s)," b=",str(b),"s/b",str(s/b) 
             (result,error)=sensitivityError(s,se,b,be,debug) # sensitivity
         else:
             # slide 39 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
             # for s<<b, it reduced to s/sqrt(b)
             result=math.sqrt(2.0*((s+b)*math.log(1.0+1.0*s/b)-s))
             dfds=math.log(1.0+1.0*s/b)*math.pow((s+b)*math.log(1.0+1.0*s/b)-s,3.0/2.0)
+            if debug:
+                print "dfds",dfds
             dfdb=(1.0*s/b+math.log(1.0+1.0*s/b))*math.pow((s+b)*math.log(1.0+1.0*s/b)-s,3.0/2.0)
+            if debug:
+                print "dfdb",dfdb
             error=math.sqrt(math.pow(dfds,2)*math.pow(se,2)+math.pow(dfdb,2)*math.pow(be,2))
+    if debug:
+        print "significance","content +/-error","%-.5f +/- %-.5f" % (result,error) 
     return (result,error)
 # done function
 
