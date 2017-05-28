@@ -926,20 +926,7 @@ def ratioError(s,se,b,be,debug=False):
 # done function
 
 # sensitivity, or s over sqrt(b)
-def sensitivity(s,b,debug=False):
-    if debug:
-        print "sensitivity","s",s,"b",b
-    if b<0.0001:
-        if True:
-            print "WARNING! b<0.0001, returning result 0! s=",str(s)," b=",str(b) 
-        result=0.0
-    else:
-        result=s/math.sqrt(b)
-    return result
-# done function
-
-# sensitivity, or s over sqrt(b)
-def sensitivityError(s,se,b,be,debug=False):
+def sensitivity(s,se,b,be,debug=False):
     if debug:
         print "sensitivityError ","s",s,"se",se,"b",b,"be",be
     if b<0.0001:
@@ -963,6 +950,7 @@ def sensitivityError(s,se,b,be,debug=False):
 # done function
 
 # sensitivity, or s over sqrt(b+be*be)
+# if s<<b, but be*be is not << b
 def sensitivitySigmaB(s,se,b,be,debug=False):
     if debug:
         print "sensitivitySigmaB ","s",s,"se",se,"b",b,"be",be
@@ -973,38 +961,17 @@ def sensitivitySigmaB(s,se,b,be,debug=False):
         error=0
     else:
         result=s/math.sqrt(b+be*be)
-        error=0 # not sure how to calculate the error in this case
+        # trial and error has shown that the signal error on the ratio is the same percentage than the signal error
+        # the two formulas below are equivalent
+        #error=ratio(se,math.sqrt(b+be*be),debug=False)
+        error=result*ratio(se,s,debug=False)
     if debug:
         print "sensitivity ","content +/-error","%-.5f +/- %-.5f" % (result,error) 
     return (result,error)
 # done function
 
 # significance, or DLLR, the longer formula which becomes s/sqrt(b) in the limit when s/b -> 0
-def significance(s,b,debug=False): 
-    if debug:
-        print "signifiance","s",s,"b",b
-    if b<0.001:
-        result=0
-        if True:
-            print "WARNING! b<0.001, returning result 0! s=",str(s)," b=",str(b) 
-    else:
-        # for very low numbers, the sensitivity is a very good approximation
-        # of the significance, but the code runs out of digits and approximates
-        # the log(1+s/b) with zero, which makes it have negative values 
-        # under the square root and then it crashes
-        if s/b<0.000001:
-            if True:
-                print "WARNING! s/b<0.000001, returning sensitivity s=",str(s)," b=",str(b),"s/b",str(s/b) 
-            result=sensitivity(s,b,debug) # sensitivity
-        else:
-            # slide 39 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
-            result=math.sqrt(2*((s+b)*math.log(1+s/b)-s))
-            # for s<<b, it reduced to s/sqrt(b)
-    return result
-# done function
-
-# significance, or DLLR, the longer formula which becomes s/sqrt(b) in the limit when s/b -> 0
-def significanceError(s,se,b,be,debug=False):
+def significance(s,se,b,be,debug=False):
     if debug:
         print "significanceError","s",s,"se",se,"b",b,"be",be
     if b<0.001:
@@ -1040,11 +1007,16 @@ def significanceError(s,se,b,be,debug=False):
     return (result,error)
 # done function
 
-# significance, or DLLR, the longer formula which becomes s/sqrt(b+be*be) in the limit when s/b -> 0 and when be*be/b -> 0
+# the most generic formula as a figure of merit
+# if s/b << 1 it becomes SensitivitySigmaB
+# if be*be<<b it becomes Significance 
+# if be*be<<b, SensitivitySigmaB becomes Sensitivity
+# if s/b <<1, Significance becomes Sensitivity
+# significance the longer formula which becomes s/sqrt(b+be*be) in the limit when s/b -> 0 and when be*be/b -> 0
 def significanceSigmaB(s,se,b,be,debug=False):
     if debug:
         print "significanceSigmaB","s",s,"se",se,"b",b,"be",be,"s/b",s/b,"be*be/b",be*be/b
-    if b<0.001:
+    if b<0.0000001:
         result=0
         error=0
         if True:
@@ -1054,7 +1026,7 @@ def significanceSigmaB(s,se,b,be,debug=False):
         # of the significance, but the code runs out of digits and approximates
         # the log(1+s/b) with zero, which makes it have negative values 
         # under the square root and then it crashes
-        if s/b<0.000001:
+        if s/b<0.0000001:
             if True:
                 print "WARNING! s/b<0.000001, returning sensitivityErrorSigmaB s=",str(s)," b=",str(b),"s/b",str(s/b) 
             (result,error)=sensitivitySigmaB(s,se,b,be,debug) # sensitivity
