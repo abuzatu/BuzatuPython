@@ -6,8 +6,8 @@ from HelperPython import *#import math
 import ROOT
 from ROOT import TLatex,TPad,TList,TH1,TH1F,TH2F,TH1D,TH2D,TFile,TTree,TChain,TCanvas,TLegend,SetOwnership,gDirectory,TObject,gStyle,gROOT,TLorentzVector,TGraph,TMultiGraph,TColor,TAttMarker,TLine,TDatime,TGaxis,TF1,THStack,TAxis,TStyle,TPaveText,TAttFill,TCutG,TMath,TNamed
 
-#list_color=[1,2,4,3,6,ROOT.kOrange,6,7,8,9,14,29,38,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
-list_color=[7,1,4,2,3,12,9,14,29,38,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+list_color=[1,2,4,3,6,ROOT.kOrange,6,7,8,9,14,29,38,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+#list_color=[7,1,4,2,3,12,9,14,29,38,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
 
 # checks if an object exists, useful for checking of a file or tree or histogram is found in a TFile
 # Warning, actually it only checks if the object exists, and not if the file exists or th tree exists
@@ -562,9 +562,13 @@ def medianOfFunction(func,dx):
 def divideHistograms(h_numerator,h_denominator,debug):
     if debug:
         print "Start divideHistograms of h_numerator",h_numerator,"and h_denominator",h_denominator
+        getBinValues(h_numerator,doRescaleMeVtoGeV=False,debug=debug)
+        getBinValues(h_denominator,doRescaleMeVtoGeV=False,debug=debug)
     h_ratio=h_numerator.Clone("h_ratio")
     h_ratio.Reset()
-    for i in xrange(h_ratio.GetNbinsX()+2):
+    #for i in xrange(h_ratio.GetNbinsX()+2):
+    # skip the underflow and overflow which are empty
+    for i in xrange(1,h_ratio.GetNbinsX()+1):
         if debug:
             print "bin",i
         # numerator
@@ -1720,7 +1724,7 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
         #ratio_h1D=list_tuple_h1D[i][0].Clone()
         #ratio_h1D.Divide(reference_h1D)
         # to avoid this, I created my own function, as seen at Madalina Stanescu and Jose Benitez
-        ratio_h1D=divideHistograms(list_tuple_h1D[i][0],list_tuple_h1D[0][0],debug)
+        ratio_h1D=divideHistograms(list_tuple_h1D[i][0],list_tuple_h1D[0][0],debug=debug)
         #getBinValues(ratio_h1D,debug)
         # add ratio_h1D to list of histograms to overlay
         list_tuple_ratio_h1D.append([ratio_h1D,list_tuple_h1D[i][1]])
