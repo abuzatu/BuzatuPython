@@ -1313,7 +1313,7 @@ def get_histo_smoothed(h,debug):
     result.Reset()
     for i in xrange(h.GetNbinsX()+1):
         value=average(h.GetBinContent(i-1),h.GetBinContent(i),h.GetBinContent(i+1))
-        error=sum_in_quadrature(h.GetBinError(i-1),h.GetBinError(i),h.GetBinContent(i+1))
+        error=add_in_quadrature(h.GetBinError(i-1),h.GetBinError(i),h.GetBinContent(i+1))
         result.SetBinContent(i,value)
         result.SetBinError(i,error)
     return result

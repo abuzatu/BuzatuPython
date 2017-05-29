@@ -1063,11 +1063,18 @@ def average(a,b):
 def average(a,b,c):
   return (1.0/3)*(a+b+c)
 
-def sum_in_quadrature(a,b):
+def addin_quadrature(a,b):
   return math.sqrt(a*a+b*b)
 
-def sum_in_quadrature(a,b,c):
+def add_in_quadrature(a,b,c):
   return math.sqrt(a*a+b*b+c*c)
+
+def add_in_quadrature(list_value):
+    sum=0.0
+    for value in list_value:
+        sum+=value*value
+    return math.sqrt(sum)
+# done function
 
 def print_figures_of_merit(s,b):
     print "s",s,"b",b,"sensitivity",sensitivity(s,b),"significance",significance(s,b)
