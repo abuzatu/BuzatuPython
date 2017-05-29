@@ -1319,7 +1319,7 @@ def get_histo_smoothed(h,debug):
     return result
 # done
 
-def getBinValues(histo,doRescaleMeVtoGeV=False,debug=False):
+def getBinValues(histo,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=False,debug=False):
     if debug:
         print "Printing bin values for histogram of name",histo.GetName(),":"
     list_value=[]
@@ -1327,6 +1327,8 @@ def getBinValues(histo,doRescaleMeVtoGeV=False,debug=False):
     list_binInfo=[]
     # loop over each bin and for each bin write the cross section on a different line
     for i in xrange(histo.GetNbinsX()+2):
+        if doUnderflow==False and i==0:
+            continue
         binContent=histo.GetBinContent(i)
         binLowEdge=histo.GetBinLowEdge(i)
         if doRescaleMeVtoGeV:
@@ -1337,9 +1339,9 @@ def getBinValues(histo,doRescaleMeVtoGeV=False,debug=False):
         binHighEdge=binLowEdge+binWidth
         binIntegral=binContent#*binWidth
         binError=histo.GetBinError(i)
-        line="bin number %.0f bin values [%.1f,%.1f] bin content %.4f bin integral %.8f bin error %.8f" % (i,binLowEdge,binHighEdge,binContent,binIntegral,binError)
+        line="bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f" % (i,binLowEdge,binHighEdge,binContent,binError)
         if debug:
-            print "line",line
+            print line
         list_line.append(line)
         binInfo=(binLowEdge,binHighEdge),(binContent,binError)
         list_binInfo.append(binInfo)

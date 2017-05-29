@@ -23,10 +23,31 @@ from collections import namedtuple
 # to get line number
 from inspect import currentframe
 
+def example_format_string():
+    list_values=[
+        ["bla", 1, 0.0, 30.0, 0.0, 0.0],
+        ["bla22",5, 170.0, 190.0, 559.06, 30.65],
+        ["bla333",16, 500.0, 1300.0, 7.22, 2.38],
+        ]
+    for text,i,binLowEdge,binHighEdge,binContent,binError in list_values:
+        line="%8s bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f" % (text,i,binLowEdge,binHighEdge,binContent,binError)
+        print line
+    #     bla bin    1 range [   0,  30] value     0.00 error     0.00
+    #   bla22 bin    5 range [ 170, 190] value   559.06 error    30.65
+    #  bla333 bin   16 range [ 500,1300] value     7.22 error     2.38
+    for text,i,binLowEdge,binHighEdge,binContent,binError in list_values:
+        line="%-8s bin %-4.0f range [%-4.0f,%4.0f] value %-8.2f error %-8.2f" % (text,i,binLowEdge,binHighEdge,binContent,binError)
+        print line
+    # bla      bin 1    range [0   ,  30] value 0.00     error 0.00    
+    # bla22    bin 5    range [170 , 190] value 559.06   error 30.65   
+    # bla333   bin 16   range [500 ,1300] value 7.22     error 2.38 
+    # Notice how - arranges to the left and lack of - arranges to the righ!
+# done function
+
 def get_lineNumber():
     cf = currentframe()
     return cf.f_back.f_lineno
-
+# done function
 
 # start functions
 def percentageDifference(x,y,debug=False):
