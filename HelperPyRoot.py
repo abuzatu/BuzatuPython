@@ -1313,11 +1313,31 @@ def get_histo_smoothed(h,debug):
     result.Reset()
     for i in xrange(h.GetNbinsX()+1):
         value=average(h.GetBinContent(i-1),h.GetBinContent(i),h.GetBinContent(i+1))
-        error=add_in_quadrature(h.GetBinError(i-1),h.GetBinError(i),h.GetBinContent(i+1))
+        error=add_in_quadrature_three(h.GetBinError(i-1),h.GetBinError(i),h.GetBinContent(i+1))
         result.SetBinContent(i,value)
         result.SetBinError(i,error)
     return result
 # done
+
+
+def get_histo_increased_stat_error_with_equivalent_of_systematic_error(h,extraErrorFraction=0.10,debug=False):
+    # adding a flat fraction of error say 10% on top of the statistical error
+    new_h=h.Clone(h.GetName()+"_new_error")
+    for i in xrange(new_h.GetNbinsX()+2):
+        content=new_h.GetBinContent(i)
+        error=new_h.GetBinError(i)
+        errorExtra=content*extraErrorFraction
+        new_error=add_in_quadrature(error,errorExtra)
+        #new_error=0.0
+        new_h.SetBinError(i,new_error)
+    # done loop over bins
+    if debug:
+        getBinValues(h,doRescaleMeVtoGeV=False,debug=True)
+    if debug:
+        getBinValues(new_h,doRescaleMeVtoGeV=False,debug=True)
+    # done
+    return new_h
+# done function
 
 def getBinValues(histo,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=False,debug=False):
     if debug:
@@ -1329,6 +1349,8 @@ def getBinValues(histo,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=Fals
     for i in xrange(histo.GetNbinsX()+2):
         if doUnderflow==False and i==0:
             continue
+        if doOverflow==False and i==histo.GetNbinsX()+1:
+            continue
         binContent=histo.GetBinContent(i)
         binLowEdge=histo.GetBinLowEdge(i)
         if doRescaleMeVtoGeV:
@@ -1339,7 +1361,7 @@ def getBinValues(histo,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=Fals
         binHighEdge=binLowEdge+binWidth
         binIntegral=binContent#*binWidth
         binError=histo.GetBinError(i)
-        line="bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f" % (i,binLowEdge,binHighEdge,binContent,binError)
+        line="bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f (%4.1f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,ratio(binError,binContent)*100)
         if debug:
             print line
         list_line.append(line)

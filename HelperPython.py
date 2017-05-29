@@ -1084,13 +1084,13 @@ def average(a,b):
 def average(a,b,c):
   return (1.0/3)*(a+b+c)
 
-def addin_quadrature(a,b):
+def add_in_quadrature(a,b):
   return math.sqrt(a*a+b*b)
 
-def add_in_quadrature(a,b,c):
+def add_in_quadrature_three(a,b,c):
   return math.sqrt(a*a+b*b+c*c)
 
-def add_in_quadrature(list_value):
+def add_in_quadrature_list(list_value):
     sum=0.0
     for value in list_value:
         sum+=value*value
