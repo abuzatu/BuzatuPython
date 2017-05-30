@@ -1365,7 +1365,11 @@ def getBinValues(histo,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=Fals
         binHighEdge=binLowEdge+binWidth
         binIntegral=binContent#*binWidth
         binError=histo.GetBinError(i)
-        line="bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f (%4.1f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,ratio(binError,binContent)*100)
+        if binContent<=0:
+            binRatio=0
+        else:
+            binRatio=ratio(binError,binContent)*100
+        line="bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f (%4.1f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
         if debug:
             print line
         list_line.append(line)

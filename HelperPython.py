@@ -472,7 +472,7 @@ def testTrainRankCalc(t_train, t_test):
 ############### Automatic binning #######################
 #########################################################
 
-def get_numpyarray_from_listString(listString,debug):
+def get_numpyarray_from_listString(listString,debug=False):
   if debug:
     print "listString",listString
   listFloat=[]
@@ -485,7 +485,7 @@ def get_numpyarray_from_listString(listString,debug):
   return numpyarray
 # done function
 
-def get_string_from_listString(listString,debug):
+def get_string_from_listString(listString,debug=False):
   result=""
   for i,name in enumerate(listString):
     if i!=0:
