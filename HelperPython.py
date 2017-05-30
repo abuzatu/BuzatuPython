@@ -1078,6 +1078,26 @@ def significanceSigmaB(s,se,b,be,debug=False):
     return (result,error)
 # done function
 
+def get_figure_of_merit(s,se,b,be,figureOfMerit="SignificanceSigmaB",debug=False):
+    result=0.0
+    if figureOfMerit=="SignalOverBackground":
+        result=ratioError(s,se,b,be,debug)
+    elif figureOfMerit=="Sensitivity":
+        result=sensitivity(s,se,b,be,debug=debug)
+    elif figureOfMerit=="Significance":
+        result=significance(s,se,b,be,debug=debug)
+    elif figureOfMerit=="SensitivitySigmaB":
+        result=sensitivitySigmaB(s,se,b,be,debug=debug)
+    elif figureOfMerit=="SignificanceSigmaB":
+        result=significanceSigmaB(s,se,b,be,debug=debug)
+    else:
+        print "figureOfMerit",figureOfMerit,"not know in get_figure_of_merit(). Will ABORT!!!"
+        assert(False)
+    if debug:
+        print "figureOfMerit",figureOfMerit
+    return result
+# done function
+
 def average(a,b):
   return 0.5*(a+b)
 

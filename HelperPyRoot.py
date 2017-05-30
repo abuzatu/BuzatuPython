@@ -1192,6 +1192,12 @@ def set_min_max_title_list_tuple_h1D(list_tuple_h1D,max_value,min_value,ignoreze
         list_tuple_h1D[0][0].SetTitle("")
 # done function
 
+def get_histo_normalised(h,debug=False):
+    h_new=h.Clone(h.GetName()+"_normalised")
+    h_new.Scale(ratio(1.0,h_new.Integral()))
+    return h_new
+# done function
+
 def get_histo_values(h,i,debug=False):
     low=h.GetBinLowEdge(i)
     high=low+h.GetBinWidth(i)
