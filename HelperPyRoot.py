@@ -548,51 +548,6 @@ def medianOfFunction(func,dx):
     return x
 # ended function
 
-# divide two histograms
-#def divideHistograms(h1,h2,name="h_division",debug=False):
-#    h1clone=h1.Clone()
-#    h2clone=h2.Clone()
-#    h1clone.Divide(h1clone,h2clone)
-#    h1clone.SetName(name)
-#    h1clone.SetTitle(name)
-#    return h1clone
-
-# TH1::Divide has wrong statistical error, as double the value
-# so we create our custom function
-def divideHistograms(h_numerator,h_denominator,debug):
-    if debug:
-        print "Start divideHistograms of h_numerator",h_numerator,"and h_denominator",h_denominator
-        getBinValues(h_numerator,doRescaleMeVtoGeV=False,debug=debug)
-        getBinValues(h_denominator,doRescaleMeVtoGeV=False,debug=debug)
-    h_ratio=h_numerator.Clone("h_ratio")
-    h_ratio.Reset()
-    #for i in xrange(h_ratio.GetNbinsX()+2):
-    # skip the underflow and overflow which are empty
-    for i in xrange(1,h_ratio.GetNbinsX()+1):
-        if debug:
-            print "bin",i
-        # numerator
-        numerator_value=h_numerator.GetBinContent(i)
-        numerator_error=h_numerator.GetBinError(i)
-        # denominator
-        denominator_value=h_denominator.GetBinContent(i)
-        denominator_error=h_denominator.GetBinError(i)
-        # ratio
-        ratio_value=ratio(numerator_value,denominator_value)
-        ratio_error=ratio(numerator_error,denominator_value)
-        if debug:
-            print "numerator",numerator_value,"+/-",numerator_error,"denominator",denominator_value,"+/-",denominator_error,"ratio",ratio_value,"+/-",ratio_error
-
-        # set the bin in the h_ratio histogram
-        h_ratio.SetBinContent(i,ratio_value)
-        h_ratio.SetBinError(i,ratio_error)
-        #h_ratio.SetBinError(i,0)
-    # done loop over bins
-    if debug:
-        print "End divideHistograms of h_numerator",h_numerator,"and h_denominator",h_denominator
-    return h_ratio
-# done function
-
 # retrieve histogram from file
 def retrieveHistogram(fileName="",histoPath="",histoName="",name="",returnDummyIfNotFound=False,debug=False):
     if debug:
@@ -1375,7 +1330,7 @@ def getBinValues(histo,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=Fals
             binRatio=0
         else:
             binRatio=ratio(binError,binContent)*100
-        line="bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f (%4.1f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+        line="bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
         if debug:
             print line
         list_line.append(line)
@@ -1723,7 +1678,7 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
     #h_canvas.Reset()
     #h_canvas.Draw(plot_option)
     list_tuple_ratio_h1D=[]
-    #reference_h1D=list_tuple_h1D[0][0].Clone()
+    reference_h1D=list_tuple_h1D[0][0].Clone()
     if debug:
         print "num",num
     # loop over list_tuple_h1D
@@ -1731,11 +1686,9 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
         if debug:
             print "i",i,list_tuple_h1D[i][0].GetName(),list_tuple_h1D[i][1]
         #two lines below are standard ROOT, but statistical error is counted twice
-        #ratio_h1D=list_tuple_h1D[i][0].Clone()
-        #ratio_h1D.Divide(reference_h1D)
-        # to avoid this, I created my own function, as seen at Madalina Stanescu and Jose Benitez
-        ratio_h1D=divideHistograms(list_tuple_h1D[i][0],list_tuple_h1D[0][0],debug=debug)
-        #getBinValues(ratio_h1D,debug)
+        ratio_h1D=list_tuple_h1D[i][0].Clone()
+        ratio_h1D.Divide(reference_h1D)
+        getBinValues(ratio_h1D,debug=debug)
         # add ratio_h1D to list of histograms to overlay
         list_tuple_ratio_h1D.append([ratio_h1D,list_tuple_h1D[i][1]])
     # done loop over histograms
