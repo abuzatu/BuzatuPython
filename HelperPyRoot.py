@@ -1161,6 +1161,9 @@ def get_histo_values(h,i,debug=False):
     return (low,high,value,error)
 # done function
 
+# actually coded by Root in h.Rebin(nbins,"new name",numpyArrayOfbins)
+# https://root.cern.ch/doc/master/classTH1.html#aff6520fdae026334bf34fa1800946790
+# so can get rid of this
 # ex  h=get_histo_subRange(h,[260,340],debug)
 def get_histo_subRange(h,subRange,debug=False):
     xmin=subRange[0]
@@ -1213,6 +1216,9 @@ def get_histo_subRange(h,subRange,debug=False):
     return h_subRange
 # done
 
+# actually coded by Root in h.Rebin(nbins,"new name",numpyArrayOfbins)
+# https://root.cern.ch/doc/master/classTH1.html#aff6520fdae026334bf34fa1800946790
+# so can get rid of this
 def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False):
     if option!="sum" and option!="average":
         print "option",option,"not known. Choose sum, average. Will ABORT!!!"
@@ -2900,3 +2906,91 @@ def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,Wh
     return total,error
 # done function
 
+
+class Poisson:
+    def __call__( self, x, par ):
+        n=x[0] # data
+        e=par[0] # expected, can be b, or s+b, or mu*s+b
+        if e<10000:
+            result=TMath.Poisson(n,e)
+        else:
+            # better to return a Gauss; so this is where the error is taken into account
+            result=TMath.Gaus(n,e,math.sqrt(e),ROOT.kTrue)
+        return result
+    # done function
+# done class
+
+class LogLikelihood:
+    def __init__(self,histo_s,histo_b,histo_d, debug=False):
+        self.poisson=Poisson()
+        self.histo_s=histo_s
+        self.histo_b=histo_b
+        self.histo_d=histo_d
+        self.debug=debug
+
+    def __call__( self, x):
+        if self.debug:
+            print ""
+        mu=x[0] # signal parameter strength
+        result=0.0
+        # log of product of likelihood for each bin = 
+        # sum of log of likelihood in each bin
+        # prefer log as we can have very small numbers
+        # log is natural logarithm
+        # loop over the bins
+        for i in xrange(1,self.histo_s.GetNbinsX()+1):
+            s=self.histo_s.GetBinContent(i)
+            b=self.histo_b.GetBinContent(i)
+            d=self.histo_d.GetBinContent(i)
+            n=d # data
+            e=mu*s+b # expected
+            if b<0:
+                continue
+            if e<0:
+                continue
+            if d<0:
+                continue
+            #p=Poisson()
+            #result+=p.__call__([n],[e])
+            #result+=Poisson().__call__([n],[e])
+            #likelihood=self.poisson.__call__([n],[e])
+            likelihood=TMath.Poisson(n,e)
+            if self.debug:
+                print "n,e,l",n,e,likelihood
+            result+=TMath.Log(likelihood)
+        # done loop over bins
+        return result
+    # done function
+# done class
+
+class F_qmu_given_muprime:
+    def __call__( self, x, par ):
+        qmu=x[0]
+        mu=par[0]
+        muprime=par[1]
+        sigma=par[2]
+        arg=math.sqrt(qmu)-(mu-muprime)/sigma
+        result=0
+        if qmu>0:
+            # slide 23 of https://www.pp.rhul.ac.uk/~cowan/stat/weizmann15/cowan_weizmann15_3.pdf
+            result=0.5*(1.0/math.sqrt(2.0*math.pi))*(1.0/math.sqrt(qmu))*math.exp(-0.5*arg*arg)
+        else:
+            # where does this come from?
+            result=ROOT.Math.normal_cdf((muprime-mu)/sigma,1.0,0.0)
+        return result
+    # done function
+# done class
+
+class F_qmu_given_mu:
+    def __call__( self, x):
+        qmu=x[0]
+        result=0
+        if qmu>0:
+            # slide 23 of https://www.pp.rhul.ac.uk/~cowan/stat/weizmann15/cowan_weizmann15_3.pdf
+            result=0.5*(1.0/math.sqrt(2.0*math.pi))*(1.0/math.sqrt(qmu))*math.exp(-0.5*qmu)
+        else:
+            # where does this come from?
+            result=0.5
+        return result
+    # done function
+# done class
