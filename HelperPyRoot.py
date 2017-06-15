@@ -801,6 +801,28 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
         else:
             print "WARNING! No fit done, as entries=",entries,"rms=",rms
             None
+    elif fit=="PieceWiseLinear":
+        #if entries>cutnentries and rms>0.02:
+        if rms>0.02:
+            if debug:
+                print "we do the fit, as entries>cutnentries and rms>0.02"
+            if fitRangeDefault==True:
+                xmin=30
+                xmax=230
+            function=TF1("piecewiselinear",PieceWiseLinear(),xmin,xmax,2)
+            function.SetParName(0,"p0")
+            function.SetParName(1,"p1")
+            h.Fit("linear","RQ",plot_option+"same",xmin,xmax)
+            f=h.GetFunction("linear")
+            if addMedianInFitInfo==True:
+                result=((medianOfFunction(f,0.01),0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(0.0,0.0))
+            else:
+                result=((0.0,0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(0.0,0.0))
+            f.SetLineColor(color)
+            f.Draw("SAME")
+        else:
+            print "WARNING! No fit done, as entries=",entries,"rms=",rms
+            None
     elif fit=="Parabolic":
         if True:
             if fitRangeDefault==True:
