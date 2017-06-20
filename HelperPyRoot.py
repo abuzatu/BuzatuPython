@@ -758,6 +758,7 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
         print "entries",entries
         print "result",result
         print "f",type(f),f
+        print "fit",fit
 
     cutnentries=50
     color=h.GetLineColor()
@@ -809,17 +810,50 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             if fitRangeDefault==True:
                 xmin=30
                 xmax=230
-            function=TF1("piecewiselinear",PieceWiseLinear(),xmin,xmax,2)
-            function.SetParName(0,"p0")
-            function.SetParName(1,"p1")
-            h.Fit("linear","RQ",plot_option+"same",xmin,xmax)
-            f=h.GetFunction("linear")
+            #function=TF1("piecewiselinear",Linear(),xmin,xmax,2)
+            function=TF1("piecewiselinear",PieceWiseLinear(),xmin,xmax,6)
+            if debug:
+                print "Done define function of type TF1"
+            # y=y1+(x-x1)*(y2-y1)/(x2-x1)=(x[0]<par[0])*(par[1]+((par[2]-par[1])/(par[0]-par[4]))*(x[0]-par[4]))
+            # y=y2+(x-x2)*(y3-y2)/(x3-x2)=(x[0]>=par[0])*(par[2]+((par[3]-par[2])/(par[5]-par[0]))*(x[0]-par[0]))
+            # set parameter name
+            # notation of parameters from Eliot, 
+            # may be renamed later so that the parameters come in the more natural order x1,y1,x2,y2,x3,y3
+            function.SetParName(0,"p0") # x2
+            function.SetParName(1,"p1") # y1
+            function.SetParName(2,"p2") # y2
+            function.SetParName(3,"p3") # y3
+            function.SetParName(4,"p4") # x1
+            function.SetParName(5,"p5") # x3
+            if debug:
+                print "Done function SetParName"
+            # set parameter values to default values of two straight lines, both at 1
+            # y1 = y2 = y3 = 1.0
+            # x1 = 30; x3 = 230; x2 = 30+(230-30)/2 = 130 (at middle)
+            function.SetParameter(0,130.0)
+            function.SetParameter(1,1.0)
+            function.SetParameter(2,1.0)
+            function.SetParameter(3,1.0)
+            function.SetParameter(4,30.0)
+            function.SetParameter(5,230.0)
+            if debug:
+                print "Done function SetParameter"
+            h.Fit("piecewiselinear","RQ",plot_option+"same",xmin,xmax)
+            if debug:
+                print "Done do the fit"
+            f=h.GetFunction("piecewiselinear")
+            if debug:
+                print "Done get the function"
             if addMedianInFitInfo==True:
-                result=((medianOfFunction(f,0.01),0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(0.0,0.0))
+                result=((medianOfFunction(f,0.01),0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(f.GetParError(2),f.GetParameter(2)),(f.GetParError(3),f.GetParError(3)),(f.GetParameter(4),f.GetParError(4)),(f.GetParameter(5),f.GetParError(5)))
             else:
-                result=((0.0,0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(0.0,0.0))
+                result=((0.0,0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(f.GetParError(2),f.GetParameter(2)),(f.GetParError(3),f.GetParError(3)),(f.GetParameter(4),f.GetParError(4)),(f.GetParameter(5),f.GetParError(5)))
+            if debug:
+                print "Done create result by getting parameters"
             f.SetLineColor(color)
             f.Draw("SAME")
+            if debug:
+                print "Done set color and draw the function with SAME"
         else:
             print "WARNING! No fit done, as entries=",entries,"rms=",rms
             None
@@ -1470,7 +1504,7 @@ def get_interpolated_graph_for_histo(h,debug):
 # for statistical error band
 # code example: https://www.desy.de/~stanescu/my-tmp/plotUpDownSys.C
 # its plot:https://www.desy.de/~stanescu/my-tmp/AFII/Nom-Up-Down-A500-tb050/jes1_h_ttbar_chi2_m_inc_res_mu.png
-def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",legend_info=[0.60,0.50,0.88,0.72,72,0.037,0],plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{Hinv analysis}",0.04,13,0.60,0.88,0.05),line_option=([0,0.5,0,0.5],2),debug=False):
+def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio each to one on top",legend_info=[0.60,0.50,0.88,0.72,72,0.037,0],plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{Hinv analysis}",0.04,13,0.60,0.88,0.05),line_option=([0,0.5,0,0.5],2),debug=False):
     if debug:
         print "Start overlayHistograms(...)"
         print "option",option
