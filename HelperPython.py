@@ -5,6 +5,7 @@ import inspect
 from array import array
 # this allows you to call console (bash) commands into your script
 from subprocess import call
+import subprocess
 # help us see if a file exists
 import os.path
 # import operator needed to sort dictionaries in a list
