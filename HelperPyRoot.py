@@ -1369,7 +1369,30 @@ def get_histo_increased_stat_error_with_equivalent_of_systematic_error(h,extraEr
     return new_h
 # done function
 
-def getBinValues(histo,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=False,debug=False):
+def getHistoNonZeroRange(histo,debug=False):
+    if debug:
+        print "Getting non-zero range for histogram of name",histo.GetName(),":"
+    minBinLowEdge=999999999
+    maxHighBinEdge=-1
+    # loop over bins skipping underflow and overflow
+    for i in xrange(1,histo.GetNbinsX()+1):
+        binContent=histo.GetBinContent(i)
+        if binContent<=0.0:
+            continue
+        binLowEdge=histo.GetBinLowEdge(i)
+        binWidth=histo.GetBinWidth(i)
+        binHighEdge=binLowEdge+binWidth
+        if binLowEdge<minBinLowEdge:
+            minBinLowEdge=binLowEdge
+        if binHighEdge>maxHighBinEdge:
+            maxHighBinEdge=binHighEdge
+    result=[minBinLowEdge,maxHighBinEdge]
+    if debug:
+        print "result non-zero bin range",result
+    return result
+# done function
+
+def getBinValues(histo,significantDigits=0,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=False,debug=False):
     if debug:
         print "Printing bin values for histogram of name",histo.GetName(),":"
     list_value=[]
@@ -1395,7 +1418,18 @@ def getBinValues(histo,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=Fals
             binRatio=0
         else:
             binRatio=ratio(binError,binContent)*100
-        line="bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+        if significantDigits==0:
+            line="bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+        elif significantDigits==1:
+            line="bin %4.0f range [%4.1f,%4.1f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+        elif significantDigits==2:
+            line="bin %4.0f range [%4.2f,%4.2f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+        elif significantDigits==3:
+            line="bin %4.0f range [%4.3f,%4.3f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+        else:
+            print "number of significant digits is not known. Will ABORT!"
+            assert(false)
+        # done if
         if debug:
             print line
         list_line.append(line)
