@@ -724,8 +724,11 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
         print "fitRange",fitRange
         print "fit",fit
         print "plot_option",plot_option
-    if fitRange[0]==-1 and fitRange[1]==-1 or fitRange[1]<fitRange[0]:
+    if fitRange==0 or (fitRange[0]==-1 and fitRange[1]==-1) or fitRange[1]<fitRange[0]:
         fitRangeDefault=True
+        xmin=h.GetBinLowEdge(0)
+        NrBins=h.GetNbinsX()
+        xmax=h.GetBinLowEdge(NrBins)+h.GetBinWidth(NrBins)
     else:
         fitRangeDefault=False
         xmin=fitRange[0]
@@ -766,9 +769,6 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
         None
     elif fit=="Sigmoid":
         if True:
-            if fitRangeDefault==True:
-                xmin=20
-                xmax=300
             function=TF1("sigmoid",Sigmoid(),xmin,xmax,2)
             h.Fit("sigmoid","RQ",plot_option+"same",xmin,xmax)
             f=h.GetFunction("sigmoid")
@@ -785,9 +785,6 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
         if rms>0.02:
             if debug:
                 print "we do the fit, as entries>cutnentries and rms>0.02"
-            if fitRangeDefault==True:
-                xmin=30
-                xmax=230
             function=TF1("linear",Linear(),xmin,xmax,2)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -807,9 +804,6 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
         if rms>0.02:
             if debug:
                 print "we do the fit, as entries>cutnentries and rms>0.02"
-            if fitRangeDefault==True:
-                xmin=30
-                xmax=230
             if debug:
                 print "xmin",xmin,"xmax",xmax
             function=TF1("piecewiselinear",PieceWiseLinear(),xmin,xmax,6)
@@ -861,9 +855,6 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             None
     elif fit=="Parabolic":
         if True:
-            if fitRangeDefault==True:
-                xmin=20
-                xmax=300
             function=TF1("parabolic",Parabolic(),xmin,xmax,3)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -871,18 +862,33 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             h.Fit("parabolic","RQ",plot_option+"same",xmin,xmax)
             f=h.GetFunction("parabolic")
             if addMedianInFitInfo==True:
-                result=((medianOfFunction(f,0.01),0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(0.0,0.0))
+                result=((medianOfFunction(f,0.01),0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(f.GetParameter(2),f.GetParError(2)))
             else:
-                result=((0.0,0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(0.0,0.0))
+                result=((0.0,0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(f.GetParameter(2),f.GetParError(2)))
+            f.SetLineColor(color)
+            f.Draw("SAME")
+        else:
+            None
+    elif fit=="Parabolic2":
+        if True:
+            function=TF1("parabolic2",Parabolic2(),xmin,xmax,5)
+            function.SetParName(0,"p0")
+            function.SetParName(1,"p1")
+            function.SetParName(2,"p2")
+            function.SetParName(3,"p3")
+            function.SetParName(4,"p4")
+            h.Fit("parabolic2","RQ",plot_option+"same",xmin,xmax)
+            f=h.GetFunction("parabolic2")
+            if addMedianInFitInfo==True:
+                result=((medianOfFunction(f,0.01),0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(f.GetParameter(2),f.GetParError(2)))
+            else:
+                result=((0.0,0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(f.GetParameter(2),f.GetParError(2)))
             f.SetLineColor(color)
             f.Draw("SAME")
         else:
             None
     elif "pol" in fit:
         if True:
-            if fitRangeDefault==True:
-                xmin=20
-                xmax=300
             h.Fit(fit,"Q",plot_option+"same",xmin,xmax)
             f=h.GetFunction(fit)
             if addMedianInFitInfo==True:
@@ -895,9 +901,6 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             None
     elif fit=="Polynomial3":
         if True:
-            if fitRangeDefault==True:
-                xmin=20
-                xmax=300
             function=TF1("polynomial3",Polynomial3(),xmin,xmax,4)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -915,9 +918,6 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             None
     elif fit=="Polynomial4":
         if True:
-            if fitRangeDefault==True:
-                xmin=20
-                xmax=300
             function=TF1("polynomial4",Polynomial4(),xmin,xmax,5)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -936,9 +936,6 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             None
     elif fit=="Polynomial5":
         if True:
-            if fitRangeDefault==True:
-                xmin=20
-                xmax=300
             function=TF1("polynomial5",Polynomial5(),xmin,xmax,6)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -958,9 +955,6 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             None
     elif fit=="Polynomial6":
         if True:
-            if fitRangeDefault==True:
-                xmin=20
-                xmax=300
             function=TF1("polynomial6",Polynomial6(),xmin,xmax,7)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
