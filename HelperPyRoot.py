@@ -816,29 +816,29 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             function=TF1("piecewiselinear",PieceWiseLinear(),xmin,xmax,6)
             if debug:
                 print "Done define function of type TF1"
-            # y=y1+(x-x1)*(y2-y1)/(x2-x1)=(x[0]<par[0])*(par[1]+((par[2]-par[1])/(par[0]-par[4]))*(x[0]-par[4]))
-            # y=y2+(x-x2)*(y3-y2)/(x3-x2)=(x[0]>=par[0])*(par[2]+((par[3]-par[2])/(par[5]-par[0]))*(x[0]-par[0]))
+            # y=y1+(x-x1)*(y2-y1)/(x2-x1)
+            # y=y2+(x-x2)*(y3-y2)/(x3-x2)
             # set parameter name
             # notation of parameters from Eliot, 
             # may be renamed later so that the parameters come in the more natural order x1,y1,x2,y2,x3,y3
-            function.SetParName(0,"p0") # x2
+            function.SetParName(0,"p0") # x1
             function.SetParName(1,"p1") # y1
-            function.SetParName(2,"p2") # y2
-            function.SetParName(3,"p3") # y3
-            function.SetParName(4,"p4") # x1
-            function.SetParName(5,"p5") # x3
+            function.SetParName(2,"p2") # x2
+            function.SetParName(3,"p3") # y2
+            function.SetParName(4,"p4") # x3
+            function.SetParName(5,"p5") # y3
             if debug:
                 print "Done function SetParName"
             # set parameter values to default values of two straight lines, both at 1
             # y1 = y2 = y3 = 1.0
             # for mcc: x1 = 30; x3 = 230; x2 = 30+(230-30)/2 = 130 (at middle)
             # for BDT: x1 = -1; x3 = +1;  x2 = -1+(1-(-1))/2 = 0   (at middle)
-            function.SetParameter(0,xmin+0.5*(xmax-xmin))
+            function.SetParameter(0,xmin)
             function.SetParameter(1,1.0)
-            function.SetParameter(2,1.0)
+            function.SetParameter(2,xmin+0.5*(xmax-xmin))
             function.SetParameter(3,1.0)
-            function.SetParameter(4,xmin)
-            function.SetParameter(5,xmax)
+            function.SetParameter(4,xmax)
+            function.SetParameter(5,1.0)
             if debug:
                 print "Done function SetParameter"
             h.Fit("piecewiselinear","RQ",plot_option+"same",xmin,xmax)
