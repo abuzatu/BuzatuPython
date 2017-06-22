@@ -751,7 +751,7 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
     if addMedianInFitInfo==True:
         result=((median,0.0),(height,0.0),(mean,0.0),(rms,0.0))
     else:
-         result=((0.0,0.0),(height,0.0),(mean,0.0),(rms,0.0))
+         result=((0.0,0.0),(height,0.0),(mean,0.0),(rms,0.0),(0.0,0.0),(0.0,0.0),(0.0,0.0))
     f=defaultFunction
     if debug:
         print "initially as dummy values"
@@ -810,6 +810,8 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             if fitRangeDefault==True:
                 xmin=30
                 xmax=230
+            if debug:
+                print "xmin",xmin,"xmax",xmax
             #function=TF1("piecewiselinear",Linear(),xmin,xmax,2)
             function=TF1("piecewiselinear",PieceWiseLinear(),xmin,xmax,6)
             if debug:
@@ -829,13 +831,14 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
                 print "Done function SetParName"
             # set parameter values to default values of two straight lines, both at 1
             # y1 = y2 = y3 = 1.0
-            # x1 = 30; x3 = 230; x2 = 30+(230-30)/2 = 130 (at middle)
-            function.SetParameter(0,130.0)
+            # for mcc: x1 = 30; x3 = 230; x2 = 30+(230-30)/2 = 130 (at middle)
+            # for BDT: x1 = -1; x3 = +1;  x2 = -1+(1-(-1))/2 = 0   (at middle)
+            function.SetParameter(0,xmin+0.5*(xmax-xmin))
             function.SetParameter(1,1.0)
             function.SetParameter(2,1.0)
             function.SetParameter(3,1.0)
-            function.SetParameter(4,30.0)
-            function.SetParameter(5,230.0)
+            function.SetParameter(4,xmin)
+            function.SetParameter(5,xmax)
             if debug:
                 print "Done function SetParameter"
             h.Fit("piecewiselinear","RQ",plot_option+"same",xmin,xmax)
