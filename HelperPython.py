@@ -192,21 +192,15 @@ class Linear:
     # done function
 # done class
 
-#From Elliot: fit = Fit(fit_name, "(x<[0])*([1]+(([2]-[1])/([0]-[4]))*(x-[4])) + (x>=[0])*([2]+(([3]-[2])/([5]-[0]))*(x-[0]))", binning[0], binning[1], 6);
 class PieceWiseLinear:
     def __call__( self, x, par ):
-        # return (x[0]<par[0])*(par[1]+((par[2]-par[1])/(par[0]-par[4]))*(x[0]-par[4])) + (x[0]>=par[0])*(par[2]+((par[3]-par[2])/(par[5]-par[0]))*(x[0]-par[0]))
-        #if x[0]<par[0]:
-        #    result=par[1]+((par[2]-par[1])/(par[0]-par[4]))*(x[0]-par[4])
-        #else:
-        #    result=par[2]+((par[3]-par[2])/(par[5]-par[0]))*(x[0]-par[0])
         if x[0]<par[2]:
             result=par[1]+((par[3]-par[1])/(par[2]-par[0]))*(x[0]-par[0])
         else:
             result=par[3]+((par[5]-par[3])/(par[4]-par[2]))*(x[0]-par[2])
         return result
-    # Done
-# Done
+    # done function
+# done class
 
 class Parabolic:
     def __call__( self, x, par ):

@@ -812,7 +812,6 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
                 xmax=230
             if debug:
                 print "xmin",xmin,"xmax",xmax
-            #function=TF1("piecewiselinear",Linear(),xmin,xmax,2)
             function=TF1("piecewiselinear",PieceWiseLinear(),xmin,xmax,6)
             if debug:
                 print "Done define function of type TF1"
