@@ -664,9 +664,54 @@ def createDirectory(fileName,folders,debug=False):
 # plot just one histogram, either 1D or 2D
 def plotHistogram(h,plot_option="",filePath="./",fileName="plot",extensions="pdf"):
     # plot one histogram, either 1D or 2D
-    h.SetLineColor(1)
+    #h.SetLineColor(1)
     c=TCanvas()
     h.Draw(plot_option)
+    # if path does not have / as the last character, add one
+    if filePath=="":
+        filePath="./"
+    elif filePath[-1]!="/":
+        filePath+="/"
+    # compute the name
+    if fileName=="":
+        fileName=filePath+h.GetName()
+    else:
+        fileName=filePath+fileName
+    # save the canvas in files with what extensions we want
+    for extension in extensions.split(","):
+        c.Print(fileName+"."+extension)
+    # ended for over extensions
+    return None
+# ended function
+
+# plot two histograms (numerator and denominator) and at the bottom their ratio, which is fitted
+def plotHistograms(hdenom,hnumer,hratio,plot_option="",filePath="./",fileName="plot",extensions="pdf",debug=False):
+    # plot one histogram, either 1D or 2D
+    #h.SetLineColor(1)
+    gStyle.SetOptStat(0) 
+    c=TCanvas("c","c",600,600)
+    p_main=TPad("p_main","p_main",0,0.33,1,1)
+    p_ratio=TPad("p_ratio","p_ratio",0,0,1,0.33)
+    p_main.Draw()
+    p_ratio.Draw()
+    # main pad
+    p_main.cd()
+    hdenom.SetMinimum(0)
+    hdenom.Draw(plot_option)
+    hnumer.Draw(plot_option+"SAME")
+    legend_info=[0.70,0.70,0.88,0.82,72,0.037,0]
+    legend=get_legend(legend_info,debug)
+    legend.AddEntry(hdenom,"Default","f")
+    legend.AddEntry(hnumer,"Alternative","f")
+    legend.SetBorderSize(0)
+    legend.Draw("same")
+    p_main.Update()
+    # ratio pad
+    p_ratio.cd()
+    hratio.Draw(plot_option)
+    # canvas
+    c.Update()
+
     # if path does not have / as the last character, add one
     if filePath=="":
         filePath="./"
@@ -1428,16 +1473,20 @@ def getBinValues(histo,significantDigits=0,doRescaleMeVtoGeV=False,doUnderflow=F
         else:
             binRatio=ratio(binError,binContent)*100
         if significantDigits==0:
-            line="bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+            line="bin %4.0f range [%6.0f,%6.0f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
         elif significantDigits==1:
-            line="bin %4.0f range [%4.1f,%4.1f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+            line="bin %4.0f range [%6.1f,%6.1f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
         elif significantDigits==2:
-            line="bin %4.0f range [%4.2f,%4.2f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+            line="bin %4.0f range [%6.2f,%6.2f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
         elif significantDigits==3:
-            line="bin %4.0f range [%4.3f,%4.3f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+            line="bin %4.0f range [%6.3f,%6.3f] value %8.3f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+        elif significantDigits==4:
+            line="bin %4.0f range [%6.2f,%6.2f] value %8.4f error %8.4f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+        elif significantDigits==5:
+            line="bin %4.0f range [%6.2f,%6.2f] value %10.8f error %10.8f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
         else:
             print "number of significant digits is not known. Will ABORT!"
-            assert(false)
+            assert(False)
         # done if
         if debug:
             print line
@@ -2889,7 +2938,7 @@ def get_histo_integral_error(histo,myRange=-1,debug=False):
     return (integral,error)
 # done function
 
-def isHistoConsitentWithOne(histo,debug=False):
+def isHistoConsistentWithOne(histo,debug=False):
     result=False
     counterNonZeroBins=0
     counterNonZeroBinsConsistentWithOne=0
