@@ -877,6 +877,12 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             function.SetParName(2,"p2")
             function.SetParName(3,"p3")
             function.SetParName(4,"p4")
+            # set parameter values 
+            function.SetParameter(0,1.0)
+            function.SetParameter(0,1.0)
+            function.SetParameter(0,1.0)
+            function.SetParameter(0,-1.0)
+            function.SetParameter(0,1.0)
             h.Fit("parabolic2","RQ",plot_option+"same",xmin,xmax)
             f=h.GetFunction("parabolic2")
             if addMedianInFitInfo==True:
@@ -906,6 +912,11 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             function.SetParName(1,"p1")
             function.SetParName(2,"p2")
             function.SetParName(3,"p3")
+            #
+            function.SetParameter(0,1.0)
+            function.SetParameter(1,1.0)
+            function.SetParameter(2,1.0)
+            function.SetParameter(3,1.0)
             h.Fit("polynomial3","RQ",plot_option+"same",xmin,xmax)
             f=h.GetFunction("polynomial3")
             if addMedianInFitInfo==True:
@@ -1365,13 +1376,18 @@ def get_histo_increased_stat_error_with_equivalent_of_systematic_error(h,extraEr
 def getHistoNonZeroRange(histo,debug=False):
     if debug:
         print "Getting non-zero range for histogram of name",histo.GetName(),":"
+    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,debug=True)
     minBinLowEdge=999999999
     maxHighBinEdge=-1
+    nrNonZeroBins=0
     # loop over bins skipping underflow and overflow
     for i in xrange(1,histo.GetNbinsX()+1):
+        if debug:
+            print "bin i",
         binContent=histo.GetBinContent(i)
         if binContent<=0.0:
             continue
+        nrNonZeroBins+=1
         binLowEdge=histo.GetBinLowEdge(i)
         binWidth=histo.GetBinWidth(i)
         binHighEdge=binLowEdge+binWidth
@@ -1379,10 +1395,10 @@ def getHistoNonZeroRange(histo,debug=False):
             minBinLowEdge=binLowEdge
         if binHighEdge>maxHighBinEdge:
             maxHighBinEdge=binHighEdge
-    result=[minBinLowEdge,maxHighBinEdge]
+    nonZeroRange=[minBinLowEdge,maxHighBinEdge]
     if debug:
-        print "result non-zero bin range",result
-    return result
+        print "result non-zero bin range",nonZeroRange,"with nrNonZeroBins",nrNonZeroBins
+    return nonZeroRange,nrNonZeroBins
 # done function
 
 def getBinValues(histo,significantDigits=0,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=False,debug=False):

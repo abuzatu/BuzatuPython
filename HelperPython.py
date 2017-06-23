@@ -210,8 +210,8 @@ class Parabolic:
 
 class Parabolic2:
     def __call__( self, x, par ):
-        if x[0]<-0.75:
-            result=par[3]+par[4]
+        if x[0]<par[3]:
+            result=par[4]
         else:
             result=par[0]+par[1]*x[0]+par[2]*math.pow(x[0],2)
         return result
