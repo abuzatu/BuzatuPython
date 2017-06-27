@@ -372,14 +372,15 @@ def addTree(fileName,fileOpen,treeName,list_variables,debug):
 
 # list object from file
 # ex: ListObjects(fileName,False)
-def listObjects(fileName,debug=False):
+def listObjects(fileName,directoryPath="",debug=False):
     if debug:
         print "Start .ls of root file ",fileName
     file=TFile(fileName,"READ")
     if not file.IsOpen():
         print "File",fileName,"does not exist, so will abort"
         assert(False)
-    file.ls()
+    gDirectory.cd(directoryPath)
+    gDirectory.ls()
     file.Close()
     if debug:
         print "End .ls of root file ",fileName

@@ -1164,3 +1164,20 @@ def get_duration_of_run(time_start,time_previous,option,debug):
   return time_previous,result
 # done function
 
+def get_list_fileFromFolder(inputFolderName,fileSearch="*.root",debug=False):
+    result=[]
+    proc = subprocess.Popen(["ls -1 "+inputFolderName+"/"+fileSearch], stdout=subprocess.PIPE, shell=True)
+    (out, err) = proc.communicate()
+    if debug:
+        print type(out),out
+    for file in out.split():
+        if debug:
+            print "file",file
+        result.append(file.strip('\n'))
+    # the file name contains full path
+    if debug:
+        print "list_file:"
+        for file in result:
+            print file
+    return result
+# done function
