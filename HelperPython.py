@@ -1181,3 +1181,38 @@ def get_list_fileFromFolder(inputFolderName,fileSearch="*.root",debug=False):
             print file
     return result
 # done function
+
+# optionOpenFile="w" # create from scratch, "a", append to an already existing file
+# in which case be sure to name the list differently
+def get_python_list_filesFromFolder(inputFolderName,fileSearch="*.root",
+                                    outputFileName="list.py",optionOpenFile="w",
+                                    listName="list_outputFile",
+                                    debug=False):
+    outputFile=open(outputFileName,optionOpenFile)
+    if optionOpenFile=="w":
+        line="#!/usr/bin/python\n"
+        outputFile.write(line)
+    elif optionOpenFile=="a":
+        # will append
+        None
+    else:
+        print "optionOpenFile",optionOpenFile,"not known. Choose w (rewrite), a (append). Will ABORT!!!"
+        assert(False)
+    # end if
+    line=" \n"
+    outputFile.write(line)
+    line=listName+"=[\n"
+    outputFile.write(line)
+    list_fileName=get_list_fileFromFolder(inputFolderName,fileSearch,debug)
+    for fileName in list_fileName:
+        print "fileName",fileName
+        line="    \""+fileName+"\",\n"
+        outputFile.write(line)
+    # done loop over files
+    line="]\n"
+    outputFile.write(line)
+    outputFile.close()
+    if True:
+        print "File ",outputFileName,"has been created."
+
+# done function
