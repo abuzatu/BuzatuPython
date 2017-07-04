@@ -386,7 +386,10 @@ def listObjects(fileName,directoryPath="",searchClass="",searchName="",debug=Fal
             continue
         if not (searchName=="" or searchName in key.GetName()):
             continue
-        print key.GetClassName(),key.GetName()
+        text=key.GetClassName()+" "+key.GetName()
+        if debug:
+            text+=" integral="+str(gDirectory.Get(key.GetName()).Integral())
+        print text
     if False:
         gDirectory.ls()
     file.Close()
