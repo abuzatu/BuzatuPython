@@ -388,7 +388,8 @@ def listObjects(fileName,directoryPath="",searchClass="",searchName="",debug=Fal
             continue
         text=key.GetClassName()+" "+key.GetName()
         if debug:
-            text+=" integral="+str(gDirectory.Get(key.GetName()).Integral())
+            if "TH" in searchClass:
+                text+=" integral="+str(gDirectory.Get(key.GetName()).Integral())
         print text
     if False:
         gDirectory.ls()
@@ -562,10 +563,15 @@ def medianOfFunction(func,dx):
 
 # retrieve histogram from file
 def retrieveHistogram(fileName="",histoPath="",histoName="",name="",returnDummyIfNotFound=False,debug=False):
+    histo,function=retrieveObject(fileName="",objectType="histo",objectPath=histoPath,objectName=histoName,name="",returnDummyIfNotFound=returnDummyIfNotFound,debug=debug)
+    return histo
+# ended function
+
+def retrieveObject(fileName="",objectType="histo",objectPath="",objectName="",name="",returnDummyIfNotFound=False,debug=False):
     if debug:
         print "fileName",fileName
-        print "histoPath",histoPath
-        print "histoName",histoName
+        print "objectPath",objectPath
+        print "objectName",objectName
         print "name",name
     file=TFile(fileName,"READ")
     if debug:
@@ -575,29 +581,35 @@ def retrieveHistogram(fileName="",histoPath="",histoName="",name="",returnDummyI
         assert(False)
     #if debug:
     #    file.ls()
-    gDirectory.cd(histoPath)
+    gDirectory.cd(objectPath)
     if False:
-        print "histoPath",histoPath
+        print "objectPath",objectPath
         print "gDirectory.ls()"
         gDirectory.ls()
-        print "histoName",histoName
-    histo=gDirectory.Get(histoName)
+        print "objectName",objectName
+    object=gDirectory.Get(objectName)
     if debug:
-        print "histo",histo,"type(histo)",type(histo)
-    if histo==None:
+        print "object",object,"type(object)",type(object)
+    if object==None:
         if returnDummyIfNotFound==True:
-            print "WARNING!!!! histo",histoName,"doesn't exist in file",fileName,"at path",histoPath,". We will return a string called dummy!!!"
+            print "WARNING!!!! object",objectName,"doesn't exist in file",fileName,"at path",objectPath,". We will return a string called dummy!!!"
             return "dummy" # return a dummy string
         else:
-            print "histo",histoName,"doesn't exist in file",fileName,"at path",histoPath,". We will ABORT!!!!"
+            print "object",objectName,"doesn't exist in file",fileName,"at path",objectPath,". We will ABORT!!!!"
             assert(False)
     if name!="":
-        histo.SetName(name)
-        histo.SetTitle(name)
-    histo.SetDirectory(0)
-    # needed so that the function is able to return a histogram
-    # otherwise it will return <type 'PyROOT_NoneType'>
-    return histo
+        object.SetName(name)
+        object.SetTitle(name)
+    if objectType=="histo":
+        # needed so that the object is able to return a histogram
+        # otherwise it will return <type 'PyROOT_NoneType'>
+        object.SetDirectory(0)
+    elif objectType=="function":
+        None
+    else:
+        print "objectType",objectType,"not known. Choose histo or function. Will ABORT!!"
+        assert(False)
+    return object
 # ended function
 
 # add  histogram to existing file
