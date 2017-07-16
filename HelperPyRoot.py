@@ -561,12 +561,6 @@ def medianOfFunction(func,dx):
     return x
 # ended function
 
-# retrieve histogram from file
-def retrieveHistogram(fileName="",histoPath="",histoName="",name="",returnDummyIfNotFound=False,debug=False):
-    histo,function=retrieveObject(fileName="",objectType="histo",objectPath=histoPath,objectName=histoName,name="",returnDummyIfNotFound=returnDummyIfNotFound,debug=debug)
-    return histo
-# ended function
-
 def retrieveObject(fileName="",objectType="histo",objectPath="",objectName="",name="",returnDummyIfNotFound=False,debug=False):
     if debug:
         print "fileName",fileName
@@ -610,6 +604,12 @@ def retrieveObject(fileName="",objectType="histo",objectPath="",objectName="",na
         print "objectType",objectType,"not known. Choose histo or function. Will ABORT!!"
         assert(False)
     return object
+# ended function
+
+# retrieve histogram from file
+def retrieveHistogram(fileName="",histoPath="",histoName="",name="",returnDummyIfNotFound=False,debug=False):
+    histo=retrieveObject(fileName=fileName,objectType="histo",objectPath=histoPath,objectName=histoName,name="",returnDummyIfNotFound=returnDummyIfNotFound,debug=debug)
+    return histo
 # ended function
 
 # add  histogram to existing file
