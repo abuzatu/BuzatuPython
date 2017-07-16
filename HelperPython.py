@@ -953,7 +953,7 @@ def ratio(s,b,debug=False):
 def ratioError(s,se,b,be,debug=False):
     if debug:
         print "ratioError","s",s,"se",se,"b",b,"be",be
-    if -0.0001<b<0.0001:
+    if b==0:
         if True:
             print "WARNING! -0.0001<b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
         result=0.0
