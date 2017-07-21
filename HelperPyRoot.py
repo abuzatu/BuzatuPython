@@ -388,7 +388,7 @@ def listObjects(fileName,directoryPath="",searchClass="",searchName="",debug=Fal
             continue
         text=key.GetClassName()+" "+key.GetName()
         if debug:
-            if "TH" in searchClass:
+            if False and "TH" in searchClass:
                 text+=" integral="+str(gDirectory.Get(key.GetName()).Integral())
         print text
     if False:
@@ -608,7 +608,7 @@ def retrieveObject(fileName="",objectType="histo",objectPath="",objectName="",na
 
 # retrieve histogram from file
 def retrieveHistogram(fileName="",histoPath="",histoName="",name="",returnDummyIfNotFound=False,debug=False):
-    histo=retrieveObject(fileName=fileName,objectType="histo",objectPath=histoPath,objectName=histoName,name="",returnDummyIfNotFound=returnDummyIfNotFound,debug=debug)
+    histo=retrieveObject(fileName=fileName,objectType="histo",objectPath=histoPath,objectName=histoName,name=name,returnDummyIfNotFound=returnDummyIfNotFound,debug=debug)
     return histo
 # ended function
 
@@ -1623,7 +1623,7 @@ def get_interpolated_graph_for_histo(h,debug):
 # for statistical error band
 # code example: https://www.desy.de/~stanescu/my-tmp/plotUpDownSys.C
 # its plot:https://www.desy.de/~stanescu/my-tmp/AFII/Nom-Up-Down-A500-tb050/jes1_h_ttbar_chi2_m_inc_res_mu.png
-def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio each to one on top",legend_info=[0.60,0.50,0.88,0.72,72,0.037,0],plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{Hinv analysis}",0.04,13,0.60,0.88,0.05),line_option=([0,0.5,0,0.5],2),debug=False):
+def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio each to one on top",plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; Hinv analysis}?#bf{"+"category"+"}?#bf{"+"systematicStem"+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False):
     if debug:
         print "Start overlayHistograms(...)"
         print "option",option
