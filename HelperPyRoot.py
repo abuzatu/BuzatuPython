@@ -392,7 +392,7 @@ def listObjects(fileName,directoryPath="",searchClass="",searchName="",doShowInt
         if debug:
             if doShowIntegral and "TH" in searchClass:
                 text+=" integral="+str(gDirectory.Get(key.GetName()).Integral())
-        if True:
+        if False:
             text=key.GetName().replace(searchName+"_","")
         print text
     if False:
