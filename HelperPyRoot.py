@@ -372,12 +372,14 @@ def addTree(fileName,fileOpen,treeName,list_variables,debug):
 
 # list object from file
 # ex: ListObjects(fileName,False)
-def listObjects(fileName,directoryPath="",searchClass="",list_searchName=["",""],doShowIntegral=False,debug=False):
+def listObjects(inputFileName,directoryPath="",searchClass="",list_searchName=["",""],doOption="A",doShowIntegral=False,outputFileName="a.log",debug=False):
     if debug:
-        print "Start .ls of root file ",fileName
-    file=TFile(fileName,"READ")
-    if not file.IsOpen():
-        print "File",fileName,"does not exist, so will abort"
+        print "Start .ls of root inputFile ",inputFileName
+    if outputFileName!="":
+        outputFile=open(outputFileName,"w")
+    inputFile=TFile(inputFileName,"READ")
+    if not inputFile.IsOpen():
+        print "inputFile",inputFileName,"does not exist, so will abort"
         assert(False)
     gDirectory.cd(directoryPath)
     list_key=gDirectory.GetListOfKeys()
@@ -387,20 +389,29 @@ def listObjects(fileName,directoryPath="",searchClass="",list_searchName=["",""]
             continue
         if not all(x in key.GetName() for x in list_searchName):
             continue
-        if True:
+        if doOption=="A":
             text=key.GetClassName()+" "+key.GetName()
-        if True:
             if doShowIntegral and "TH" in searchClass:
                 text+=" integral="+str(gDirectory.Get(key.GetName()).Integral())
-        #if False:
-        #    text=key.GetName().replace(searchName+"_","")
-        if True:
+        elif doOption=="B":
+            assert(len(list_searchName)==1)
+            searchName=list_searchName[0]
+            text=key.GetName().replace(searchName+"_","")
+        else:
+            print "doOption",doOption,"not known. Choose A or B. Will ABORT!!!"
+            assert(False)
+        # done if
+        if outputFileName=="":
             print text
+        else:
+            outputFile.write(text+"\n")
     if False:
         gDirectory.ls()
-    file.Close()
+    if outputFileName!="":
+        outputFile.close()
+    inputFile.Close()
     if debug:
-        print "End .ls of root file ",fileName
+        print "End .ls of root inputFile ",inputFileName
     return True
 # ended function
 
