@@ -23,6 +23,14 @@ import copy
 from collections import namedtuple
 # to get line number
 from inspect import currentframe
+# regular expressions
+import re
+
+#https://www.ics.uci.edu/~alspaugh/cls/shr/regularExpression.html
+def match_regularExpression_in_string(regex, text):
+    pattern = re.compile(regex, text)
+    return pattern.search(text) is not None
+# done function
 
 def example_format_string():
     list_values=[
