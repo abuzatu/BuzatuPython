@@ -372,7 +372,7 @@ def addTree(fileName,fileOpen,treeName,list_variables,debug):
 
 # list object from file
 # ex: ListObjects(fileName,False)
-def listObjects(fileName,directoryPath="",searchClass="",searchName="",doShowIntegral=False,debug=False):
+def listObjects(fileName,directoryPath="",searchClass="",list_searchName=["",""],doShowIntegral=False,debug=False):
     if debug:
         print "Start .ls of root file ",fileName
     file=TFile(fileName,"READ")
@@ -385,16 +385,17 @@ def listObjects(fileName,directoryPath="",searchClass="",searchName="",doShowInt
     for key in list_key:
         if not (searchClass=="" or key.GetClassName()==searchClass):
             continue
-        if not (searchName=="" or searchName in key.GetName()):
+        if not all(x in key.GetName() for x in list_searchName):
             continue
-        if debug:
+        if True:
             text=key.GetClassName()+" "+key.GetName()
-        if debug:
+        if True:
             if doShowIntegral and "TH" in searchClass:
                 text+=" integral="+str(gDirectory.Get(key.GetName()).Integral())
-        if False:
-            text=key.GetName().replace(searchName+"_","")
-        print text
+        #if False:
+        #    text=key.GetName().replace(searchName+"_","")
+        if True:
+            print text
     if False:
         gDirectory.ls()
     file.Close()
