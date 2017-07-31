@@ -725,9 +725,11 @@ def plotHistogram(h,plot_option="",filePath="./",fileName="plot",extensions="pdf
 # ended function
 
 # plot two histograms (numerator and denominator) and at the bottom their ratio, which is fitted
-def plotHistograms(hdenom,hnumer,hratio,plot_option="",filePath="./",fileName="plot",extensions="pdf",debug=False):
+def plotHistograms(hnumer0,hdenom0,hratio0,plot_option="",filePath="./",fileName="plot",extensions="pdf",debug=False):
+    hdenom=hdenom0.Clone()
+    hnumer=hnumer0.Clone()
+    hratio=hratio0.Clone()
     # plot one histogram, either 1D or 2D
-    #h.SetLineColor(1)
     gStyle.SetOptStat(0) 
     c=TCanvas("c","c",600,600)
     p_main=TPad("p_main","p_main",0,0.33,1,1)
@@ -736,13 +738,17 @@ def plotHistograms(hdenom,hnumer,hratio,plot_option="",filePath="./",fileName="p
     p_ratio.Draw()
     # main pad
     p_main.cd()
+    hdenom.SetLineColor(4)
+    hnumer.SetLineColor(2)
     hdenom.SetMinimum(0)
-    hdenom.Draw(plot_option)
-    hnumer.Draw(plot_option+"SAME")
-    legend_info=[0.70,0.70,0.88,0.82,72,0.037,0]
+    myMax=max(hdenom.GetMaximum(),hnumer.GetMaximum())
+    hnumer.SetMaximum(myMax*1.30)
+    hnumer.Draw(plot_option)
+    hdenom.Draw(plot_option+"SAME")
+    legend_info=[0.65,0.70,0.88,0.82,72,0.037,0]
     legend=get_legend(legend_info,debug)
-    legend.AddEntry(hdenom,"Default","f")
-    legend.AddEntry(hnumer,"Alternative","f")
+    legend.AddEntry(hnumer,"Num: Alternative","f")
+    legend.AddEntry(hdenom,"Den: Default","f")
     legend.SetBorderSize(0)
     legend.Draw("same")
     p_main.Update()
@@ -1461,7 +1467,7 @@ def get_histo_increased_stat_error_with_equivalent_of_systematic_error(h,extraEr
 def getHistoNonZeroRange(histo,debug=False):
     if debug:
         print "Getting non-zero range for histogram of name",histo.GetName(),":"
-    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,debug=True)
+    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,debug=debug)
     minBinLowEdge=999999999
     maxHighBinEdge=-1
     nrNonZeroBins=0
@@ -2944,11 +2950,11 @@ def do_error_myRange(myRange):
     assert(False)
 # done function
 
-def get_histo_integral_error(histo,myRange=-1,debug=False):
+def get_histo_integral_error(histo,myRange=0,debug=False):
     if myRange==-1:
-        myRange=[0,histo.GetNbinsX()+2]
+        myRange=[0,histo.GetNbinsX()+1] # with    overflow bins
     elif myRange==0:
-        myRange=[1,histo.GetNbinsX()+1]
+        myRange=[1,histo.GetNbinsX()]   # without overflow bins
     else:
         # check if it is in a good format
         if isinstance(myRange, list)==False:
