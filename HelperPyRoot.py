@@ -409,6 +409,7 @@ def listObjects(inputFileName,directoryPath="",searchClass="",list_searchName=["
         gDirectory.ls()
     if outputFileName!="":
         outputFile.close()
+        print "Output written to file",outputFile
     inputFile.Close()
     if debug:
         print "End .ls of root inputFile ",inputFileName
