@@ -1497,6 +1497,7 @@ def getBinValues(histo,significantDigits=0,doRescaleMeVtoGeV=False,doUnderflow=F
     if debug:
         print "Printing bin values for histogram of name",histo.GetName(),":"
     list_value=[]
+    list_error=[]
     list_line=[]
     list_binInfo=[]
     # loop over each bin and for each bin write the cross section on a different line
@@ -1543,11 +1544,14 @@ def getBinValues(histo,significantDigits=0,doRescaleMeVtoGeV=False,doUnderflow=F
         #outputfile.write(line)
         #outputfile.write("\n")
         list_value.append(binIntegral)
+        list_error.append(binError)
     # done loop over bins
     nparray_value=numpy.array(list_value)
+    nparray_error=numpy.array(list_error)
     if debug:
         print "nparray_value",nparray_value
-    return (nparray_value,list_line,list_binInfo)
+        print "nparray_error",nparray_error
+    return (nparray_value,list_line,list_binInfo,nparray_error)
 # done function
 
 def getBinInfo(histo,doRescaleMeVtoGeV=False,debug=False):
