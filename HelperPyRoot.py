@@ -372,6 +372,7 @@ def addTree(fileName,fileOpen,treeName,list_variables,debug):
 
 # list object from file
 # ex: ListObjects(fileName,False)
+# ex of class: TH1F, TH1D, TF1, TDirectoryFile
 def listObjects(inputFileName,directoryPath="",searchClass="",list_searchName=["",""],doOption="A",doShowIntegral=False,outputFileName="a.log",debug=False):
     if debug:
         print "Start .ls of root inputFile ",inputFileName
@@ -624,6 +625,7 @@ def retrieveObject(fileName="",objectType="histo",objectPath="",objectName="",na
 # ended function
 
 # retrieve histogram from file
+# ex: histo=retrieveHistogram(fileName=inputFileName,histoPath=histoPath,histoName=histoName,name="",returnDummyIfNotFound=False,debug=debug)
 def retrieveHistogram(fileName="",histoPath="",histoName="",name="",returnDummyIfNotFound=False,debug=False):
     histo=retrieveObject(fileName=fileName,objectType="histo",objectPath=histoPath,objectName=histoName,name=name,returnDummyIfNotFound=returnDummyIfNotFound,debug=debug)
     return histo
