@@ -1150,6 +1150,42 @@ def print_figures_of_merit(s,b):
     print "s",s,"b",b,"sensitivity",sensitivity(s,b),"significance",significance(s,b)
 # done function
 
+# very much used in statistics and measurement in science
+# average two or more measurements given their uncertainty
+# https://physics.stackexchange.com/questions/15197/how-do-you-find-the-uncertainty-of-a-weighted-average
+# http://ipl.physics.harvard.edu/wp-uploads/2013/03/PS3_Error_Propagation_sp13.pdf
+# for example for two measurements
+# x1+/-e1; x2+/-e2
+# w1=1.0/(e1*e1); w2=1.0/(e2*e2)
+# mu=x1w1+x2w2/(w1+w2)
+# e=1.0/sqrt(w1+w2)
+def get_average_weighted_by_uncertainties(list_tuple,debug=False):
+    if debug:
+        print "Calculated average weighted by their uncertainties for", list_tuple
+    weightedsum=0.0
+    sumofweights=0.0
+    for value,error in list_tuple:
+        if debug:
+            print "new value",value,"error",error
+        if error<0 or error==0:
+            print "error",error,"should be positive. Will ABORT!!!"
+            assert(False)
+        weight=1.0/(error*error)
+        if debug:
+            print "weight",weight
+        weightedsum+=weight*value
+        sumofweights+=weight
+        if debug:
+            print "weightedsum",weightedsum
+            print "sumofweights",sumofweights
+    # done loop
+    average=weightedsum/sumofweights
+    error=1.0/math.sqrt(sumofweights)
+    if debug:
+        print "average",average,"error",error
+    return average,error
+# done function
+
 def get_duration_of_run(time_start,time_previous,option,debug):
   if option=="start":
     time_first=time_start
