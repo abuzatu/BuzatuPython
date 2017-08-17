@@ -948,7 +948,9 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             print "WARNING! No fit done, as entries=",entries,"rms=",rms
             None
     elif fit=="Parabolic":
-        if True:
+        if h.GetEntries()<20:
+            None
+        else:
             function=TF1("parabolic",Parabolic(),xmin,xmax,3)
             function.SetParName(0,"p0")
             function.SetParName(1,"p1")
@@ -961,8 +963,6 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
                 result=((0.0,0.0),(f.GetParameter(0),f.GetParError(0)),(f.GetParameter(1),f.GetParError(1)),(f.GetParameter(2),f.GetParError(2)))
             f.SetLineColor(color)
             f.Draw("SAME")
-        else:
-            None
     elif fit=="Parabolic2":
         if True:
             function=TF1("parabolic2",Parabolic2(),xmin,xmax,5)
