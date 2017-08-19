@@ -1159,28 +1159,57 @@ def print_figures_of_merit(s,b):
 # w1=1.0/(e1*e1); w2=1.0/(e2*e2)
 # mu=x1w1+x2w2/(w1+w2)
 # e=1.0/sqrt(w1+w2)
+# if at least one weight is zero, return normal average
 def get_average_weighted_by_uncertainties(list_tuple,debug=False):
     if debug:
         print "Calculated average weighted by their uncertainties for", list_tuple
     weightedsum=0.0
     sumofweights=0.0
+    # check all weights are at least zero or positive
     for value,error in list_tuple:
         if debug:
             print "new value",value,"error",error
-        if error<0 or error==0:
-            print "error",error,"should be positive. Will ABORT!!!"
+        if error<0:
+            print "error",error,"should be zero or positive. Will ABORT!!!"
             assert(False)
-        weight=1.0/(error*error)
+    areAllWeightsPositive=True
+    # check if all weights are True
+    for value,error in list_tuple:
         if debug:
-            print "weight",weight
-        weightedsum+=weight*value
-        sumofweights+=weight
-        if debug:
-            print "weightedsum",weightedsum
-            print "sumofweights",sumofweights
-    # done loop
-    average=weightedsum/sumofweights
-    error=1.0/math.sqrt(sumofweights)
+            print "new value",value,"error",error
+        if error==0:
+            areAllWeightsPositive=False
+    # start if
+    if areAllWeightsPositive==False:
+    # if not all weights are positive, return regular average
+        valueSum=0.0
+        valueErrorSquared=0.0
+        for value,error in list_tuple:
+            if debug:
+                print "new value",value,"error",error
+            valueSum+=valueSum
+            valueErrorSquared+=error*error
+        # done for loop
+        NrElements=len(list_tuple)
+        average=valueSum/NrElements
+        average=math.sqrt(valueErrorSquared)/NrElements
+    else:
+        # if all weights are positive return weighted average
+        for value,error in list_tuple:
+            if debug:
+                print "new value",value,"error",error
+            weight=1.0/(error*error)
+            if debug:
+                print "weight",weight
+            weightedsum+=weight*value
+            sumofweights+=weight
+            if debug:
+                print "weightedsum",weightedsum
+                print "sumofweights",sumofweights
+            # done loop
+            average=weightedsum/sumofweights
+            error=1.0/math.sqrt(sumofweights)
+    # done if normal average (if at least one weight of zero) or weighted average (if all weights are larger than zero)
     if debug:
         print "average",average,"error",error
     return average,error
