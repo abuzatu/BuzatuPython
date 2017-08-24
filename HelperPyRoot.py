@@ -6,7 +6,7 @@ from HelperPython import *#import math
 import ROOT
 from ROOT import TLatex,TPad,TList,TH1,TH1F,TH2F,TH1D,TH2D,TFile,TTree,TChain,TCanvas,TLegend,SetOwnership,gDirectory,TObject,gStyle,gROOT,TLorentzVector,TGraph,TMultiGraph,TColor,TAttMarker,TLine,TDatime,TGaxis,TF1,THStack,TAxis,TStyle,TPaveText,TAttFill,TCutG,TMath,TNamed
 
-list_color=[1,2,4,3,6,ROOT.kOrange,6,7,8,9,14,29,38,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+list_color=[1,2,4,3,6,ROOT.kOrange,7,8,9,14,29,38,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
 #list_color=[7,1,4,2,3,12,9,14,29,38,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
 
 # checks if an object exists, useful for checking of a file or tree or histogram is found in a TFile
