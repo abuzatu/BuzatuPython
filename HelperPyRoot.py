@@ -1495,7 +1495,7 @@ def getHistoNonZeroRange(histo,debug=False):
     return nonZeroRange,nrNonZeroBins
 # done function
 
-def getBinValues(histo,significantDigits=0,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=False,debug=False):
+def getBinValues(histo,significantDigits=0,doRescaleMeVtoGeV=False,doUnderflow=False,doOverflow=False,debug=True):
     if debug:
         print "Printing bin values for histogram of name",histo.GetName(),":"
     list_value=[]
@@ -1652,7 +1652,7 @@ def get_interpolated_graph_for_histo(h,debug):
 # for statistical error band
 # code example: https://www.desy.de/~stanescu/my-tmp/plotUpDownSys.C
 # its plot:https://www.desy.de/~stanescu/my-tmp/AFII/Nom-Up-Down-A500-tb050/jes1_h_ttbar_chi2_m_inc_res_mu.png
-def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio each to one on top",plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; Hinv analysis}?#bf{"+"category"+"}?#bf{"+"systematicStem"+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False):
+def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; Hinv analysis}?#bf{"+"category"+"}?#bf{"+"systematicStem"+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False):
     if debug:
         print "Start overlayHistograms(...)"
         print "option",option
@@ -1690,6 +1690,8 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
         print "Start Draw legend"
     # Draw the legend
     legend=get_legend(legend_info,debug)
+    list_tuple_h1D[0][0].GetYaxis().SetTitleSize(0.05)
+    list_tuple_h1D[0][0].GetYaxis().SetTitleOffset(1.01)
     h_canvas=list_tuple_h1D[0][0].Clone()
     if debug:
         print "after h_canvas"
@@ -1747,8 +1749,8 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
         #h1D.SetTitleOffset(YTitleOffset,"Y");
         #h1D.SetTitleOffset(10.0,"Y");
         ##h1D.GetYaxis().SetLabelSize(0.001)
-        #h1D.GetYaxis().SetTitleSize(0.20)
-        #h1D.GetYaxis().SetTitleOffset(1.45)
+        #h1D.GetYaxis().SetTitleSize(0.80)
+        #h1D.GetYaxis().SetTitleOffset(1.20)
         #h1D.GetYaxis().SetLabelOffset(1000)
         #h1D.GetXaxis().SetLabelSize(0.00)
         #h1D.GetYaxis().SetLabelSize(0.00)
@@ -1926,8 +1928,8 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
             #ratio_h1D.SetMaximum(1.05)
             ratio_h1D.GetYaxis().SetTitle(ratioTitle)
             ratio_h1D.GetYaxis().SetLabelSize(0.08)
-            ratio_h1D.GetYaxis().SetTitleSize(0.10)
-            ratio_h1D.GetYaxis().SetTitleOffset(0.45)
+            ratio_h1D.GetYaxis().SetTitleSize(0.08)
+            ratio_h1D.GetYaxis().SetTitleOffset(0.55)
             # no need of an x axis label, as the same as from the pad above
             ratio_h1D.GetXaxis().SetTitle("")
             ratio_h1D.GetXaxis().SetLabelSize(0.08)
