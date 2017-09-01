@@ -1167,6 +1167,18 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
     return f,result
 # done function
 
+def debug_fit_function(f,debug=False):
+    if debug==False:
+        return
+    print "NDF",f.GetNDF()
+    print "Ndim",f.GetNdim()
+    print "Npar",f.GetNpar()
+    print "Npx",f.GetNpx()
+    print "Number",f.GetNumber()
+    print "NumberFitPoints",f.GetNumberFitPoints()
+    print "NumberFreeParameters",f.GetNumberFreeParameters()
+# done function
+
 def get_value_error_from_result_fit(fitVar,result_fit,debug):
     if debug:
         print "result_fit (median,(height,height_error),(mean,mean_error),(sigma,sigma_error))",result_fit
