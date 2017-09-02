@@ -3231,7 +3231,7 @@ def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,histo
     histoSystNrBins=histoSyst.GetNbinsX()
     if debug:
         print "histoSystNrBins",histoSystNrBins
-    list_myType="Hessian_Up,Hessian_Down,AddQuadrature_Up,AddQuadrature_Down,StdDev_Up,StdDev_Down".split(",")
+    list_myType="Hessian_Up,Hessian_Down,AddQuadr_Up,AddQuadr_Down,StdDev_Up,StdDev_Down".split(",")
     dict_myType_histo={}
     for myType in list_myType:
         histoName=histoNameSyst+"_"+myType+"_"+suffixName
