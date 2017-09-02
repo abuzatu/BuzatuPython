@@ -3214,17 +3214,20 @@ class F_qmu_given_mu:
 # done class
 
 # https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/PdfRecommendations#PDF_uncertainty_prescriptions
-# eg. PDF uncertainty prescriptions, Asymmetric Hessian: eg. MSTW/MRST, CT10  MSTW/MRST, CT10 
-def get_Hessian_asymmetric(list_input_histo,debug=False):
+# Hessian asymmetric Up, Down, eg. PDF uncertainty prescriptions, Asymmetric Hessian: eg. MSTW/MRST, CT10  MSTW/MRST, CT10
+# standard deviation Symmetric, e.g. NNNPDF
+def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,debug=False):
     nrHistos=len(list_input_histo)
     if debug:
-        print "get_Hessian_asymmetric from",nrHistos,"elements"
+        print "get_systematic_error_from_list_histo_ratio_alt_to_nom()",nrHistos,"elements"
+        print "We return Up and down from Hessian asymmetric, like for CT10 PDF"
+        print "We also return StandardDeviation from symmetric, like for NNNPDF"
     assert(len(list_input_histo)>0)
     histoName0=list_input_histo[0].GetName()
     if debug:
         print "histoName0",histoName0
     # find the last _ and remove what is after it (name of the systematic)
-    # to keep a common stem, to which to add _Up, _Down
+    # to keep a common stem, to which to add _Hessian_Up, _Hessian_Down
     k=histoName0.rfind("_")
     histoNameStem=histoName0[0:k]
     if debug:
@@ -3235,7 +3238,7 @@ def get_Hessian_asymmetric(list_input_histo,debug=False):
     histoSystNrBins=histoSyst.GetNbinsX()
     if debug:
         print "histoSystNrBins",histoSystNrBins
-    list_myType="Up,Down".split(",")
+    list_myType="Hessian_Up,Hessian_Down,AddQuadrature_Up,AddQuadrature_Down,StdDev_Up,StdDev_Down".split(",")
     dict_myType_histo={}
     for myType in list_myType:
         histoName=histoNameStem+"_"+myType
@@ -3244,12 +3247,15 @@ def get_Hessian_asymmetric(list_input_histo,debug=False):
         if debug:
             print myType,"name",dict_myType_histo[myType].GetName(),"title",dict_myType_histo[myType].GetTitle()
     # done loop over type
+    dict_myType_binSyst={}
     # loop over the bins
     for i in xrange(1,1+histoSystNrBins):
         if debug:
             print "i bin",i
         # for each bin, loop over all the histograms
-        dict_myType_binSyst={"Up":0.0,"Down":0.0}
+        # (re)set the dictionary of binSyst to zero
+        for myType in list_myType:
+            dict_myType_binSyst[myType]=0.0 
         for j in xrange(0,nrHistos):
             if debug:
                 print "j histo",j
@@ -3269,25 +3275,45 @@ def get_Hessian_asymmetric(list_input_histo,debug=False):
             if debug:
                 print "binValue",binValue,"binSyst",binSyst
             if binSyst>=0:
-                myTypeLocal="Up"
+                myTypeHessian="Hessian_Up"
             else:
-                myTypeLocal="Down"
-            dict_myType_binSyst[myTypeLocal]+=binSyst*binSyst # add in quadrature
+                myTypeHessian="Hessian_Down"
+            binSystSquared=binSyst*binSyst
+            dict_myType_binSyst[myTypeHessian]+=binSystSquared # add in quadrature to either up or down
+            # now add in quadrature for the others for both up and down
+            for myType in list_myType:
+                if "Hessian" in myType:
+                    continue
+                dict_myType_binSyst[myType]+=binSystSquared
         # done loop over histograms
         # for this bin take the square root part of adding in quadrature
         for myType in list_myType:
+            if "StdDev" in myType: # for both up and down divide by the number of systematics
+                dict_myType_binSyst[myType]/=nrHistos 
+            # for all take the square root
             dict_myType_binSyst[myType]=math.sqrt(dict_myType_binSyst[myType]) 
             if debug:
                 print "myType",myType,"total syst",dict_myType_binSyst[myType]
-        # for Up, add to 1, for Down subtract from 1
-        dict_myType_binSyst["Up"]  =1.0+dict_myType_binSyst["Up"] 
-        dict_myType_binSyst["Down"]=1.0-dict_myType_binSyst["Down"] 
+        # for Hessian_Up, add to 1, for Hessian_Down subtract from 1
+        for myType in list_myType:
+            if "Up" in myType:
+                dict_myType_binSyst[myType]=1.0+dict_myType_binSyst[myType]
+            elif "Down" in myType:
+                dict_myType_binSyst[myType]=1.0-dict_myType_binSyst[myType]
+            else:
+                print "In myType",myType,"Up or Down is not found. Will ABORT!!!"
+                assert(false)
+            # done if
+        # done for loop over myType
         if debug:
             for myType in list_myType:
                 print "myType",myType,"total syst near 1",dict_myType_binSyst[myType]
         # now set these as bin content with no errror in the final histograms
         for myType in list_myType:
-            dict_myType_histo[myType].SetBinContent(i,dict_myType_binSyst[myType]) 
+            print "myType",myType
+            dict_myType_histo[myType].SetBinContent(i,dict_myType_binSyst[myType])
+            dict_myType_histo[myType].SetMinimum(0.5)
+            dict_myType_histo[myType].SetMaximum(1.5)
     # done loop over bins
     # now the histograms are ready
     if debug:
