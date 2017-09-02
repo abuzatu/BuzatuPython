@@ -3216,24 +3216,17 @@ class F_qmu_given_mu:
 # https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/PdfRecommendations#PDF_uncertainty_prescriptions
 # Hessian asymmetric Up, Down, eg. PDF uncertainty prescriptions, Asymmetric Hessian: eg. MSTW/MRST, CT10  MSTW/MRST, CT10
 # standard deviation Symmetric, e.g. NNNPDF
-def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,debug=False):
+def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,histoNameSyst="histoSyst",suffixName="Main",debug=False):
     nrHistos=len(list_input_histo)
     if debug:
         print "get_systematic_error_from_list_histo_ratio_alt_to_nom()",nrHistos,"elements"
         print "We return Up and down from Hessian asymmetric, like for CT10 PDF"
         print "We also return StandardDeviation from symmetric, like for NNNPDF"
     assert(len(list_input_histo)>0)
-    histoName0=list_input_histo[0].GetName()
     if debug:
-        print "histoName0",histoName0
-    # find the last _ and remove what is after it (name of the systematic)
-    # to keep a common stem, to which to add _Hessian_Up, _Hessian_Down
-    k=histoName0.rfind("_")
-    histoNameStem=histoName0[0:k]
-    if debug:
-        print "histoNameStem",histoNameStem
+        print "histoNameSyst",histoNameSyst
     # clone the first one and reset it to have the same binings, but zero values
-    histoSyst=list_input_histo[0].Clone(histoNameStem)
+    histoSyst=list_input_histo[0].Clone(histoNameSyst)
     histoSyst.Reset()
     histoSystNrBins=histoSyst.GetNbinsX()
     if debug:
@@ -3241,7 +3234,7 @@ def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,debug
     list_myType="Hessian_Up,Hessian_Down,AddQuadrature_Up,AddQuadrature_Down,StdDev_Up,StdDev_Down".split(",")
     dict_myType_histo={}
     for myType in list_myType:
-        histoName=histoNameStem+"_"+myType
+        histoName=histoNameSyst+"_"+myType+"_"+suffixName
         dict_myType_histo[myType]=histoSyst.Clone(histoName)
         dict_myType_histo[myType].SetTitle(histoName)
         if debug:
