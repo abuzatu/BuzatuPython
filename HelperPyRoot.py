@@ -1535,7 +1535,7 @@ def getBinValues(histo,significantDigits=0,doRescaleMeVtoGeV=False,doUnderflow=F
         else:
             binRatio=ratio(binError,binContent)*100
         if significantDigits==0:
-            line="bin %4.0f range [%6.0f,%6.0f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
+            line="bin %4.0f range [%6.0f,%6.0f] value %8.4f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
         elif significantDigits==1:
             line="bin %4.0f range [%6.1f,%6.1f] value %8.2f error %8.2f (%4.2f%%)" % (i,binLowEdge,binHighEdge,binContent,binError,binRatio)
         elif significantDigits==2:
@@ -3212,3 +3212,87 @@ class F_qmu_given_mu:
         return result
     # done function
 # done class
+
+# https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/PdfRecommendations#PDF_uncertainty_prescriptions
+# eg. PDF uncertainty prescriptions, Asymmetric Hessian: eg. MSTW/MRST, CT10  MSTW/MRST, CT10 
+def get_Hessian_asymmetric(list_input_histo,debug=False):
+    nrHistos=len(list_input_histo)
+    if debug:
+        print "get_Hessian_asymmetric from",nrHistos,"elements"
+    assert(len(list_input_histo)>0)
+    histoName0=list_input_histo[0].GetName()
+    if debug:
+        print "histoName0",histoName0
+    # find the last _ and remove what is after it (name of the systematic)
+    # to keep a common stem, to which to add _Up, _Down
+    k=histoName0.rfind("_")
+    histoNameStem=histoName0[0:k]
+    if debug:
+        print "histoNameStem",histoNameStem
+    # clone the first one and reset it to have the same binings, but zero values
+    histoSyst=list_input_histo[0].Clone(histoNameStem)
+    histoSyst.Reset()
+    histoSystNrBins=histoSyst.GetNbinsX()
+    if debug:
+        print "histoSystNrBins",histoSystNrBins
+    list_myType="Up,Down".split(",")
+    dict_myType_histo={}
+    for myType in list_myType:
+        histoName=histoNameStem+"_"+myType
+        dict_myType_histo[myType]=histoSyst.Clone(histoName)
+        dict_myType_histo[myType].SetTitle(histoName)
+        if debug:
+            print myType,"name",dict_myType_histo[myType].GetName(),"title",dict_myType_histo[myType].GetTitle()
+    # done loop over type
+    # loop over the bins
+    for i in xrange(1,1+histoSystNrBins):
+        if debug:
+            print "i bin",i
+        # for each bin, loop over all the histograms
+        dict_myType_binSyst={"Up":0.0,"Down":0.0}
+        for j in xrange(0,nrHistos):
+            if debug:
+                print "j histo",j
+            binValue=list_input_histo[j].GetBinContent(i)
+            # the bins are made of dividing histograms of alternative and nominal
+            # but if alternative has no bin content in some bin, the ratio is also zero
+            # and so binSyst becomes -1.0 and adding in quadrature it reaches large values
+            # so we set binValue to that of the earlier bin
+            # initially I thought to have it 1.0, meaning zero syst, but that is unphysical
+            # and use while to go back as many bins as necessary to find a non zero bin
+            # as maybe more than one bin at the end are empty
+            my_i=i
+            while binValue==0:
+                my_i=my_i-1
+                binValue=list_input_histo[j].GetBinContent(my_i)
+            binSyst=binValue-1.0
+            if debug:
+                print "binValue",binValue,"binSyst",binSyst
+            if binSyst>=0:
+                myTypeLocal="Up"
+            else:
+                myTypeLocal="Down"
+            dict_myType_binSyst[myTypeLocal]+=binSyst*binSyst # add in quadrature
+        # done loop over histograms
+        # for this bin take the square root part of adding in quadrature
+        for myType in list_myType:
+            dict_myType_binSyst[myType]=math.sqrt(dict_myType_binSyst[myType]) 
+            if debug:
+                print "myType",myType,"total syst",dict_myType_binSyst[myType]
+        # for Up, add to 1, for Down subtract from 1
+        dict_myType_binSyst["Up"]  =1.0+dict_myType_binSyst["Up"] 
+        dict_myType_binSyst["Down"]=1.0-dict_myType_binSyst["Down"] 
+        if debug:
+            for myType in list_myType:
+                print "myType",myType,"total syst near 1",dict_myType_binSyst[myType]
+        # now set these as bin content with no errror in the final histograms
+        for myType in list_myType:
+            dict_myType_histo[myType].SetBinContent(i,dict_myType_binSyst[myType]) 
+    # done loop over bins
+    # now the histograms are ready
+    if debug:
+        for myType in list_myType:
+            print "myType",myType
+            getBinValues(dict_myType_histo[myType])
+    return dict_myType_histo
+# done function
