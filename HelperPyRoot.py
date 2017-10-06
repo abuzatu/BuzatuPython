@@ -397,7 +397,7 @@ def listObjects(inputFileName,directoryPath="",searchClass="",list_searchName=["
         elif doOption=="B":
             assert(len(list_searchName)==1)
             searchName=list_searchName[0]
-            text=key.GetName().replace(searchName+"_","")
+            text=key.GetName().replace("_"+searchName,"")
         else:
             print "doOption",doOption,"not known. Choose A or B. Will ABORT!!!"
             assert(False)
