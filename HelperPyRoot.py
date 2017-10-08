@@ -2971,7 +2971,11 @@ def do_error_myRange(myRange):
     assert(False)
 # done function
 
-def get_histo_integral_error(histo,myRange=0,debug=False):
+# myRange=-1 with underflow and overflow bins
+# myRange=0 without underflow and overflow bins
+# option="" just add the bin contentss
+# option="width" add the bin contents multiplied by the respective bin width (key for asymmetric bins)
+def get_histo_integral_error(histo,myRange=0,option="",debug=False):
     if myRange==-1:
         myRange=[0,histo.GetNbinsX()+1] # with    overflow bins
     elif myRange==0:
@@ -2997,7 +3001,7 @@ def get_histo_integral_error(histo,myRange=0,debug=False):
         None
     # range is good and defined, we can move on
     array_error=array("d",[0])
-    option=""
+    # option "" or "width" 
     integral=histo.IntegralAndError(myRange[0],myRange[1],array_error,option)
     error=array_error[0]
     if debug:
