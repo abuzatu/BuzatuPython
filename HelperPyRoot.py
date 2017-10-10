@@ -3235,7 +3235,9 @@ def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,histo
     histoSystNrBins=histoSyst.GetNbinsX()
     if debug:
         print "histoSystNrBins",histoSystNrBins
-    list_myType="Hessian_Up,Hessian_Down,AddQuadr_Up,AddQuadr_Down,StdDev_Up,StdDev_Down".split(",")
+    # list_myType="Hessian_Up,Hessian_Down,AddQuadr_Up,AddQuadr_Down,StdDev_Up,StdDev_Down".split(",")
+    # list_myType="Max_Up,Max_Down".split(",")
+    list_myType="Hessian_Up,Hessian_Down,AddQuadr_Up,AddQuadr_Down,StdDev_Up,StdDev_Down,Max_Up,Max_Down".split(",")
     dict_myType_histo={}
     for myType in list_myType:
         histoName=histoNameSyst+"_"+myType+"_"+suffixName
@@ -3249,6 +3251,7 @@ def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,histo
     for i in xrange(1,1+histoSystNrBins):
         if debug:
             print "i bin",i
+        maxBinSystSquared=0.0
         # for each bin, loop over all the histograms
         # (re)set the dictionary of binSyst to zero
         for myType in list_myType:
@@ -3271,27 +3274,44 @@ def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,histo
             binSyst=binValue-1.0
             if debug:
                 print "binValue",binValue,"binSyst",binSyst
+            # for Hessian_Up, Hessian_Down
             if binSyst>=0:
                 myTypeHessian="Hessian_Up"
             else:
                 myTypeHessian="Hessian_Down"
             binSystSquared=binSyst*binSyst
             dict_myType_binSyst[myTypeHessian]+=binSystSquared # add in quadrature to either up or down
+            # find max value for the Max_Up, Max_Down
+            if binSystSquared>maxBinSystSquared:
+                maxBinSystSquared=binSystSquared
             # now add in quadrature for the others for both up and down
             for myType in list_myType:
                 if "Hessian" in myType:
-                    continue
-                dict_myType_binSyst[myType]+=binSystSquared
+                    None
+                elif "Max" in myType:
+                    dict_myType_binSyst[myType]=maxBinSystSquared
+                elif "AddQuadr" in myType or "StdDev" in myType:
+                    dict_myType_binSyst[myType]+=binSystSquared
+                else:
+                    print "myType",myType,"not known. Choose Hessian_Up,Hessian_Down,AddQuadr_Up,AddQuadr_Down,StdDev_Up,StdDev_Down,Max_Up,Max_Down. Will ABORTT!!!"
+                    assert(False)
+                # done if
         # done loop over histograms
         # for this bin take the square root part of adding in quadrature
         for myType in list_myType:
+            if debug:
+                print "C",myType,dict_myType_binSyst[myType],"after first fill"
             if "StdDev" in myType: # for both up and down divide by the number of systematics
-                dict_myType_binSyst[myType]/=nrHistos 
+                dict_myType_binSyst[myType]/=nrHistos
+            if debug:
+                print "D",myType,dict_myType_binSyst[myType],"after /nrHistos by StdDev",nrHistos
             # for all take the square root
             dict_myType_binSyst[myType]=math.sqrt(dict_myType_binSyst[myType]) 
             if debug:
+                print "E",myType,dict_myType_binSyst[myType],"after sqrt()"
+            if debug:
                 print "myType",myType,"total syst",dict_myType_binSyst[myType]
-        # for Hessian_Up, add to 1, for Hessian_Down subtract from 1
+        # for *_Up, add to 1, for *_Down subtract from 1
         for myType in list_myType:
             if "Up" in myType:
                 dict_myType_binSyst[myType]=1.0+dict_myType_binSyst[myType]
@@ -3307,10 +3327,11 @@ def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,histo
                 print "myType",myType,"total syst near 1",dict_myType_binSyst[myType]
         # now set these as bin content with no errror in the final histograms
         for myType in list_myType:
-            print "myType",myType
+            if debug:
+                print "myType",myType
             dict_myType_histo[myType].SetBinContent(i,dict_myType_binSyst[myType])
-            dict_myType_histo[myType].SetMinimum(0.5)
-            dict_myType_histo[myType].SetMaximum(1.5)
+            dict_myType_histo[myType].SetMinimum(0.0)
+            dict_myType_histo[myType].SetMaximum(2.5)
     # done loop over bins
     # now the histograms are ready
     if debug:
