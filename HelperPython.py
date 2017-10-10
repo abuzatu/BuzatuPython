@@ -1127,23 +1127,140 @@ def get_figure_of_merit(s,se,b,be,figureOfMerit="SignificanceSigmaB",debug=False
     return result
 # done function
 
-def average(a,b):
-  return 0.5*(a+b)
+def sum(a,b):
+    return a+b
+# done function
 
-def average(a,b,c):
-  return (1.0/3)*(a+b+c)
+def sum_error(a,sa,b,sb):
+    result=a+b
+    error=math.sqrt(sa*sa+sb*sb)
+    return (result,error)
+# done function
+
+def sum_error_three(a,b,c):
+    return a+b+c
+# done function
+
+def sum_error_three(a,sa,b,sb,c,sc):
+    result=a+b+c
+    error=math.sqrt(sa*sa+sb*sb+sc*sc)
+    return (result,error)
+# done function
+
+def sum_list(list_value):
+    result=0.0
+    for value in list_value:
+        result+=value
+    return result
+# done function
+
+def sum_error_list(list_tuple,debug=False):
+    sum=0.0
+    sumErrorSquared=0.0
+    for tuple in list_tuple:
+        value=tuple[0]
+        error=tuple[1]
+        sum+=value
+        sumErrorSquared+=error*error # for sum errors are added in quadrature (like at histo bins)
+    # done loop over entries
+    sumError=math.sqrt(sumErrorSquared)
+    result=(sum,sumError)
+    if debug:
+        print "result",result,"input",list_tuple
+    return result
+# done function
+
+def average(a,b):
+    return 0.5*(a+b)
+# done function
+
+def average_error(a,sa,b,sb):
+    result=0.5*(a+b)
+    error=0.5*math.sqrt(sa*sa+sb*sb)
+    return (result,error)
+# done function
+
+def average_error_three(a,b,c):
+    return (1.0/3)*(a+b+c)
+# done function
+
+def average_error_three(a,sa,b,sb,c,sc):
+    result=(1.0/3)*(a+b+c)
+    error=(1.0/3)*math.sqrt(sa*sa+sb*sb+sc*sc)
+    return (result,error)
+# done function
+
+def average_list(list_value):
+    result=0.0
+    for value in list_value:
+        result+=value
+    result/=len(list_value)
+    return result
+# done function
+
+def average_error_list(list_tuple,debug=False):
+    sum=0.0
+    sumErrorSquared=0.0
+    for tuple in list_tuple:
+        value=tuple[0]
+        error=tuple[1]
+        sum+=value
+        sumErrorSquared+=error*error # for sum errors are added in quadrature (like at histo bins)
+    # done loop over entries
+    N=len(list_tuple)
+    average=sum/N
+    averageError=math.sqrt(sumErrorSquared)/N
+    result=(average,averageError)
+    if debug:
+        print "average",result,"input",list_tuple
+    return result
+# done function
 
 def add_in_quadrature(a,b):
   return math.sqrt(a*a+b*b)
+# done function
+
+def add_in_quadrature_error(a,sa,b,sb):
+    result=math.sqrt(a*a+b*b)
+    error=2*math.sqrt(a*a*sa*sa+b*b*sb*sb)
+    return result,error
+# done function
 
 def add_in_quadrature_three(a,b,c):
   return math.sqrt(a*a+b*b+c*c)
+# done function
 
-def add_in_quadrature_list(list_value):
-    sum=0.0
+def add_in_quadrature_error_three(a,sa,b,sb,c,sc):
+    result=math.sqrt(a*a+b*b+c*c)
+    error=2*math.sqrt(a*a*sa*sa+b*b*sb*sb+c*c*sc*sc)
+    return result,error
+# done function
+
+def add_in_quadrature_list(list_value,debug=False):
+    result=0.0
     for value in list_value:
-        sum+=value*value
-    return math.sqrt(sum)
+        result+=value*value
+    # done loop over entries
+    result=math.sqrt(result)
+    if debug:
+        print "add_in_quadrature",result,"from input",list_value
+    return result
+# done function
+
+def add_in_quadrature_error_list(list_tuple,debug=False):
+    result=0.0
+    resultError=0.0
+    for tuple in list_tuple:
+        value=tuple[0]
+        valueError=tuple[1]
+        result+=value*value
+        resultError+=(2*value*valueError)*(2*value*valueError)
+    # done loop over entries
+    result=math.sqrt(result)
+    resultError=math.sqrt(resultError)
+    if debug:
+        print "add_in_quadrature",(result,resultError),"from input",list_tuple
+    return (result,resultError)
 # done function
 
 def print_figures_of_merit(s,b):
