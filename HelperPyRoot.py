@@ -3217,6 +3217,79 @@ class F_qmu_given_mu:
     # done function
 # done class
 
+
+# function that takes a histogram, fits it, gets the value of the fit in the middle of the bins
+# and fits a new histogram with that
+# useful for systematics when the statistical errors are too large to trust the histogram as is
+def get_histo_after_fit(histo,fitType="Linear",outputFolder="./",debug=False):
+    if debug:
+        print "Start get_histo_after_fit for histoName="+histo.GetName()
+    histo.SetMinimum(0.6)
+    histo.SetMaximum(1.4)
+    result=histo.Clone(histo.GetName()+"_Fit_"+fitType)
+    if debug:
+        print "result histo name",result.GetName(),"title",result.GetTitle()
+    # reset all values to add later the ones after the fit
+    result.Reset()
+    # fit original function
+    canvasname=outputFolder+"/"+histo.GetName()+"_fit_"+fitType
+    f,fitValues=fit_hist(h=histo,fitRange=[-1,-1],defaultFunction=TF1(),fit=fitType,addMedianInFitInfo=False,plot_option="",doValidationPlot=True,canvasname=canvasname,debug=debug)
+    print type(f)
+    debug_fit_function(f,debug=debug)
+    print "175",f.Eval(175)
+    print "225",f.Eval(225)
+    print "700",f.Eval(700)
+    print "1150",f.Eval(1150)
+
+    par0=f.GetParameter(0)
+    par1=f.GetParameter(1)
+    par0Error=f.GetParError(0)
+    par1Error=f.GetParError(1)
+    if debug:
+        print "par0",par0,"par0Error",par0Error,"par1",par1,"par1Error",par1Error
+    print f.Eval(100.0)
+    list_sign0=[-1,0,1]
+    list_sign1=[-1,0,1]
+    #f.SetParameters(par0,par1)
+    #print f.Eval(100.0)
+    #f.SetParameters(par0+par0Error,par1)
+    #print f.Eval(100.0)
+
+    # now set the bins to result
+    for i in xrange(1,result.GetNbinsX()+1):
+        binLowEdge=result.GetBinLowEdge(i)
+        binWidth=result.GetBinWidth(i)
+        binHighEdge=binLowEdge+binWidth
+        binCenter=result.GetBinCenter(i)
+        binCenter2=binLowEdge+0.5*binWidth
+        assert(binCenter==binCenter2)
+        #value=f.Eval(binCenter)
+        if debug:
+            print "i",i,"edges",binLowEdge,"-",binHighEdge,"enter",binCenter#,"value",value
+        #result.SetBinContent(i,value)
+        #continue
+        # now evaluate error for this bin
+        error=0.0
+        f.SetParameters(par0,par1)
+        value=f.Eval(binCenter)
+        if debug:
+            print "value",value
+        for sign0 in list_sign0:
+            for sign1 in list_sign1:
+                f.SetParameters(par0+sign0*par0Error,par1+sign1*par1Error)
+                valueTemp=f.Eval(binCenter)
+                diffTemp=abs(valueTemp-value)
+                if diffTemp>error:
+                    error=diffTemp
+        # done for loops, we have error
+        if debug:
+            print "fitValue",value,"fitError",error
+        result.SetBinContent(i,value)
+        result.SetBinError(i,error)
+    # done fit over bins
+    return result
+# done function
+
 # https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/PdfRecommendations#PDF_uncertainty_prescriptions
 # Hessian asymmetric Up, Down, eg. PDF uncertainty prescriptions, Asymmetric Hessian: eg. MSTW/MRST, CT10  MSTW/MRST, CT10
 # standard deviation Symmetric, e.g. NNNPDF
