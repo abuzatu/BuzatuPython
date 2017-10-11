@@ -3224,8 +3224,8 @@ class F_qmu_given_mu:
 def get_histo_after_fit(histo,fitType="Linear",outputFolder="./",debug=False):
     if debug:
         print "Start get_histo_after_fit for histoName="+histo.GetName()
-    histo.SetMinimum(0.0)
-    histo.SetMaximum(2.5)
+    histo.SetMinimum(0.4)
+    histo.SetMaximum(1.6)
     result=histo.Clone(histo.GetName()+"_Fit_"+fitType)
     if debug:
         print "result histo name",result.GetName(),"title",result.GetTitle()
@@ -3245,7 +3245,6 @@ def get_histo_after_fit(histo,fitType="Linear",outputFolder="./",debug=False):
     par1Error=f.GetParError(1)
     if debug:
         print "par0",par0,"par0Error",par0Error,"par1",par1,"par1Error",par1Error
-    print f.Eval(100.0)
     list_sign0=[-1,0,1]
     list_sign1=[-1,0,1]
 
@@ -3394,8 +3393,8 @@ def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,histo
             if debug:
                 print "myType",myType
             dict_myType_histo[myType].SetBinContent(i,dict_myType_binSyst[myType])
-            dict_myType_histo[myType].SetMinimum(0.0)
-            dict_myType_histo[myType].SetMaximum(2.5)
+            dict_myType_histo[myType].SetMinimum(0.4)
+            dict_myType_histo[myType].SetMaximum(1.6)
     # done loop over bins
     # now the histograms are ready
     if debug:
