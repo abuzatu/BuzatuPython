@@ -1127,6 +1127,40 @@ def get_figure_of_merit(s,se,b,be,figureOfMerit="SignificanceSigmaB",debug=False
     return result
 # done function
 
+# max(a,b) is already defined by Python
+
+# ex (1.0,0.1,2.0,0.2)
+def max_error(a,sa,b,sb):
+    result=(a,sa)
+    if b>result[0]:
+        result=(b,sb)
+    return result
+# done function
+
+# 1.0, 2.0, 3.0
+def max_list(list_value):
+    result=list_value[0]
+    for value in list_value:
+        if value>result:
+            result=value
+    return result
+# done function
+
+# ex [(1.0,0.1),(2.0,0.2),(3.0,0.3)]
+def max_error_list(list_tuple):
+    result=list_tuple[0]
+    for tuple in list_tuple:
+        if tuple[0]>result[0]:
+            result=tuple
+    return result
+# done function
+
+# abs(a) is already defined by Python
+
+def abs_error(a,sa):
+    return (abs(a),sa)
+# done function
+
 def sum(a,b):
     return a+b
 # done function
