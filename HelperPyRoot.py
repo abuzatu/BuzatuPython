@@ -3224,8 +3224,8 @@ class F_qmu_given_mu:
 def get_histo_after_fit(histo,fitType="Linear",outputFolder="./",debug=False):
     if debug:
         print "Start get_histo_after_fit for histoName="+histo.GetName()
-    histo.SetMinimum(0.6)
-    histo.SetMaximum(1.4)
+    histo.SetMinimum(0.0)
+    histo.SetMaximum(2.5)
     result=histo.Clone(histo.GetName()+"_Fit_"+fitType)
     if debug:
         print "result histo name",result.GetName(),"title",result.GetTitle()
@@ -3234,13 +3234,11 @@ def get_histo_after_fit(histo,fitType="Linear",outputFolder="./",debug=False):
     # fit original function
     canvasname=outputFolder+"/"+histo.GetName()+"_fit_"+fitType
     f,fitValues=fit_hist(h=histo,fitRange=[-1,-1],defaultFunction=TF1(),fit=fitType,addMedianInFitInfo=False,plot_option="",doValidationPlot=True,canvasname=canvasname,debug=debug)
-    print type(f)
     debug_fit_function(f,debug=debug)
-    print "175",f.Eval(175)
-    print "225",f.Eval(225)
-    print "700",f.Eval(700)
-    print "1150",f.Eval(1150)
 
+    # the error treatment below assumes the fitType is Linear
+    assert(fitType=="Linear")
+    # 
     par0=f.GetParameter(0)
     par1=f.GetParameter(1)
     par0Error=f.GetParError(0)
@@ -3250,10 +3248,6 @@ def get_histo_after_fit(histo,fitType="Linear",outputFolder="./",debug=False):
     print f.Eval(100.0)
     list_sign0=[-1,0,1]
     list_sign1=[-1,0,1]
-    #f.SetParameters(par0,par1)
-    #print f.Eval(100.0)
-    #f.SetParameters(par0+par0Error,par1)
-    #print f.Eval(100.0)
 
     # now set the bins to result
     for i in xrange(1,result.GetNbinsX()+1):
@@ -3263,12 +3257,9 @@ def get_histo_after_fit(histo,fitType="Linear",outputFolder="./",debug=False):
         binCenter=result.GetBinCenter(i)
         binCenter2=binLowEdge+0.5*binWidth
         assert(binCenter==binCenter2)
-        #value=f.Eval(binCenter)
         if debug:
-            print "i",i,"edges",binLowEdge,"-",binHighEdge,"enter",binCenter#,"value",value
-        #result.SetBinContent(i,value)
-        #continue
-        # now evaluate error for this bin
+            print "i",i,"edges",binLowEdge,"-",binHighEdge,"enter",binCenter
+        # evaluate value and error for this bin
         error=0.0
         f.SetParameters(par0,par1)
         value=f.Eval(binCenter)
@@ -3283,7 +3274,7 @@ def get_histo_after_fit(histo,fitType="Linear",outputFolder="./",debug=False):
                     error=diffTemp
         # done for loops, we have error
         if debug:
-            print "fitValue",value,"fitError",error
+            print "value",value,"error",error
         result.SetBinContent(i,value)
         result.SetBinError(i,error)
     # done fit over bins
