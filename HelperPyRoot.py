@@ -79,6 +79,22 @@ def exCreateTree(fileName,treeName,debug):
     return True
 # ended function
 
+def getNrEntriesTree(fileName,treeName,debug=False):
+    # open file
+    file=TFile(fileName,"READ")
+    if not file.IsOpen():
+        print "File",fileName,"does not exist, so will abort"
+        assert(False)
+    # open tree
+    tree=file.Get(treeName)
+    if tree==None:
+        print "tree",treeName,"doesn't exist in file",fileName
+        assert(False)
+    # use tree
+    nrEntries=tree.GetEntries()
+    return nrEntries
+# done function
+
 # read a Tree with a style like in ROOT
 # ex: exReadTreeStyle1("file1.root","tree1.root","rPt",False)
 def exReadTreeStyle1(fileName,treeName,variableName,debug=False):
