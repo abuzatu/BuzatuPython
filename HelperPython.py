@@ -204,9 +204,15 @@ def OpenFile(filename, debug):
         raise
 # done function
 
+class XPlus1OverX:
+    def __call__( self, x, par ):
+        return par[0]+x[0]*par[1]+(1.0/x[0])*par[2]
+    # done function
+# done class
+
 class Sigmoid:
     def __call__( self, x, par ):
-        return 1/(1+par[0]*math.exp(par[1]*(x[0])))
+        return 1.0/(1.0+par[0]*math.exp(par[1]*(x[0])))
     # done function
 # done class
 
