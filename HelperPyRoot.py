@@ -877,8 +877,10 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
     color=h.GetLineColor()
     if fit=="None":
         None
+    elif fit=="XPlus1OverX":
+        None
     elif fit=="Sigmoid":
-        if True:
+        if rms>0.02:
             function=TF1("sigmoid",Sigmoid(),xmin,xmax,2)
             h.Fit("sigmoid","RQ",plot_option+"same",xmin,xmax)
             f=h.GetFunction("sigmoid")
@@ -1419,6 +1421,8 @@ def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False
         print "histoName",histoName,"histoTitle",histoTitle,"histoNrBins",histoNrBins
     # create a histogram with this binning
     result=TH1F(histoName,histoTitle,histoNrBins, nparray_binRange)
+    result.SetXTitle(h.GetXaxis().GetTitle())
+    result.SetYTitle(h.GetYaxis().GetTitle())
     # loop over each bin of the new histogram
     for i in xrange(1,result.GetNbinsX()+1):
         low=result.GetBinLowEdge(i)
