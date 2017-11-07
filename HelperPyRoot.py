@@ -1988,6 +1988,7 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
             #ratio_h1D.SetLineColor(0)
             ratio_h1D.SetMarkerStyle(8)
             ratio_h1D.SetMarkerSize(0.7)
+            ratio_h1D.SetMarkerColor(ratio_h1D.GetLineColor())  
             #ratio_h1D.Draw("E6 SAME") # stat errors on the ratios of systematics as curved shape
             #ratio_h1D.Draw("E1 SAME") # stat errors on the ratios of systematics as crosses
             #ratio_h1D.Draw("HIST SAME") # no errors but it draws the line also horizontally when the bins have zero value at start and vertically for the first non zero bin
