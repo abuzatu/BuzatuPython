@@ -1404,6 +1404,31 @@ def get_histo_subRange(h,subRange,debug=False):
     return h_subRange
 # done
 
+def remove_duplicates_from_generic_binRange(binRange="150,200,400",debug=False):
+    # evaluate the desired binning
+    # when making the bin range from a sum of several other bin ranges
+    # one ends and the other starts with the same value
+    # in that case, skip one of them, as it gives incorrectly a bin of zero range
+    if debug:
+        print "input binRange",binRange
+    binRangeOutput=""
+    previousEdge=""
+    list_repeatedEdge=[]
+    for i,currentEdge in enumerate(binRange.split(",")):
+        if False:
+            print "previousEdge",previousEdge,"currentEdge",currentEdge
+        if currentEdge!=previousEdge:
+            if i!=0:
+                binRangeOutput+=","
+            binRangeOutput+=currentEdge
+        # done if
+        previousEdge=currentEdge
+    # done for loop over bin edges
+    if debug:
+        print "output binRange",binRangeOutput
+    return binRangeOutput
+# done
+
 # actually coded by Root in h.Rebin(nbins,"new name",numpyArrayOfbins)
 # https://root.cern.ch/doc/master/classTH1.html#aff6520fdae026334bf34fa1800946790
 # so can get rid of this
@@ -1411,7 +1436,16 @@ def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False
     if option!="sum" and option!="average":
         print "option",option,"not known. Choose sum, average. Will ABORT!!!"
         assert(False)
-    # evaluate the desired binning
+    if binRange=="":
+        # then do nothing, return as it was
+        # it makes easier to use the same generic function and for some histograms to not actually rebin
+        return h
+    # actually start
+    if debug:
+        print "binRange",binRange,"option",option
+    # remove duplicates from the binRange, needed when making sum of bin ranges
+    binRange=remove_duplicates_from_generic_binRange(binRange=binRange,debug=debug)
+    # create numpy arrange of range from the string representing range
     nparray_binRange=get_numpyarray_from_listString(binRange.split(","),debug)
     if debug:
         print "nparray_binRange",nparray_binRange
