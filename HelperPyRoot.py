@@ -1442,9 +1442,13 @@ def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False
         return h
     # actually start
     if debug:
+        print "before removing duplicates:"
         print "binRange",binRange,"option",option
     # remove duplicates from the binRange, needed when making sum of bin ranges
     binRange=remove_duplicates_from_generic_binRange(binRange=binRange,debug=debug)
+    if debug:
+        print "after removing duplicates:"
+        print "binRange",binRange,"option",option
     # create numpy arrange of range from the string representing range
     nparray_binRange=get_numpyarray_from_listString(binRange.split(","),debug)
     if debug:
@@ -1459,6 +1463,8 @@ def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False
     result.SetXTitle(h.GetXaxis().GetTitle())
     result.SetYTitle(h.GetYaxis().GetTitle())
     # loop over each bin of the new histogram
+    if debug:
+        print "Start loop over bins of the new (rebinned) histogram"
     for i in xrange(1,result.GetNbinsX()+1):
         low=result.GetBinLowEdge(i)
         width=result.GetBinWidth(i)
@@ -1470,21 +1476,27 @@ def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False
         # and set them here
         value=0.0
         error_squared=0.0
+        if debug:
+            print "Start loop over bins of the initial histogram"
         for j in xrange(1,h.GetNbinsX()+1):
             current_low=h.GetBinLowEdge(j)
             current_width=h.GetBinWidth(j)
             current_high=current_low+current_width
+            #if debug:
+                #print "bin", i,"low","%.10f"%low,"high","%.10f"%high,"bin initial histogram",j,"current_low","%.10f"%current_low,"current_high","%.10f"%current_high,",current_high<=low",current_high<=low,",current_low>=high", current_low>=high,",OR",current_high<=low or current_low>=high
+                #print "bin", i,"current_high","%.10f"%current_high,"low","%.10f"%low,"current_high<=low",current_high<=low,"current_low","%.10f"%current_low,"high","%.10f"%high,"current_low>=high", current_low>=high,",OR",current_high<=low or current_low>=high
             # skip the bins that not in our range
-            if current_high<=low or current_low>=high:
+            epsilon=0.00001 # use epsilon I got errors before to with >= or <= since = comparison did not always work fine for non integers
+            if current_high<low+epsilon or current_low>high-epsilon:
                 continue                
             current_value=h.GetBinContent(j)
             current_error=h.GetBinError(j)
-            if debug:
-                print "bin initial histogram", j,"current_low",current_low,"current_high",current_high,"value",current_value,"error",current_error
             value+=current_value
             # error propagation: error of on bin is the sqrt of sum of weights
             # https://root.cern.ch/doc/master/classTH1.html Associated errors Sumw2
             error_squared+=current_error*current_error
+            if debug:
+                print "bin", i,"low",low,"high",high,"bin initial histogram", j,"current_low",current_low,"current_high",current_high,"current_value",current_value,"current_error",current_error,"value",value,"error_squared",error_squared
         # done loop over the bins of the initial histogram
         # we need the average value, so divide by the bin width
         error=math.sqrt(error_squared)
@@ -1497,7 +1509,7 @@ def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False
         result.SetBinContent(i,value)
         result.SetBinError(i,error)
     # all done
-    getBinValues(result,doRescaleMeVtoGeV=False,debug=debug)
+    getBinValues(result,doRescaleMeVtoGeV=False,significantDigits=2,debug=debug)
     return result
 # done function
 
