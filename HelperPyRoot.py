@@ -3112,6 +3112,43 @@ def isHistoConsistentWithOne(histo,debug=False):
     return result
 # done function
 
+def add_in_quadrature_bins_of_histo(h,IncludeUnderflowOverflowBins=False,debug=False):
+    if debug:
+        print "add_in_quadrature_bins_of_histo() with IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins
+    NbinsX=h.GetNbinsX()
+    # what is my range of bins I run on?
+    if IncludeUnderflowOverflowBins:
+        myrange=[0,NbinsX+1+1]
+    else:
+        # we want to run excluding the underflow (bin 0)
+        # and overflow bin NbinsX+1
+        myrange=[1,NbinsX+1]
+    if debug:
+        print "myrange",myrange
+    totalContent_squared=0.0
+    totalError_squared=0.0
+    # loop over bins
+    for i in xrange(myrange[0],myrange[-1]):
+        if debug:
+            print "Starting new bin"
+        currentContent=h.GetBinContent(i)
+        currentError  =h.GetBinError(i)
+        if debug:
+            print "i",i,"B +- errB","%-.5f +- %-5f" % (currentContent,currentError)
+        # add in quadrature
+        totalContent_squared+=currentContent*currentContent
+        totalError_squared+=currentError*currentError
+    # done loop over all the bins in the histogram
+    if debug:
+        print "totalContent_squared",totalContent_squared
+        print "totalError_squared",totalError_squared
+    total=math.sqrt(totalContent_squared)
+    error=math.sqrt(totalError_squared)
+    if debug:
+        print "IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins,"total",total
+    return total,error
+# done function
+
 def computeSB(h_S,h_B,IncludeUnderflowOverflowBins=False,AddInQuadrature=True,WhatToCompute="sensitivity",output=True,debug=False):
     if debug:
         print "Start computeSB() with IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins,"AddInQuadrature",AddInQuadrature,"WhatToCompute",WhatToCompute,"output",output
@@ -3476,4 +3513,39 @@ def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,histo
             print "myType",myType
             getBinValues(dict_myType_histo[myType])
     return dict_myType_histo
+# done function
+
+def get_dict_figureOfMerit_histo(sig_h,bkg_h,list_figureOfMerit=["SignalOverBackground","Sensitivity","Significance","SensitivitySigmaB","SignificanceSigmaB"],debug=False):
+    if debug:
+        print "Calculate histograms for the list of figure of merit",list_figureOfMerit
+    dict_figureOfMerit_histo={}
+    for figureOfMerit in list_figureOfMerit:
+        dict_figureOfMerit_histo[figureOfMerit]=sig_h.Clone(figureOfMerit)
+        dict_figureOfMerit_histo[figureOfMerit].Reset()
+        histoName=sig_h.GetName().replace("_S_","_"+figureOfMerit+"_")
+        dict_figureOfMerit_histo[figureOfMerit].SetName(histoName)
+        dict_figureOfMerit_histo[figureOfMerit].SetTitle(histoName)
+    # loop over all the bins of the histograms, including the underflow and overflow
+    for i in xrange(0,sig_h.GetNbinsX()+2):
+        s=sig_h.GetBinContent(i)
+        se=sig_h.GetBinError(i)
+        b=bkg_h.GetBinContent(i)
+        be=bkg_h.GetBinError(i)
+        low=sig_h.GetBinLowEdge(i)
+        high=sig_h.GetBinLowEdge(i)+sig_h.GetBinWidth(i)
+        # calculate for this bin the different figures of merit
+        for figureOfMerit in list_figureOfMerit:
+            result,error=get_figure_of_merit(s,se,b,be,figureOfMerit=figureOfMerit,debug=debug)
+            if debug:
+                print "Bin:",i,"[%.2f-%.2f]" % (low,high), "%-25s" % figureOfMerit,"%-.4f +/- %-.4f" % (result,error),"rel error %","%-.2f" % (ratio(error,result)*100)
+            dict_figureOfMerit_histo[figureOfMerit].SetBinContent(i,result)
+            dict_figureOfMerit_histo[figureOfMerit].SetBinError(i,error)
+        # done loop over all figures of merit
+    # done loop over bins
+    if debug:
+        for figureOfMerit in list_figureOfMerit:
+            histo=dict_figureOfMerit_histo[figureOfMerit]
+            getBinValues(histo,debug=debug)
+    # 
+    return dict_figureOfMerit_histo
 # done function
