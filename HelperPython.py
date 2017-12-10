@@ -1087,13 +1087,15 @@ def significance(s,se,b,be,debug=False):
 # significance the longer formula which becomes s/sqrt(b+be*be) in the limit when s/b -> 0 and when be*be/b -> 0
 def significanceSigmaB(s,se,b,be,debug=False):
     if debug:
-        print "significanceSigmaB","s",s,"se",se,"b",b,"be",be,"s/b",s/b,"be*be/b",be*be/b
+        print "significanceSigmaB","s",s,"se",se,"b",b,"be",be
     if b<0.0000001:
         result=0
         error=0
         if True:
             print "WARNING! b<0.001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
     else:
+        if debug:
+            print "significanceSigmaB","s",s,"se",se,"b",b,"be",be,"s/b",s/b,"be*be/b",be*be/b
         # for very low numbers, the sensitivity is a very good approximation
         # of the significance, but the code runs out of digits and approximates
         # the log(1+s/b) with zero, which makes it have negative values 
