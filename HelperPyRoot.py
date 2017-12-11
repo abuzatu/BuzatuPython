@@ -3112,7 +3112,50 @@ def isHistoConsistentWithOne(histo,debug=False):
     return result
 # done function
 
-def add_in_quadrature_bins_of_histo(h,IncludeUnderflowOverflowBins=False,debug=False):
+def add_in_quadrature_bin_by_bin_list_of_histo(list_histo,histoNameTotal="total",debug=False):
+    if debug:
+        print "add_in_quadrature_bin_by_bin_list_of_hist()"
+        for histo in list_histo:
+            print "histoName",histo.GetName()
+    histoTotal=list_histo[0].Clone()
+    histoTotal.Reset()
+    histoTotal.SetName(histoNameTotal)
+    histoTotal.SetTitle(histoNameTotal)
+    # loop over bins
+    NbinsX=histoTotal.GetNbinsX()
+    myrange=[1,NbinsX+1] # includes underflow and overflow
+    if debug:
+        print "myrange",myrange
+    for i in xrange(myrange[0],myrange[-1]):
+        if debug:
+            print "Starting new bin"
+        totalContent_squared=0.0
+        totalError_squared=0.0
+        # for this bin loop over histograms
+        for histo in list_histo:
+            currentContent=histo.GetBinContent(i)
+            currentError  =histo.GetBinError(i)
+            if debug:
+                print "i",i,"B +- errB","%-.5f +- %-5f" % (currentContent,currentError)
+            # add in quadrature
+            totalContent_squared+=currentContent*currentContent
+            totalError_squared+=currentError*currentError
+        # done loop over all histograms
+        if debug:
+            print "totalContent_squared",totalContent_squared
+            print "totalError_squared",totalError_squared
+        total=math.sqrt(totalContent_squared)
+        error=math.sqrt(totalError_squared)
+        # set the value and error to this bin
+        histoTotal.SetBinContent(i,total)
+        histoTotal.SetBinError(i,error)
+    # done loop over bins
+    if debug:
+        getBinValues(histoTotal,significantDigits=3,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+    return histoTotal
+# done function
+
+def add_in_quadrature_bins_of_one_histo(h,IncludeUnderflowOverflowBins=False,debug=False):
     if debug:
         print "add_in_quadrature_bins_of_histo() with IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins
     NbinsX=h.GetNbinsX()
