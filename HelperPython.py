@@ -1094,6 +1094,7 @@ def sensitivitySigmaB(s,se,b,be,debug=False):
 # is this the same as slide 5 and 6 of Nicolas' https://indico.cern.ch/event/688766/contributions/2830787/attachments/1578214/2492928/ApproximateSignificance.pdf
 # in Nicolas's slides: delta is relative uncertainty, so be/b. A 10% error gives delta of 0.10.
 # theta0 is the nuisance parameter that maximizes L for mu=0, it has formula on slide 5
+# Nicolas uses Gaussian prior, Cowan uses Poisson, so probably the results are very similar
 def significanceSigmaB(s,se,b,be,debug=False):
     if debug:
         print "significanceSigmaB","s",s,"se",se,"b",b,"be",be
