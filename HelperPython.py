@@ -998,6 +998,7 @@ def ratioError(s,se,b,be,debug=False):
 # done function
 
 # sensitivity, or s over sqrt(b)
+# slide 37 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
 def sensitivity(s,se,b,be,debug=False):
     if debug:
         print "sensitivity ","s",s,"se",se,"b",b,"be",be
@@ -1021,28 +1022,8 @@ def sensitivity(s,se,b,be,debug=False):
     return (result,error)
 # done function
 
-# sensitivity, or s over sqrt(b+be*be)
-# if s<<b, but be*be is not << b
-def sensitivitySigmaB(s,se,b,be,debug=False):
-    if debug:
-        print "sensitivitySigmaB ","s",s,"se",se,"b",b,"be",be
-    if b<0.0001:
-        if True:
-            print "WARNING! b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
-        result=0
-        error=0
-    else:
-        result=s/math.sqrt(b+be*be)
-        # trial and error has shown that the signal error on the ratio is the same percentage than the signal error
-        # the two formulas below are equivalent
-        #error=ratio(se,math.sqrt(b+be*be),debug=False)
-        error=result*ratio(se,s,debug=False)
-    if debug:
-        print "sensitivity ","content +/-error","%-.5f +/- %-.5f" % (result,error) 
-    return (result,error)
-# done function
-
 # significance, or DLLR, the longer formula which becomes s/sqrt(b) in the limit when s/b -> 0
+# slides 37 and 38 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
 def significance(s,se,b,be,debug=False):
     if debug:
         print "significance","s",s,"se",se,"b",b,"be",be
@@ -1079,12 +1060,40 @@ def significance(s,se,b,be,debug=False):
     return (result,error)
 # done function
 
+# when there is an uncertainty on the background
+# sensitivity, or s over sqrt(b+be*be)
+# if s<<b, but be*be is not << b
+# slide 41 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
+# can be rewritten as slide 4 of Nicolas' https://indico.cern.ch/event/688766/contributions/2830787/attachments/1578214/2492928/ApproximateSignificance.pdf
+def sensitivitySigmaB(s,se,b,be,debug=False):
+    if debug:
+        print "sensitivitySigmaB ","s",s,"se",se,"b",b,"be",be
+    if b<0.0001:
+        if True:
+            print "WARNING! b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
+        result=0
+        error=0
+    else:
+        result=s/math.sqrt(b+be*be)
+        # trial and error has shown that the signal error on the ratio is the same percentage than the signal error
+        # the two formulas below are equivalent
+        #error=ratio(se,math.sqrt(b+be*be),debug=False)
+        error=result*ratio(se,s,debug=False)
+    if debug:
+        print "sensitivity ","content +/-error","%-.5f +/- %-.5f" % (result,error) 
+    return (result,error)
+# done function
+
 # the most generic formula as a figure of merit
 # if s/b << 1 it becomes SensitivitySigmaB
 # if be*be<<b it becomes Significance 
 # if be*be<<b, SensitivitySigmaB becomes Sensitivity
 # if s/b <<1, Significance becomes Sensitivity
 # significance the longer formula which becomes s/sqrt(b+be*be) in the limit when s/b -> 0 and when be*be/b -> 0
+# slide 45 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
+# is this the same as slide 5 and 6 of Nicolas' https://indico.cern.ch/event/688766/contributions/2830787/attachments/1578214/2492928/ApproximateSignificance.pdf
+# in Nicolas's slides: delta is relative uncertainty, so be/b. A 10% error gives delta of 0.10.
+# theta0 is the nuisance parameter that maximizes L for mu=0, it has formula on slide 5
 def significanceSigmaB(s,se,b,be,debug=False):
     if debug:
         print "significanceSigmaB","s",s,"se",se,"b",b,"be",be
