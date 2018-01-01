@@ -963,6 +963,34 @@ def get_string_scale_resolution(fit_name,scale_value,resolution_value):
     return result
 # done function
 
+# http://changingminds.org/explanations/research/statistics/standard_error.htm
+# https://simple.wikipedia.org/wiki/Standard_deviation#With_sample_standard_deviation
+# https://simple.wikipedia.org/wiki/Standard_error
+
+def process_sample(list_value,debug=False):
+    if debug:
+        print "list_value",list_value
+    N=len(list_value)
+    Sum=0.0
+    for value in list_value:
+        Sum+=value
+    # done for loop
+    Mean=ratio(Sum,N)
+    # standard deviation (https://simple.wikipedia.org/wiki/Standard_deviation#With_sample_standard_deviation)
+    # https://en.wikipedia.org/wiki/Standard_deviation#Sample_standard_deviation_of_metabolic_rate_of_Northern_Fulmars
+    StdDev=0.0
+    for value in list_value:
+        StdDev+=(value-Mean)*(value-Mean)
+    # done for loop
+    StdDev=ratio(StdDev,N-1)
+    StdDev=math.sqrt(StdDev)
+    # standard error 
+    StdErr=ratio(StdDev,math.sqrt(N))
+    if debug:
+        print "N=%.0f Mean=%.2f StdDev=%.2f StdErr=%.2f" % (N,Mean,StdDev,StdErr)
+    return N,Mean,StdDev,StdErr
+# done function
+
 # ratio, or s/b
 def ratio(s,b,debug=False):
     if debug:
