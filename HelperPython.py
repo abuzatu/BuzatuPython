@@ -1318,7 +1318,12 @@ def add_in_quadrature(a,b):
 
 def add_in_quadrature_error(a,sa,b,sb):
     result=math.sqrt(a*a+b*b)
-    error=2*math.sqrt(a*a*sa*sa+b*b*sb*sb)
+    if result==0:
+        error=0.0
+    else:
+        # from error propagation formula
+        # in other writing: (f*sf)^2=(a*sa)^2+(b*sb)^2
+        error=math.sqrt(a*a*sa*sa+b*b*sb*sb)/result
     return result,error
 # done function
 
@@ -1328,7 +1333,12 @@ def add_in_quadrature_three(a,b,c):
 
 def add_in_quadrature_error_three(a,sa,b,sb,c,sc):
     result=math.sqrt(a*a+b*b+c*c)
-    error=2*math.sqrt(a*a*sa*sa+b*b*sb*sb+c*c*sc*sc)
+    if result==0:
+        error=0.0
+    else:
+        # from error propagation formula
+        # in other writing: (f*sf)^2=(a*sa)^2+(b*sb)^2+(c*sc)^2
+        error=math.sqrt(a*a*sa*sa+b*b*sb*sb+c*c*sc*sc)/result
     return result,error
 # done function
 
@@ -1350,10 +1360,13 @@ def add_in_quadrature_error_list(list_tuple,debug=False):
         value=tuple[0]
         valueError=tuple[1]
         result+=value*value
-        resultError+=(2*value*valueError)*(2*value*valueError)
+        resultError+=(value*valueError)*(value*valueError)
     # done loop over entries
     result=math.sqrt(result)
-    resultError=math.sqrt(resultError)
+    if result==0:
+        resultError=0.0
+    else:
+        resultError=math.sqrt(resultError)/result
     if debug:
         print "add_in_quadrature",(result,resultError),"from input",list_tuple
     return (result,resultError)
