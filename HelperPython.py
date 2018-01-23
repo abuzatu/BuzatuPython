@@ -1312,6 +1312,9 @@ def average_error_list(list_tuple,debug=False):
     return result
 # done function
 
+# add in quadrature, taking the error from error propagation formula
+# https://en.wikipedia.org/wiki/Propagation_of_uncertainty
+
 def add_in_quadrature(a,b):
   return math.sqrt(a*a+b*b)
 # done function
