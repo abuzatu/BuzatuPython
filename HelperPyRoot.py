@@ -3129,23 +3129,18 @@ def add_in_quadrature_bin_by_bin_list_of_histo(list_histo,histoNameTotal="total"
     for i in xrange(myrange[0],myrange[-1]):
         if debug:
             print "Starting new bin"
-        totalContent_squared=0.0
-        totalError_squared=0.0
+        list_ContentError=[]
         # for this bin loop over histograms
         for histo in list_histo:
             currentContent=histo.GetBinContent(i)
             currentError  =histo.GetBinError(i)
             if debug:
                 print "i",i,"B +- errB","%-.5f +- %-5f" % (currentContent,currentError)
-            # add in quadrature
-            totalContent_squared+=currentContent*currentContent
-            totalError_squared+=currentError*currentError
-        # done loop over all histograms
+            list_ContentError.append((currentContent,currentError))
+        # done loop over histograms
+        total,error=add_in_quadrature_error_list(list_ContentError,debug=debug)
         if debug:
-            print "totalContent_squared",totalContent_squared
-            print "totalError_squared",totalError_squared
-        total=math.sqrt(totalContent_squared)
-        error=math.sqrt(totalError_squared)
+            print "total+/-error = %.2f+/-%.2f" % (total,error)
         # set the value and error to this bin
         histoTotal.SetBinContent(i,total)
         histoTotal.SetBinError(i,error)
@@ -3168,8 +3163,7 @@ def add_in_quadrature_bins_of_one_histo(h,IncludeUnderflowOverflowBins=False,deb
         myrange=[1,NbinsX+1]
     if debug:
         print "myrange",myrange
-    totalContent_squared=0.0
-    totalError_squared=0.0
+    list_ContentError=[]
     # loop over bins
     for i in xrange(myrange[0],myrange[-1]):
         if debug:
@@ -3178,17 +3172,11 @@ def add_in_quadrature_bins_of_one_histo(h,IncludeUnderflowOverflowBins=False,deb
         currentError  =h.GetBinError(i)
         if debug:
             print "i",i,"B +- errB","%-.5f +- %-5f" % (currentContent,currentError)
-        # add in quadrature
-        totalContent_squared+=currentContent*currentContent
-        totalError_squared+=currentError*currentError
+        list_ContentError.append((currentContent,currentError))
     # done loop over all the bins in the histogram
+    total,error=add_in_quadrature_error_list(list_ContentError,debug=debug)
     if debug:
-        print "totalContent_squared",totalContent_squared
-        print "totalError_squared",totalError_squared
-    total=math.sqrt(totalContent_squared)
-    error=math.sqrt(totalError_squared)
-    if debug:
-        print "IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins,"total",total
+        print "IncludeUnderflowOverflowBins",IncludeUnderflowOverflowBins,"total+/-error = %.2f+/-%.2f" % (total,error)
     return total,error
 # done function
 
