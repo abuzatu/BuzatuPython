@@ -837,14 +837,19 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
         print "plot_option",plot_option
     if fitRange==0 or (fitRange[0]==-1 and fitRange[1]==-1) or fitRange[1]<fitRange[0]:
         fitRangeDefault=True
-        xmin=h.GetBinLowEdge(0)
-        NrBins=h.GetNbinsX()
-        xmax=h.GetBinLowEdge(NrBins)+h.GetBinWidth(NrBins)
+        nonZeroRange,nrNonZeroBins=getHistoNonZeroRange(h,debug=debug)
+        xmin=nonZeroRange[0]
+        xmax=nonZeroRange[1]
+        #xmin=h.GetBinLowEdge(0)
+        #NrBins=h.GetNbinsX()
+        #xmax=h.GetBinLowEdge(NrBins)+h.GetBinWidth(NrBins)
     else:
         fitRangeDefault=False
         xmin=fitRange[0]
         xmax=fitRange[1]
     #
+    if debug:
+        print "fit range xmin",xmin,"xmax",xmax
 
     if doValidationPlot:
         ROOT.gStyle.SetOptFit(1011)
@@ -1796,6 +1801,12 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
                 titleLegend="Bukin: median/peak/width/ratio"
             else:
                 titleLegend="Bukin: peak/width/ratio"
+        elif "Linear" in option:
+            if addMedianInFitInfo==True:
+                print "For Linear fit, you should not ask for Median?! Will ABORT!!!"
+                assert(False)
+            else:
+                titleLegend="Linear fit (a0+a1*x):"
         else:
             print "option",option,"not known in setting LegendTitle of addfitinfo is True. Will ABORT!!"
             assert(False)
@@ -1864,7 +1875,7 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
                     if debug:
                         print "fit",fit
                     #f,result_fit=fit_hist(h1D,fit,plot_option+"O",debug)
-                    f,result_fit=fit_hist(h=h1D,fit=fit,addMedianInFitInfo=addMedianInFitInfo,plot_option=plot_option+"O",doValidationPlot=doValidationPlot,canvasname=canvasname+"_"+h1D.GetName(),debug=debug)
+                    f,result_fit=fit_hist(h=h1D,fitRange=[-1,-1],fit=fit,addMedianInFitInfo=addMedianInFitInfo,plot_option=plot_option+"O",doValidationPlot=doValidationPlot,canvasname=canvasname+"_"+h1D.GetName(),debug=debug)
                     f.SetLineWidth(h1D.GetLineWidth())
                     f.Draw("SAME")
         else:
@@ -1879,7 +1890,7 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
             #f,result_fit=fit_hist(h1D,fit,"",debug)
             plot_option="R"
             #f,result_fit=fit_hist(h1D,fit,plot_option+"O",debug)
-            f,result_fit=fit_hist(h=h1D,fit=fit,addMedianInFitInfo=addMedianInFitInfo,plot_option=plot_option+"O",doValidationPlot=doValidationPlot,canvasname=canvasname+"_"+h1D.GetName(),debug=debug)
+            f,result_fit=fit_hist(h=h1D,fitRange=[-1,-1],fit=fit,addMedianInFitInfo=addMedianInFitInfo,plot_option=plot_option+"O",doValidationPlot=doValidationPlot,canvasname=canvasname+"_"+h1D.GetName(),debug=debug)
             if debug:
                 print "B5 start","i",i,"type(p_main)",type(p_main)
             #f.Draw("SAME")
@@ -1902,19 +1913,28 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
 
         #    
         legend_name="#bf{"+shortname+"}"
-        # legend text median, peak, width, width/peak
-        if addMedianInFitInfo==True:
-            #legend_text="#bf{%-.1f/%-.1f/%-.1f/%-.3f}" % (result_fit[0][0],result_fit[2][0],result_fit[3][0],ratio(result_fit[3][0],result_fit[2][0]))
-            #significantDigits=("3","3","3","3")
+        if fit=="Linear":
+            tempString="#bf{a1=%."+significantDigits[2]+"f +/- %."+significantDigits[2]+"f; a0=%."+significantDigits[1]+"f +/- %."+significantDigits[1]+"f}"
             if debug:
                 print "tempString",tempString
-            tempString="#bf{%-."+significantDigits[0]+"f/%-."+significantDigits[1]+"f/%-."+significantDigits[2]+"f/%-."+significantDigits[3]+"f}"
-            legend_text= tempString % (result_fit[0][0],result_fit[2][0],result_fit[3][0],ratio(result_fit[3][0],result_fit[2][0]))
+            legend_text=tempString % (result_fit[2][0],result_fit[2][1],result_fit[1][0],result_fit[1][1])
         else:
-            tempString="#bf{%-."+significantDigits[1]+"f/%-."+significantDigits[2]+"f/%-."+significantDigits[3]+"f}"
-            if debug:
-                print "tempString",tempString
-            legend_text=tempString % (result_fit[2][0],result_fit[3][0],ratio(result_fit[3][0],result_fit[2][0]))
+            # legend text median, peak, width, width/peak
+            if addMedianInFitInfo==True:
+                # legend_text="#bf{%-.1f/%-.1f/%-.1f/%-.3f}" % (result_fit[0][0],result_fit[2][0],result_fit[3][0],ratio(result_fit[3][0],result_fit[2][0]))
+                # significantDigits=("3","3","3","3")
+                tempString="#bf{%-."+significantDigits[0]+"f/%-."+significantDigits[1]+"f/%-."+significantDigits[2]+"f/%-."+significantDigits[3]+"f}"
+                if debug:
+                    print "tempString",tempString
+                legend_text= tempString % (result_fit[0][0],result_fit[2][0],result_fit[3][0],ratio(result_fit[3][0],result_fit[2][0]))
+            else:
+                tempString="#bf{%-."+significantDigits[1]+"f/%-."+significantDigits[2]+"f/%-."+significantDigits[3]+"f}"
+                if debug:
+                    print "tempString",tempString
+                legend_text=tempString % (result_fit[2][0],result_fit[3][0],ratio(result_fit[3][0],result_fit[2][0]))
+            # done if addMedianInFitInfo
+        # done if fit is Linear or not
+        # legend text is done, now plot it
         legend.AddEntry(h1D,legend_name,"f")
         if addfitinfo:
             legend.AddEntry(None,legend_text,"")
