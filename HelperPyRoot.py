@@ -968,7 +968,7 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             f.Draw("SAME")
             if debug:
                 print "Done set color and draw the function with SAME"
-        else:
+        else:            
             print "WARNING! No fit done, as entries=",entries,"rms=",rms
             None
     elif fit=="Parabolic":
@@ -1807,6 +1807,12 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
                 assert(False)
             else:
                 titleLegend="Linear fit (a0+a1*x):"
+        elif "Parabolic" in option:
+            if addMedianInFitInfo==True:
+                print "For Linear fit, you should not ask for Median?! Will ABORT!!!"
+                assert(False)
+            else:
+                titleLegend="Parabolic fit (a0+a1*x+a2*x*x): a0/a1/a2"
         else:
             print "option",option,"not known in setting LegendTitle of addfitinfo is True. Will ABORT!!"
             assert(False)
@@ -1909,7 +1915,6 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
 
         if debug:
             print "F","i",i,"type(p_main)",type(p_main)
-
 
         #    
         legend_name="#bf{"+shortname+"}"
