@@ -231,7 +231,165 @@ class Analysis:
         self.list_variable=get_list_from_file(fileName,self.debug)
     # done function 
 
-  ### print
+    def create_folderHistos(self):
+        self.folderHistos=self.folderOutput+"/histos"
+        os.system("mkdir -p "+self.folderHistos)
+    # done function
+
+    def get_histoNameInitial(self,process,category,variable):
+        histoNameInitial=process+"_"+category+"_"+variable
+        if self.debug:
+            print "histoNameInitial",histoNameInitial
+        return histoNameInitial
+    # done function
+
+    def get_histoNameRaw(self,process,category,variable,processInitial):
+        histoNameRaw=process+"_"+category+"_"+variable+"_"+processInitial
+        if self.debug:
+            print "histoNameRaw",histoNameRaw
+        return histoNameRaw
+    # done function
+
+    def set_fileNameHistosRaw(self):
+        self.fileNameHistosRaw=self.folderHistos+"/histosRaw.root"
+    # done function
+
+    def create_histosRaw(self):
+        # stores those histograms that exist, and puts them in the same folder
+        outputFile=TFile(self.fileNameHistosRaw,"RECREATE")
+        outputFile.Close()
+        for variable in self.list_variable:
+            for category in self.list_category:
+                for process in self.list_process:
+                    for processInitial in self.list_processInitial:
+                        if self.debug:
+                            print "%-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
+                        inputFileName=self.folderProcessInitial+"/"+processInitial+".root"
+                        histoNameInitial=self.get_histoNameInitial(process,category,variable)
+                        histoNameRaw    =self.get_histoNameRaw    (process,category,variable,processInitial)
+                        histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameInitial,name=histoNameRaw,returnDummyIfNotFound=True,debug=self.debug)
+                        if histo=="dummy":
+                            continue
+                        outputFile=TFile(self.fileNameHistosRaw,"UPDATE")
+                        histo.SetDirectory(outputFile)
+                        histo.Write()
+                        outputFile.Close()
+                    # done for loop over processInitial
+                # done for loop over process
+            # done for loop over category
+        # done for loop over variable
+    # done function
+
+    def set_folderPlotsHistosRawByProcessInitial(self):
+        self.folderPlotsHistosRawByProcessInitial=self.folderOutput+"/plots_histosRaw_by_processInital"
+        os.system("mkdir -p "+self.folderPlotsHistosRawByProcessInitial)
+    # done function
+
+    def set_dict_variable_info(self):
+        debug_binRange=False
+        self.dict_variable_info={
+            "EtaB1":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
+            "EtaB2":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
+            "EtaFwdJets":[get_binRange(-4.5,4.5,0.1,debug_binRange)],
+            "EtaSigJets":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
+            "MET":[get_binRange(140,400,10,debug_binRange)+","+get_binRange(400,700,100,debug_binRange)],
+            "MET_Track":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,100,debug_binRange)],
+            "MEff":[get_binRange(280,500,10,debug_binRange)+","+get_binRange(500,1000,20,debug_binRange)],
+            "MEff3":[get_binRange(280,500,10,debug_binRange)+","+get_binRange(500,1000,20,debug_binRange)],
+            "METDirectional":[""],
+            "MV2c10_B":[get_binRange(0.8,1,0.02,debug_binRange)],
+            "MV2c10_C":[get_binRange(0.8,1,0.02,debug_binRange)],
+            "MV2c10_L":[get_binRange(0.8,1,0.02,debug_binRange)],
+            "MV2c10_Data":[get_binRange(0.8,1,0.02,debug_binRange)],
+            "MV2cB1":[get_binRange(0.8,1,0.02,debug_binRange)],
+            "MV2cB2":[get_binRange(0.8,1,0.02,debug_binRange)],
+            "MV2c10_B":[get_binRange(0.8,1,0.02,debug_binRange)],
+            "btag_weight_B":[get_binRange(0.0,1,0.05,debug_binRange)],
+            "btag_weight_C":[get_binRange(0.0,1,0.05,debug_binRange)],
+            "btag_weight_L":[get_binRange(0.0,1,0.05,debug_binRange)],
+            "btag_weight_Data":[get_binRange(0.0,1,0.05,debug_binRange)],
+            "eff_B":[get_binRange(0.0,1,0.05,debug_binRange)],
+            "eff_C":[get_binRange(0.0,1,0.05,debug_binRange)],
+            "eff_L":[get_binRange(0.0,1,0.05,debug_binRange)],
+            "eff_Data":[get_binRange(0.0,1,0.05,debug_binRange)],
+            "MindPhiMETJet":[get_binRange(0.0315*40,3.15,0.0315*2,debug_binRange)],
+            "NTags":[""],
+            "Njets":[get_binRange(2,10,1,debug_binRange)],
+            "njets":[get_binRange(2,10,1,debug_binRange)],
+            "NFwdJets":[get_binRange(2,10,1,debug_binRange)],
+            "NSigJets":[get_binRange(2,10,1,debug_binRange)],
+            "SumPtJet":[get_binRange(120,400,10,debug_binRange)+","+get_binRange(400,600,20,debug_binRange)],
+            "costheta":[get_binRange(0,1,0.02,debug_binRange)],
+            "dEtaBB":[get_binRange(0,1.5,0.1,debug_binRange)+","+get_binRange(1.5,2.5,0.2,debug_binRange)+","+get_binRange(2.5,4.5,1,debug_binRange)],
+            "dPhiBB":[get_binRange(0,3.2-20*0.032,0.032*2,debug_binRange)],
+            "dPhiMETMPT":[get_binRange(0,3.15-0.0315*48,0.0315,debug_binRange)],
+            "dPhiVBB":[get_binRange(3.2-10*0.032,3.2,0.032,debug_binRange)],
+            "dRB1J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
+            "dRB2J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
+            "dRBB":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
+            "mBB":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBJ":[get_binRange(40,80,20,debug_binRange)+","+get_binRange(80,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)+","+get_binRange(500,700,50,debug_binRange)+","+get_binRange(700,1000,100,debug_binRange)],
+            "maxdRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
+            "mindRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
+            "mu":[get_binRange(7,50,1,debug_binRange)],
+            "mva":[get_binRange(-1,1,0.05,debug_binRange)],
+            "mvadiboson":[get_binRange(-1,1,0.05,debug_binRange)],
+            "nTaus":[""],
+            "pTB1":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
+            "pTB2":[get_binRange(0,140,10,debug_binRange)+","+get_binRange(140,200,20,debug_binRange)],
+            "PtFwdJets":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
+            "PtSigJets":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
+            "pTBB":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,500,20,debug_binRange)],
+            "pTBBMETAsym":[get_binRange(-0.6,-0.2,0.1,debug_binRange)+","+get_binRange(-0.2,0.1,0.02,debug_binRange)+","+get_binRange(0.1,0.3,0.1,debug_binRange)],
+            "pTBBoverMET":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
+            "METOverSqrtHT":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
+            "METOverSqrtSumET":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
+            "METRho":[""],
+            "METSig":[""],
+            "METSig_hard":[""],
+            "METSig_soft":[""],
+            "METVarL":[""],
+            "METVarL_hard":[""],
+            "METVarL_soft":[""],
+            "METVarT":[""],
+            "pTJ3":[get_binRange(0,120,10,debug_binRange)+","+get_binRange(120,200,40,debug_binRange)],
+            "yBB":[get_binRange(0,2.5,0.05,debug_binRange)],
+            }
+    # done function
+
+
+    def overlay_histosRaw_by_processInitial(self):
+        for variable in self.list_variable:
+            info=self.dict_variable_info[variable]
+            binRange=info[0]
+            for category in self.list_category:
+                for process in self.list_process:
+                    list_tuple_h1D=[]
+                    for i,processInitial in enumerate(self.list_processInitial):
+                        if self.debug:
+                            print "%-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
+                        inputFileName=self.fileNameHistosRaw
+                        histoNameRaw    =self.get_histoNameRaw    (process,category,variable,processInitial)
+                        histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameRaw,name="",returnDummyIfNotFound=True,debug=self.debug)
+                        if histo=="dummy":
+                            continue
+                        histo=get_histo_generic_binRange(histo,binRange=binRange,option="average",debug=False)
+                        histo.SetLineColor(list_color[i])
+                        list_tuple_h1D.append((histo,processInitial))
+                    # done for loop over processInitial
+                    if self.debug:
+                        print "len(list_tuple_h1D)",len(list_tuple_h1D)
+                    if len(list_tuple_h1D)==0:
+                        continue
+                    outputFileName=self.folderPlotsHistosRawByProcessInitial+"/overlay_"+variable+"_"+category+"_"+process
+                    overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0.8,max_value_ratio=1.2,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to one on top",plot_option="HIST E",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; VHbb 0L MVA selection}?#bf{Var "+variable+" Cat "+category+"}?#bf{Process "+process+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.55,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False) 
+                # done for loop over process
+            # done for loop over category
+        # done for loop over variable
+    # done function
+
+
+    ### print
 
     def print_list_category(self):
         print "list_category",self.list_category
@@ -264,8 +422,16 @@ class Analysis:
             print "\n list_process",self.list_process
             print "\n list_category",self.list_category
             print "\n list_variable",self.list_variable
-        self.set_list_category("2tag2jet_150ptv_SR")
-        self.set_list_variable("pTB1")
+        self.set_list_category(["0tag2jet_150ptv_SR","0tag3jet_150ptv_SR","1tag2jet_150ptv_SR","1tag3jet_150ptv_SR","2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
+        #self.set_list_variable(["pTB1"])
+        self.set_list_process(["ttbar"])
+        self.set_list_processInitial(["ttbar_nonallhad_A14","ttbar_nonallhad"])
+        self.create_folderHistos()
+        self.set_fileNameHistosRaw()
+        #self.create_histosRaw()
+        self.set_folderPlotsHistosRawByProcessInitial()
+        self.set_dict_variable_info()
+        self.overlay_histosRaw_by_processInitial()
 
         #self.set_list_processInitial(["WHlv125J_MINLO"])
         #self.set_list_processInitial(["ZeeL_v221"])
