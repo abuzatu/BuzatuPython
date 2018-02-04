@@ -1516,5 +1516,18 @@ def get_python_list_filesFromFolder(inputFolderName,fileSearch="*.root",
     outputFile.close()
     if True:
         print "File ",outputFileName,"has been created."
+# done function
 
+def get_list_from_file(fileName,debug=False):
+    # it assumes there is one element per line
+    list_line=[]
+    for line in open(fileName, 'r'):
+        line=line.rstrip()
+        if debug:
+            print "line",line
+        list_line.append(line)
+    # done for loop over lines
+    if debug:
+        print "list_line",list_line
+    return list_line
 # done function

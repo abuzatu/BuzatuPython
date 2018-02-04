@@ -401,6 +401,7 @@ def listObjects(inputFileName,directoryPath="",searchClass="",list_searchName=["
     gDirectory.cd(directoryPath)
     list_key=gDirectory.GetListOfKeys()
     list_key.sort() # sort it in alphabetical order
+    list_text=[]
     for key in list_key:
         if not (searchClass=="" or key.GetClassName()==searchClass):
             continue
@@ -415,14 +416,17 @@ def listObjects(inputFileName,directoryPath="",searchClass="",list_searchName=["
             searchName=list_searchName[0]
             text=key.GetName().replace("_"+searchName,"")
             #text="\""+key.GetName().replace("_"+searchName,"")+"\","
+        elif doOption=="C":
+            text=key.GetName()
         else:
-            print "doOption",doOption,"not known. Choose A or B. Will ABORT!!!"
+            print "doOption",doOption,"not known. Choose A, B or C. Will ABORT!!!"
             assert(False)
         # done if
         if outputFileName=="":
             print text
         else:
             outputFile.write(text+"\n")
+        list_text.append(text)
     if False:
         gDirectory.ls()
     if outputFileName!="":
@@ -431,7 +435,7 @@ def listObjects(inputFileName,directoryPath="",searchClass="",list_searchName=["
     inputFile.Close()
     if debug:
         print "End .ls of root inputFile ",inputFileName
-    return True
+    return list_text
 # ended function
 
 # remove object from file
