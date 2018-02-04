@@ -1922,7 +1922,7 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
 
         #    
         legend_name="#bf{"+shortname+"}"
-        if fit=="Linear":
+        if option!="histo" and fit=="Linear":
             tempString="#bf{a1=%."+significantDigits[2]+"f +/- %."+significantDigits[2]+"f; a0=%."+significantDigits[1]+"f +/- %."+significantDigits[1]+"f}"
             if debug:
                 print "tempString",tempString
