@@ -13,24 +13,6 @@ import subprocess
 from sets import Set
 
 #######################################################
-####                                                ###
-#######################################################
-
-
-
-#######################################################
-#### Dummy                                          ###
-#######################################################
-
-class MyClass:
-    """A simple example class"""
-    i = 12345
-
-    def f(self):
-        print 'hello world'
-# done class
-
-#######################################################
 #### Class Analysis                                 ###
 #######################################################
 
@@ -82,6 +64,9 @@ class Analysis:
 
     def set_do_evaluate_content_of_all_processInitial(self,do_evaluate_content_of_all_processInitial):
         self.do_evaluate_content_of_all_processInitial=do_evaluate_content_of_all_processInitial
+
+    def set_do_overlay_histosRaw_by_processInitial(self,do_overlay_histosRaw_by_processInitial):
+        self.do_overlay_histosRaw_by_processInitial=do_overlay_histosRaw_by_processInitial
  
     ### actions
 
@@ -92,7 +77,7 @@ class Analysis:
 
     def evaluate_list_processInitial(self):
         p = subprocess.Popen(
-            ['ls', '/Users/abuzatu/data/Reader/Jan30/mc16c_MVA_PRWApplied'],
+            ['ls', self.folderInput],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             stdin=subprocess.PIPE
@@ -388,11 +373,244 @@ class Analysis:
         # done for loop over variable
     # done function
 
+    def set_fileNameHistosProcess(self):
+        self.fileNameHistosProcess=self.folderHistos+"/histosProcess.root"
+    # done function
+
+    def create_histosProcess(self):
+        # now we want to sum over processInitial for a given process
+        outputFile=TFile(self.fileNameHistosProcess,"RECREATE")
+        outputFile.Close()
+        for variable in self.list_variable:
+            for category in self.list_category:
+                for process in self.list_process:
+                    counter=0
+                    if self.debug:
+                        print "ADRIAN1  %-10s %-10s %-10s" % (variable,category,process)
+                    for processInitial in self.list_processInitial:
+                        if self.debug:
+                            print "ADRIAN2 %-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
+                        inputFileName=self.fileNameHistosRaw
+                        histoNameRaw    =self.get_histoNameRaw    (process,category,variable,processInitial)
+                        histoNameProcess=self.get_histoNameInitial(process,category,variable)
+                        histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameRaw,name=histoNameProcess,returnDummyIfNotFound=True,debug=self.debug)
+                        if histo=="dummy":
+                            continue
+                        if counter==0:
+                            histoProcess=histo
+                        else:
+                            histoProcess.Add(histo)
+                        counter+=1
+                    # done for loop over processInitial
+                    if self.debug:
+                        print "counter",counter
+                    outputFile=TFile(self.fileNameHistosProcess,"UPDATE")
+                    histoProcess.SetDirectory(outputFile)
+                    histoProcess.Write()
+                    outputFile.Close()
+                # done for loop over process
+            # done for loop over category
+        # done for loop over variable
+    # done function
+
+    def set_list_processMerged(self):
+        self.list_processMerged=[
+            "qqZvvH",
+            "qqZllH",
+            "ggZvvH",
+            "ggZllH",
+            "qqWH",
+            "Wl",
+            "Wcl",
+            "Whf",
+            "Zl",
+            "Zcl",
+            "Zhf",
+            "ttbar",
+            "stop",
+            "diboson",
+            "data",
+            ]
+
+        self.list_processMergedType=[
+            "qqZvvH",
+            "qqZllH",
+            "ggZvvH",
+            "ggZllH",
+            "qqWH",
+            "Wl",
+            "Wcl",
+            "Whf",
+            "Zl",
+            "Zcl",
+            "Zhf",
+            "ttbar",
+            "stop",
+            "diboson",
+            "S",
+            "B",
+            "data",
+            ]
+
+        self.dict_processMerged_info={
+            "qqZvvH" :["S",0,["qqZvvH125"]],
+            "qqZllH" :["S",0,["qqZllH125"]],
+            "ggZvvH" :["S",0,["ggZvvH125"]],
+            "ggZllH" :["S",0,["ggZllH125"]],
+            "qqWH"   :["S",1,["qqWlvH125"]],
+            "Wl"     :["B",0,["Wl"]],
+            "Wcl"    :["B",0,["Wcl"]],
+            "Whf"    :["B",0,["Wbb","Wbc","Wbl","Wcc"]],
+            "Zl"     :["B",0,["Zl"]],
+            "Zcl"    :["B",0,["Zcl"]],
+            "Zhf"    :["B",0,["Zbb","Zbc","Zbl","Zcc"]],
+            "ttbar"  :["B",0,["ttbar"]],
+            "stop"   :["B",0,["stops"]],
+            "diboson":["B",1,["WW","WZ","ZZ"]],
+            "S"      :["S",1,["S"]],
+            "B"      :["B",1,["B"]],
+            "data"   :["D",1,["data"]],
+            }
+
+    def set_fileNameHistosProcessMerged(self):
+        self.fileNameHistosProcessMerged=self.folderHistos+"/histosProcessMerged.root"
+    # done function
+
+    def create_histosProcessMerged(self):
+        # now we want to sum over process for a given processMerged
+        outputFile=TFile(self.fileNameHistosProcessMerged,"RECREATE")
+        outputFile.Close()
+        for variable in self.list_variable:
+            for category in self.list_category:
+                for processMerged in self.list_processMerged:
+                    counter=0
+                    if self.debug:
+                        print "ADRIAN1  %-10s %-10s %-10s" % (variable,category,processMerged)
+                    info=self.dict_processMerged_info[processMerged]
+                    list_process=info[2]
+                    for process in list_process:
+                        if self.debug:
+                            print "ADRIAN2 %-10s %-10s %-10s %-10s" % (variable,category,processMerged,process)
+                        inputFileName=self.fileNameHistosProcess
+                        histoNameProcess      =self.get_histoNameInitial(process,category,variable)
+                        histoNameProcessMerged=self.get_histoNameInitial(processMerged,category,variable)
+                        histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcess,name=histoNameProcessMerged,returnDummyIfNotFound=True,debug=self.debug)
+                        if histo=="dummy":
+                            continue
+                        if counter==0:
+                            histoProcessMerged=histo
+                        else:
+                            histoProcessMerged.Add(histo)
+                        counter+=1
+                    # done for loop over processInitial
+                    if self.debug:
+                        print "counter",counter
+                    outputFile=TFile(self.fileNameHistosProcessMerged,"UPDATE")
+                    histoProcessMerged.SetDirectory(outputFile)
+                    histoProcessMerged.Write()
+                    outputFile.Close()
+                # done for loop over process
+            # done for loop over category
+        # done for loop over variable
+    # done function
+
+    def create_folderYields(self):
+        self.folderYields=self.folderOutput+"/yields"
+        os.system("mkdir -p "+self.folderYields)
+    # done function
+
+    def set_list_processType(self):
+        self.list_processType="S,B,D".split(",")
+
+    def create_yield_latex_table(self):
+        variable=self.list_variable[0]
+        dict_category_processMerged_integralValueError={}
+        for category in self.list_category:
+            dict_processType_list_tuple={}
+            for processType in self.list_processType:
+                dict_processType_list_tuple[processType]=[]
+            for processMerged in self.list_processMerged:
+                inputFileName=self.fileNameHistosProcessMerged 
+                histoNameProcessMerged=self.get_histoNameInitial(processMerged,category,variable)
+                histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=True,debug=self.debug)
+                integralValueError=get_histo_integral_error(histo,myRange=-1,option="",debug=False) # -1 to include the under/over-flow bins
+                dict_category_processMerged_integralValueError[category+"_"+processMerged]=integralValueError
+                info=self.dict_processMerged_info[processMerged]
+                processType=info[0]
+                dict_processType_list_tuple[processType].append(integralValueError)
+            # done loop over processMerged
+            # retrieve the sums
+            for processType in self.list_processType:
+                dict_category_processMerged_integralValueError[category+"_"+processType]=sum_error_list(dict_processType_list_tuple[processType],debug=False)
+            if self.debug:
+                print "category",category,"dict_category_processMerged_integralValueError", dict_category_processMerged_integralValueError
+        # done loop over category
+        # now the dictionary is filled
+        
+
+        # we create the latex table
+        fileName=self.folderYields+"/table.tex"
+        # create a new file
+        f = open(fileName,'w')
+        f.write('\\documentclass{beamer}\n')
+        f.write('\\usepackage{tabularx}\n')
+        f.write('\\usepackage{adjustbox}\n')
+        f.write('\\usepackage{pdflscape}\n')
+        f.write('\\begin{document}\n')
+        f.write('\\begin{frame}{'+ self.name+'}\n')
+        # f.write('\\begin{center}\n')
+        f.write('\\begin{landscape} \n')
+        f.write('\\adjustbox{max height=\\dimexpr\\textheight-7.0cm\\relax,max width=\\textwidth}\n')
+        f.write('{\n')
+        text="\\begin{tabular}{|l"
+        for category in self.list_category:
+            text+="|l"
+        text+="|}\n"
+        f.write(text)
+        f.write('\\hline \n')
+        f.write('\\hline \n')
+        text="Process vs Category"
+        for category in self.list_category:
+            text+=" & \\texttt{\\detokenize{"+category+"}}"
+        text+=" \\\\ \n"
+        f.write(text)
+        f.write('\\hline \n')
+        # add processes one at a time
+        for processMergedType in self.list_processMergedType:
+            info=self.dict_processMerged_info[processMergedType]
+            doAddLineAfter=bool(info[1])
+            if self.debug:
+                print processMergedType,info[1],type(info[1]),doAddLineAfter,type(doAddLineAfter)
+            text=processMergedType
+            for category in self.list_category:
+                myYield=dict_category_processMerged_integralValueError[category+"_"+processMergedType]
+                text+=" & {\\color{orange}%.1f$\pm$%.1f}" % myYield
+            text+=" \\\\ \n"
+            f.write(text)
+            if doAddLineAfter:
+                f.write('\\hline \n')
+        # done for loop over processMerged
+        f.write('\\hline \n')
+        f.write('\\end{tabular}\n')
+        f.write('}\n')
+        f.write('\\end{landscape} \n')
+        # f.write('\\end{center}\n')
+        f.write('\\end{frame}\n')
+        f.write('\\end{document}\n')
+        f.close()
+    # done function
 
     ### print
 
     def print_list_category(self):
         print "list_category",self.list_category
+
+    def print_lists(self):
+        print "\n Print our lists:"
+        print "\n list_processInitial",self.list_processInitial
+        print "\n list_process",self.list_process
+        print "\n list_category",self.list_category
+        print "\n list_variable",self.list_variable
 
     def print_all(self):
         print ""
@@ -417,21 +635,59 @@ class Analysis:
         self.set_evaluated_list_process()
         self.set_evaluated_list_category()
         self.set_evaluated_list_variable()
-        if self.debug:
-            print "\n list_processInitial",self.list_processInitial
-            print "\n list_process",self.list_process
-            print "\n list_category",self.list_category
-            print "\n list_variable",self.list_variable
-        self.set_list_category(["0tag2jet_150ptv_SR","0tag3jet_150ptv_SR","1tag2jet_150ptv_SR","1tag3jet_150ptv_SR","2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
-        #self.set_list_variable(["pTB1"])
-        self.set_list_process(["ttbar"])
-        self.set_list_processInitial(["ttbar_nonallhad_A14","ttbar_nonallhad"])
         self.create_folderHistos()
         self.set_fileNameHistosRaw()
-        #self.create_histosRaw()
-        self.set_folderPlotsHistosRawByProcessInitial()
-        self.set_dict_variable_info()
-        self.overlay_histosRaw_by_processInitial()
+        self.set_fileNameHistosProcess()
+        self.set_fileNameHistosProcessMerged()
+        self.create_folderYields()
+
+        doTTbarStudy=False
+        if doTTbarStudy:
+            if self.debug:
+                self.print_lists()
+            self.set_list_category(["0tag2jet_150ptv_SR","0tag3jet_150ptv_SR","1tag2jet_150ptv_SR","1tag3jet_150ptv_SR","2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
+            self.set_list_process(["ttbar"])
+            self.set_list_processInitial(["ttbar_nonallhad_A14","ttbar_nonallhad"])
+            if self.debug:
+                self.print_lists()
+            self.create_histosRaw()
+            self.set_folderPlotsHistosRawByProcessInitial()
+            self.set_dict_variable_info()
+            if self.do_overlay_histosRaw_by_processInitial:
+                self.overlay_histosRaw_by_processInitial()
+        # done if doTTbarStudy
+
+        doYields=True
+        if doYields:
+            # remove ttbar_nonallhad from our processInitial
+            list_processInitial=[]
+            for processInitial in self.list_processInitial:
+                if processInitial=="ttbar_nonallhad_A14":
+                    continue
+                list_processInitial.append(processInitial)
+            # done for loop
+            self.list_processInitial=list_processInitial
+            # remove W and Z from process
+            list_process=[]
+            for process in self.list_process:
+                if process=="W" or process=="Z":
+                    continue
+                list_process.append(process)
+            # done for loop
+            self.list_process=list_process
+            # reduce category
+            self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
+            self.set_list_variable(["pTB1"])
+            if self.debug:
+                self.print_lists()
+            self.create_histosRaw()
+            # now we want to sum over processInitial for a given process
+            self.create_histosProcess()
+            self.set_list_processMerged()
+            self.create_histosProcessMerged()
+            self.set_list_processType()
+            self.create_yield_latex_table()
+        # done if doYields
 
         #self.set_list_processInitial(["WHlv125J_MINLO"])
         #self.set_list_processInitial(["ZeeL_v221"])
