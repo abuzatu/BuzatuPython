@@ -676,11 +676,13 @@ class Analysis:
             # done for loop
             self.list_process=list_process
             # reduce category
-            self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
+            self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) # old
+            #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
             self.set_list_variable(["pTB1"])
             if self.debug:
                 self.print_lists()
             self.create_histosRaw()
+            #return
             # now we want to sum over processInitial for a given process
             self.create_histosProcess()
             self.set_list_processMerged()
