@@ -991,6 +991,13 @@ def process_sample(list_value,debug=False):
     return N,Mean,StdDev,StdErr
 # done function
 
+def tuple_times_scalar(myTuple,myScalar,debug=False):
+    myTupleResult=(myTuple[0]*myScalar,myTuple[1]*myScalar)
+    if debug:
+        print "myTuple",myTuple,"myScalar",myScalar,"myTupleResult",myTupleResult
+    return myTupleResult
+# done function
+
 # ratio, or s/b
 def ratio(s,b,debug=False):
     if debug:
