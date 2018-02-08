@@ -26,6 +26,8 @@ from collections import namedtuple
 from inspect import currentframe
 # regular expressions
 import re
+# import itertools to concatenate lists
+import itertools
 
 # get a string to be used to rebin a histogram
 # 0.0, 5.0, 0.1 - from 0.0 to 5.0 with a step of 0.1
