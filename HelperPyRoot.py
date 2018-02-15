@@ -3081,6 +3081,10 @@ def do_error_myRange(myRange):
 def get_histo_integral_error(histo,myRange=0,option="",debug=False):
     if myRange==-1:
         myRange=[0,histo.GetNbinsX()+1] # with    overflow bins
+    elif myRange==-2:
+        myRange=[0,histo.GetNbinsX()] # with underflow, no overflow
+    elif myRange==-3:
+        myRange=[1,histo.GetNbinsX()+1] # no underflow, with overflow
     elif myRange==0:
         myRange=[1,histo.GetNbinsX()]   # without overflow bins
     else:
