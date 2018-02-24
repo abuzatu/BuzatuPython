@@ -3579,6 +3579,22 @@ def get_systematic_error_from_list_histo_ratio_alt_to_nom(list_input_histo,histo
     return dict_myType_histo
 # done function
 
+# example
+#sig_h=dict_processType_histo["S"]
+#bkg_h=dict_processType_histo["B"]
+#if debug:
+#    getBinValues(sig_h)
+#    getBinValues(bkg_h)
+# list_figureOfMerit=["SignalOverBackground","Sensitivity","Significance","SensitivitySigmaB","SignificanceSigmaB"]                                                                          
+#list_figureOfMerit=["SignificanceSigmaB"]
+#a=get_dict_figureOfMerit_histo(sig_h,bkg_h,list_figureOfMerit=list_figureOfMerit,debug=debug)
+#h=a["SignificanceSigmaB"]
+# histoNameF=h.GetName().replace("S","SignificanceSigmaB")
+#plotHistogram(h,plot_option="HIST E",filePath=outputFileFolderSignificance,fileName=fileName,extensions="pdf")
+#total,error=add_in_quadrature_bins_of_one_histo(h,IncludeUnderflowOverflowBins=False,debug=False)
+#if True:
+#    print "Value_SignificanceSigmaB %-20s %-20s %.2f +/- %.2f" % (cat,string_processTypeSignal,total,error)
+#
 def get_dict_figureOfMerit_histo(sig_h,bkg_h,list_figureOfMerit=["SignalOverBackground","Sensitivity","Significance","SensitivitySigmaB","SignificanceSigmaB"],debug=False):
     if debug:
         print "Calculate histograms for the list of figure of merit",list_figureOfMerit
