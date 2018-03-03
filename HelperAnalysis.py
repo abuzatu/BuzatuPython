@@ -342,6 +342,9 @@ class Analysis:
             }
     # done function
 
+    def get_dict_variable_info(self):
+        return self.dict_variable_info
+    # done function
 
     def overlay_histosRaw_by_processInitial(self):
         for variable in self.list_variable:
