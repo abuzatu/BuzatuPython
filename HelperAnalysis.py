@@ -316,7 +316,7 @@ class Analysis:
             "mBBJ":[get_binRange(40,80,20,debug_binRange)+","+get_binRange(80,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)+","+get_binRange(500,700,50,debug_binRange)+","+get_binRange(700,1000,100,debug_binRange)],
             "maxdRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "mindRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
-            "mu":[get_binRange(7,50,1,debug_binRange)],
+            "mu":[get_binRange(7,90,1,debug_binRange)],
             "mva":[get_binRange(-1,1,0.05,debug_binRange)],
             "mvadiboson":[get_binRange(-1,1,0.05,debug_binRange)],
             "nTaus":[""],
