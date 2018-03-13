@@ -389,6 +389,9 @@ def addTree(fileName,fileOpen,treeName,list_variables,debug):
 # list object from file
 # ex: ListObjects(fileName,False)
 # ex of class: TH1F, TH1D, TF1, TDirectoryFile
+# option A:
+# option B:
+# option C: just the object name 
 def listObjects(inputFileName,directoryPath="",searchClass="",list_searchName=["",""],doOption="A",doShowIntegral=False,outputFileName="a.log",debug=False):
     if debug:
         print "Start .ls of root inputFile ",inputFileName
