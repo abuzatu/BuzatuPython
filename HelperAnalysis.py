@@ -72,7 +72,10 @@ class Analysis:
 
     def create_folderProcessInitial(self):
         self.folderProcessInitial=self.folderOutput+"/processInitial"
-        os.system("mkdir -p "+self.folderProcessInitial)
+        command="mkdir -p "+self.folderProcessInitial
+        if self.debug:
+            print "command="+command
+        os.system(command)
     # done function
 
     def evaluate_list_processInitial(self):
@@ -246,7 +249,11 @@ class Analysis:
         for variable in self.list_variable:
             for category in self.list_category:
                 for process in self.list_process:
+                    if self.debug:
+                        print "process",process
                     for processInitial in self.list_processInitial:
+                        if self.debug:
+                            print "processInitial",processInitial
                         if self.debug:
                             print "%-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
                         inputFileName=self.folderProcessInitial+"/"+processInitial+".root"
@@ -385,6 +392,7 @@ class Analysis:
         outputFile=TFile(self.fileNameHistosProcess,"RECREATE")
         outputFile.Close()
         for variable in self.list_variable:
+            counter_variable=0
             for category in self.list_category:
                 for process in self.list_process:
                     counter=0
@@ -399,6 +407,10 @@ class Analysis:
                         histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameRaw,name=histoNameProcess,returnDummyIfNotFound=True,debug=self.debug)
                         if histo=="dummy":
                             continue
+                        if counter_variable==0:
+                            histoReset=histo.Clone()
+                            histoReset.Reset()
+                        counter_variable+=1
                         if counter==0:
                             histoProcess=histo
                         else:
@@ -407,6 +419,13 @@ class Analysis:
                     # done for loop over processInitial
                     if self.debug:
                         print "counter",counter
+                    if counter==0:
+                        histoProcess=histoReset
+                        histoNameProcess=self.get_histoNameInitial(process,category,variable)
+                        histoProcess.SetName(histoNameProcess)
+                        histoProcess.SetTitle(histoNameProcess)
+                        if self.debug:
+                            print "counter",counter,"for process",process,"which was not found for category",category,"in list of processInitial",self.list_processInitial
                     outputFile=TFile(self.fileNameHistosProcess,"UPDATE")
                     histoProcess.SetDirectory(outputFile)
                     histoProcess.Write()
@@ -418,11 +437,11 @@ class Analysis:
 
     def set_list_processMerged(self):
         self.list_processMerged=[
-            "qqZvvH",
-            "qqZllH",
-            "ggZvvH",
-            "ggZllH",
-            "qqWH",
+            #"qqZvvH",
+            #"qqZllH",
+            #"ggZvvH",
+            #"ggZllH",
+            #"qqWH",
             "Wl",
             "Wcl",
             "Whf",
@@ -436,11 +455,11 @@ class Analysis:
             ]
 
         self.list_processMergedType=[
-            "qqZvvH",
-            "qqZllH",
-            "ggZvvH",
-            "ggZllH",
-            "qqWH",
+            #"qqZvvH",
+            #"qqZllH",
+            #"ggZvvH",
+            #"ggZllH",
+            #"qqWH",
             "Wl",
             "Wcl",
             "Whf",
@@ -469,7 +488,7 @@ class Analysis:
             "Zhf"    :["B",0,["Zbb","Zbc","Zbl","Zcc"]],
             "ttbar"  :["B",0,["ttbar"]],
             "stop"   :["B",0,["stops"]],
-            "diboson":["B",1,["WW","WZ","ZZ"]],
+            "diboson":["B",1,["WW","WZ","ZZ","ggWW","ggZZ"]],
             "S"      :["S",1,["S"]],
             "B"      :["B",1,["B"]],
             "data"   :["D",1,["data"]],
@@ -519,7 +538,10 @@ class Analysis:
 
     def create_folderYields(self):
         self.folderYields=self.folderOutput+"/yields"
-        os.system("mkdir -p "+self.folderYields)
+        command="mkdir -p "+self.folderYields
+        if self.debug:
+            print "command="+command
+        os.system(command)
     # done function
 
     def set_list_processType(self):
@@ -643,7 +665,6 @@ class Analysis:
         self.set_fileNameHistosProcess()
         self.set_fileNameHistosProcessMerged()
         self.create_folderYields()
-
         doTTbarStudy=False
         if doTTbarStudy:
             if self.debug:
@@ -665,27 +686,32 @@ class Analysis:
             # remove ttbar_nonallhad from our processInitial
             list_processInitial=[]
             for processInitial in self.list_processInitial:
-                if processInitial=="ttbar_nonallhad_A14":
-                    continue
+                #if processInitial!="ttbar_nonallhad":
+                #    continue
                 list_processInitial.append(processInitial)
             # done for loop
             self.list_processInitial=list_processInitial
+            if self.debug:
+                print "self.list_processInitial",self.list_processInitial
             # remove W and Z from process
             list_process=[]
+            if self.debug:
+                print "list_process",self.list_process
             for process in self.list_process:
                 if process=="W" or process=="Z":
+                    print "WARNING!!! finding process",process,"will skip them!"
                     continue
                 list_process.append(process)
             # done for loop
             self.list_process=list_process
             # reduce category
             self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) # old
+            #self.set_list_category(["2tag2jet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
             self.set_list_variable(["pTB1"])
             if self.debug:
                 self.print_lists()
             self.create_histosRaw()
-            #return
             # now we want to sum over processInitial for a given process
             self.create_histosProcess()
             self.set_list_processMerged()
