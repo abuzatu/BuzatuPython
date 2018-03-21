@@ -437,11 +437,11 @@ class Analysis:
 
     def set_list_processMerged(self):
         self.list_processMerged=[
-            #"qqZvvH",
-            #"qqZllH",
-            #"ggZvvH",
-            #"ggZllH",
-            #"qqWH",
+            "qqZvvH",
+            "qqZllH",
+            "ggZvvH",
+            "ggZllH",
+            "qqWH",
             "Wl",
             "Wcl",
             "Whf",
@@ -452,14 +452,17 @@ class Analysis:
             "stop",
             "diboson",
             "data",
+            "S",
+            "B",
+            "D",
             ]
 
         self.list_processMergedType=[
-            #"qqZvvH",
-            #"qqZllH",
-            #"ggZvvH",
-            #"ggZllH",
-            #"qqWH",
+            "qqZvvH",
+            "qqZllH",
+            "ggZvvH",
+            "ggZllH",
+            "qqWH",
             "Wl",
             "Wcl",
             "Whf",
@@ -475,23 +478,42 @@ class Analysis:
             ]
 
         self.dict_processMerged_info={
-            "qqZvvH" :["S",0,["qqZvvH125"]],
-            "qqZllH" :["S",0,["qqZllH125"]],
-            "ggZvvH" :["S",0,["ggZvvH125"]],
-            "ggZllH" :["S",0,["ggZllH125"]],
-            "qqWH"   :["S",1,["qqWlvH125"]],
-            "Wl"     :["B",0,["Wl"]],
-            "Wcl"    :["B",0,["Wcl"]],
-            "Whf"    :["B",0,["Wbb","Wbc","Wbl","Wcc"]],
-            "Zl"     :["B",0,["Zl"]],
-            "Zcl"    :["B",0,["Zcl"]],
-            "Zhf"    :["B",0,["Zbb","Zbc","Zbl","Zcc"]],
-            "ttbar"  :["B",0,["ttbar"]],
-            "stop"   :["B",0,["stops"]],
-            "diboson":["B",1,["WW","WZ","ZZ","ggWW","ggZZ"]],
-            "S"      :["S",1,["S"]],
-            "B"      :["B",1,["B"]],
-            "data"   :["D",1,["data"]],
+            "qqZvvH" :["S",0,{"2":1.0,"3":1.0},
+                       ["qqZvvH125"]],
+            "qqZllH" :["S",0,{"2":1.0,"3":1.0},
+                       ["qqZllH125"]],
+            "ggZvvH" :["S",0,{"2":1.0,"3":1.0},
+                       ["ggZvvH125"]],
+            "ggZllH" :["S",0,{"2":1.0,"3":1.0},
+                       ["ggZllH125"]],
+            "qqWH"   :["S",1,{"2":1.0,"3":1.0},
+                       ["qqWlvH125"]],
+            "Wl"     :["B",0,{"2":1.0,"3":1.0},
+                       ["Wl"]],
+            "Wcl"    :["B",0,{"2":1.0,"3":1.0},
+                       ["Wcl"]],
+            "Whf"    :["B",0,{"2":1.27,"3":1.27},
+                       ["Wbb","Wbc","Wbl","Wcc"]],
+            "Zl"     :["B",0,{"2":1.0,"3":1.0},
+                       ["Zl"]],
+            "Zcl"    :["B",0,{"2":1.0,"3":1.0},
+                       ["Zcl"]],
+            "Zhf"    :["B",0,{"2":1.42,"3":1.31},
+                       ["Zbb","Zbc","Zbl","Zcc"]],
+            "ttbar"  :["B",0,{"2":0.97,"3":1.0}
+                       ,["ttbar"]],
+            "stop"   :["B",0,{"2":1.0,"3":1.0}
+                       ,["stops","stopt","stopWt"]],
+            "diboson":["B",1,{"2":1.0,"3":1.0}
+                       ,["WW","WZ","ZZ","ggWW","ggZZ"]],
+            "data"   :["D",1,{"2":1.0,"3":1.0}
+                       ,["data"]],
+            "S"      :["Sig",1,{"2":1.0,"3":1.0}
+                       ,["qqZvvH125","qqZllH125","ggZvvH125","ggZllH125","qqWlvH125"]],
+            "B"      :["Bkg",1,{"2":1.0,"3":1.0},
+                       ["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","stops","stopt","stopWt","WW","WZ","ZZ","ggWW","ggZZ"]],
+            "D"      :["Dat",1,{"2":1.0,"3":1.0},
+                       ["data"]],
             }
 
     def set_fileNameHistosProcessMerged(self):
@@ -504,12 +526,25 @@ class Analysis:
         outputFile.Close()
         for variable in self.list_variable:
             for category in self.list_category:
+                if "2jet" in category:
+                    cat="2"
+                elif "3jet" in category:
+                    cat="3"
+                else:
+                    cat="none"   
                 for processMerged in self.list_processMerged:
                     counter=0
                     if self.debug:
                         print "ADRIAN1  %-10s %-10s %-10s" % (variable,category,processMerged)
                     info=self.dict_processMerged_info[processMerged]
-                    list_process=info[2]
+                    dict_cat_SF=info[2]
+                    if cat in dict_cat_SF.keys():
+                        SF=dict_cat_SF[cat]
+                    else:
+                        SF=1.0
+                    if self.debug:
+                        print "SF",SF,"type(SF)",type(SF)
+                    list_process=info[3]
                     for process in list_process:
                         if self.debug:
                             print "ADRIAN2 %-10s %-10s %-10s %-10s" % (variable,category,processMerged,process)
@@ -527,6 +562,9 @@ class Analysis:
                     # done for loop over processInitial
                     if self.debug:
                         print "counter",counter
+                    # now scale the histogram with the SF
+                    histoProcessMerged.Scale(SF)
+                    # store the histogram
                     outputFile=TFile(self.fileNameHistosProcessMerged,"UPDATE")
                     histoProcessMerged.SetDirectory(outputFile)
                     histoProcessMerged.Write()
@@ -545,7 +583,7 @@ class Analysis:
     # done function
 
     def set_list_processType(self):
-        self.list_processType="S,B,D".split(",")
+        self.list_processType="S,B,D,Sig,Bkg,Dat".split(",")
 
     def create_yield_latex_table(self):
         variable=self.list_variable[0]
@@ -553,8 +591,12 @@ class Analysis:
         for category in self.list_category:
             dict_processType_list_tuple={}
             for processType in self.list_processType:
+                if self.debug:
+                    print "processType",processType
                 dict_processType_list_tuple[processType]=[]
             for processMerged in self.list_processMerged:
+                if self.debug:
+                    print "processMerged",processMerged
                 inputFileName=self.fileNameHistosProcessMerged 
                 histoNameProcessMerged=self.get_histoNameInitial(processMerged,category,variable)
                 histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=True,debug=self.debug)
@@ -705,15 +747,16 @@ class Analysis:
             # done for loop
             self.list_process=list_process
             # reduce category
-            self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) # old
-            #self.set_list_category(["2tag2jet_150ptv_SR"]) 
+            self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+            #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
             self.set_list_variable(["pTB1"])
+            #self.set_list_variable(["mBB","mva"])
             if self.debug:
                 self.print_lists()
-            self.create_histosRaw()
+            #self.create_histosRaw()
             # now we want to sum over processInitial for a given process
-            self.create_histosProcess()
+            #self.create_histosProcess()
             self.set_list_processMerged()
             self.create_histosProcessMerged()
             self.set_list_processType()
