@@ -79,6 +79,8 @@ class Analysis:
     # done function
 
     def evaluate_list_processInitial(self):
+        if self.debug:
+            print "Start evaluate_list_processInitial()"
         p = subprocess.Popen(
             ['ls', self.folderInput],
             stdout=subprocess.PIPE,
@@ -139,6 +141,8 @@ class Analysis:
     # done function
 
     def evaluate_content_of_one_processInitial(self,processInitial,debug):
+        if self.debug:
+            print "Start evaluate_content_of_one_processInitial()"
         fileName=self.folderProcessInitial+"/"+processInitial+".root"
         directoryPath=""
         searchClass="TH1F"
@@ -154,6 +158,8 @@ class Analysis:
     # done function
         
     def evaluate_content_of_all_processInitial(self):
+        if self.debug:
+            print "Start evaluate_content_of_all_processInitial()"
         set_process=Set()
         set_category=Set()
         set_variable=Set()
@@ -214,6 +220,8 @@ class Analysis:
     # done function
             
     def set_evaluated_list_process(self):
+        if self.debug:
+            print "Start set_evaluated_list_process()"
         fileName=self.folderProcessInitial+"/list_process.txt"
         self.list_process=get_list_from_file(fileName,self.debug)
     # done function 
@@ -241,6 +249,8 @@ class Analysis:
     # done function
 
     def get_histoNameRaw(self,process,category,variable,processInitial):
+        if self.debug:
+            print "Start get_histoNameRaw()"
         histoNameRaw=process+"_"+category+"_"+variable+"_"+processInitial
         if self.debug:
             print "histoNameRaw",histoNameRaw
@@ -252,6 +262,8 @@ class Analysis:
     # done function
 
     def create_histosRaw(self):
+        if self.debug:
+            print "Start create_histosRaw()"
         # stores those histograms that exist, and puts them in the same folder
         outputFile=TFile(self.fileNameHistosRaw,"RECREATE")
         outputFile.Close()
@@ -287,6 +299,8 @@ class Analysis:
     # done function
 
     def set_dict_variable_info(self):
+        if self.debug:
+            print "Start set_dict_variable_info()"
         debug_binRange=False
         self.dict_variable_info={
             "EtaB1":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
@@ -363,6 +377,8 @@ class Analysis:
     # done function
 
     def overlay_histosRaw_by_processInitial(self):
+        if self.debug:
+            print "Start overlay_histosRaw_by_processInitial()"
         for variable in self.list_variable:
             info=self.dict_variable_info[variable]
             binRange=info[0]
@@ -397,6 +413,8 @@ class Analysis:
     # done function
 
     def create_histosProcess(self):
+        if self.debug:
+            print "Start create_histosProcess()"
         # now we want to sum over processInitial for a given process
         outputFile=TFile(self.fileNameHistosProcess,"RECREATE")
         outputFile.Close()
@@ -445,6 +463,8 @@ class Analysis:
     # done function
 
     def set_list_processMerged(self):
+        if self.debug:
+            print "Start set_list_processMerged()"
         self.list_processMerged=[
             "qqZvvH",
             "qqZllH",
@@ -532,6 +552,8 @@ class Analysis:
     # done function
 
     def create_histosProcessMerged(self):
+        if self.debug:
+            print "Start create_histosProcessMerged()"
         # now we want to sum over process for a given processMerged
         outputFile=TFile(self.fileNameHistosProcessMerged,"RECREATE")
         outputFile.Close()
@@ -597,6 +619,8 @@ class Analysis:
         self.list_processType="S,B,D,Sig,Bkg,Dat".split(",")
 
     def create_yield_latex_table(self):
+        if self.debug:
+            print "Start create_yield_latex_table()"
         variable=self.list_variable[0]
         dict_category_processMerged_integralValueError={}
         for category in self.list_category:
@@ -702,7 +726,9 @@ class Analysis:
        
     ### summary
 
-    def do_all(self):
+    def do_all2(self):
+        print "ADI"
+        return
         self.create_folderProcessInitial()
         if self.do_evaluate_list_processInitial:
             self.evaluate_list_processInitial()
@@ -719,19 +745,23 @@ class Analysis:
         self.set_fileNameHistosProcess()
         self.set_fileNameHistosProcessMerged()
         self.create_folderYields()
+        print "ADR"
+        return
 
         #if True:
         #    self.create_histosRaw()
 
-
-
-        doTTbarStudy=False
+        doTTbarStudy=True
         if doTTbarStudy:
             if self.debug:
                 self.print_lists()
-            self.set_list_category(["0tag2jet_150ptv_SR","0tag3jet_150ptv_SR","1tag2jet_150ptv_SR","1tag3jet_150ptv_SR","2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
+            print "ADRIAN dfdfd"
+            return
+            #self.set_list_category(["0tag2jet_150ptv_SR","0tag3jet_150ptv_SR","1tag2jet_150ptv_SR","1tag3jet_150ptv_SR","2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
+            self.set_list_category(["0tag2jet_150ptv_SR"])
             self.set_list_process(["ttbar"])
-            self.set_list_processInitial(["ttbar_nonallhad_A14","ttbar_nonallhad"])
+            #self.set_list_processInitial(["ttbar_nonallhad_A14","ttbar_nonallhad"])
+            self.set_list_processInitial(["ttbar_nonallhad","ttbar_allhad"])
             if self.debug:
                 self.print_lists()
             self.create_histosRaw()
@@ -741,7 +771,7 @@ class Analysis:
                 self.overlay_histosRaw_by_processInitial()
         # done if doTTbarStudy
 
-        doYields=True
+        doYields=False
         if doYields:
             # remove ttbar_nonallhad from our processInitial
             list_processInitial=[]
