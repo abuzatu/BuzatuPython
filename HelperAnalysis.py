@@ -93,6 +93,9 @@ class Analysis:
         for fileName in output.split():
             if self.debug:
                 print "fileName",fileName
+            if ".root" not in fileName:
+                print "skipping non *.root file fileName",fileName
+                continue
             # e.g. hist-data17-3.root
             list_fileNameElement=fileName.split("-")
             processInitial=list_fileNameElement[1]
@@ -161,8 +164,14 @@ class Analysis:
             for histoName in list_histoName:
                 # e.g. ttbar_3ptag5pjet_150ptv_SR_yBB
                 list_histoNameElement=histoName.split("_")
-                process=list_histoNameElement[0] # first element e.g. ttbar
-                category=list_histoNameElement[1]+"_"+list_histoNameElement[2]+"_"+list_histoNameElement[3] # next three elements, eg. 3ptag5pjet_150ptv_SR
+                if "ttbar_dilep" in histoName or "stopWt_dilep" in histoName:
+                    process=list_histoNameElement[0]+"_"+list_histoNameElement[1] # e.g. "ttbar_dilep or stopWt_dilep
+                    category=list_histoNameElement[2]+"_"+list_histoNameElement[3]+"_"+list_histoNameElement[4] # next three elements, eg. 3ptag5pjet_150ptv_SR
+                else:
+                    # only one word to define the process, e.g. ttbar
+                    process=list_histoNameElement[0] # first element e.g. ttbar
+                    category=list_histoNameElement[1]+"_"+list_histoNameElement[2]+"_"+list_histoNameElement[3] # next three elements, eg. 3ptag5pjet_150ptv_SR
+                # done if
                 variable=histoName.replace(process+"_"+category+"_","") # the rest, tricky as sometimes the name has an _ in it
                 if self.debug:
                     print "histoName",histoName,"list_histoNameElement",list_histoNameElement,"process",process,"category",category,"variable",variable
@@ -505,13 +514,15 @@ class Analysis:
             "stop"   :["B",0,{"2":1.0,"3":1.0}
                        ,["stops","stopt","stopWt"]],
             "diboson":["B",1,{"2":1.0,"3":1.0}
-                       ,["WW","WZ","ZZ","ggWW","ggZZ"]],
+                       #,["WW","WZ","ZZ","ggWW","ggZZ"]],
+                       ,["WW","WZ","ZZ","ggZZ"]],
             "data"   :["D",1,{"2":1.0,"3":1.0}
                        ,["data"]],
             "S"      :["Sig",1,{"2":1.0,"3":1.0}
                        ,["qqZvvH125","qqZllH125","ggZvvH125","ggZllH125","qqWlvH125"]],
             "B"      :["Bkg",1,{"2":1.0,"3":1.0},
-                       ["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","stops","stopt","stopWt","WW","WZ","ZZ","ggWW","ggZZ"]],
+                       # ["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","stops","stopt","stopWt","WW","WZ","ZZ","ggWW","ggZZ"]],
+                       ["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","stops","stopt","stopWt","WW","WZ","ZZ","ggZZ"]],
             "D"      :["Dat",1,{"2":1.0,"3":1.0},
                        ["data"]],
             }
@@ -589,6 +600,7 @@ class Analysis:
         variable=self.list_variable[0]
         dict_category_processMerged_integralValueError={}
         for category in self.list_category:
+            print "ADRIAN category",category
             dict_processType_list_tuple={}
             for processType in self.list_processType:
                 if self.debug:
@@ -707,6 +719,12 @@ class Analysis:
         self.set_fileNameHistosProcess()
         self.set_fileNameHistosProcessMerged()
         self.create_folderYields()
+
+        #if True:
+        #    self.create_histosRaw()
+
+
+
         doTTbarStudy=False
         if doTTbarStudy:
             if self.debug:
@@ -747,18 +765,24 @@ class Analysis:
             # done for loop
             self.list_process=list_process
             # reduce category
-            self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+            #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
+            #self.set_list_category(["2tag3jet_150ptv_SR"]) 
+            self.set_list_category(["0ptag3jet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
             self.set_list_variable(["pTB1"])
             #self.set_list_variable(["mBB","mva"])
             if self.debug:
                 self.print_lists()
-            #self.create_histosRaw()
+            if True:
+                self.create_histosRaw()
+            return
             # now we want to sum over processInitial for a given process
-            #self.create_histosProcess()
+            if False:
+                self.create_histosProcess()
             self.set_list_processMerged()
-            self.create_histosProcessMerged()
+            if False:
+                self.create_histosProcessMerged()
             self.set_list_processType()
             self.create_yield_latex_table()
         # done if doYields
