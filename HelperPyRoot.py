@@ -1349,7 +1349,9 @@ def set_min_max_title_list_tuple_h1D(list_tuple_h1D,max_value,min_value,ignoreze
 
 def get_histo_normalised(h,debug=False):
     h_new=h.Clone(h.GetName()+"_normalised")
-    h_new.Scale(ratio(1.0,h_new.Integral()))
+    # get integral including underflow and overflow
+    integral,error=get_histo_integral_error(h,myRange=-1,debug=debug) 
+    h_new.Scale(ratio(1.0,integral))
     return h_new
 # done function
 
@@ -3632,3 +3634,4 @@ def get_dict_figureOfMerit_histo(sig_h,bkg_h,list_figureOfMerit=["SignalOverBack
     # 
     return dict_figureOfMerit_histo
 # done function
+B
