@@ -346,7 +346,12 @@ class Analysis:
             "mBBJ":[get_binRange(40,80,20,debug_binRange)+","+get_binRange(80,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)+","+get_binRange(500,700,50,debug_binRange)+","+get_binRange(700,1000,100,debug_binRange)],
             "maxdRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "mindRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
-            "mu":[get_binRange(7,90,1,debug_binRange)],
+            "AverageMu":[get_binRange(0,100,1,debug_binRange)],
+            "AverageMuScaled":[get_binRange(0,100,1,debug_binRange)],
+            "ActualMu":[get_binRange(0,100,1,debug_binRange)],
+            "ActualMuScaled":[get_binRange(0,100,1,debug_binRange)],
+            "PileupReweight":[""],
+            "RandomRunNumber":[""],
             "mva":[get_binRange(-1,1,0.05,debug_binRange)],
             "mvadiboson":[get_binRange(-1,1,0.05,debug_binRange)],
             "nTaus":[""],
@@ -389,12 +394,14 @@ class Analysis:
                         if self.debug:
                             print "%-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
                         inputFileName=self.fileNameHistosRaw
-                        histoNameRaw    =self.get_histoNameRaw    (process,category,variable,processInitial)
+                        histoNameRaw=self.get_histoNameRaw(process,category,variable,processInitial)
                         histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameRaw,name="",returnDummyIfNotFound=True,debug=self.debug)
                         if histo=="dummy":
                             continue
                         histo=get_histo_generic_binRange(histo,binRange=binRange,option="average",debug=False)
                         histo.SetLineColor(list_color[i])
+                        # normalise to unit area
+                        histo=get_histo_normalised(histo)
                         list_tuple_h1D.append((histo,processInitial))
                     # done for loop over processInitial
                     if self.debug:
@@ -726,9 +733,9 @@ class Analysis:
        
     ### summary
 
-    def do_all2(self):
-        print "ADI"
-        return
+    def do_all(self):
+        if self.debug:
+            print "Start do_all()"
         self.create_folderProcessInitial()
         if self.do_evaluate_list_processInitial:
             self.evaluate_list_processInitial()
@@ -745,23 +752,22 @@ class Analysis:
         self.set_fileNameHistosProcess()
         self.set_fileNameHistosProcessMerged()
         self.create_folderYields()
-        print "ADR"
-        return
 
         #if True:
         #    self.create_histosRaw()
 
-        doTTbarStudy=True
+        doTTbarStudy=False
         if doTTbarStudy:
             if self.debug:
                 self.print_lists()
-            print "ADRIAN dfdfd"
-            return
             #self.set_list_category(["0tag2jet_150ptv_SR","0tag3jet_150ptv_SR","1tag2jet_150ptv_SR","1tag3jet_150ptv_SR","2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
-            self.set_list_category(["0tag2jet_150ptv_SR"])
+            self.set_list_category(["2tag2jet_150ptv_SR"])
             self.set_list_process(["ttbar"])
-            #self.set_list_processInitial(["ttbar_nonallhad_A14","ttbar_nonallhad"])
-            self.set_list_processInitial(["ttbar_nonallhad","ttbar_allhad"])
+            self.set_list_processInitial(["ttbar_nonallhad_PwPy8","ttbar_allhad_PwPy8"])
+            #self.set_list_process(["ttbar"])
+            #self.set_list_processInitial(["ttbar_nonallhad_PwPy8","ttbar_allhad_PwPy8"])
+            #ZvvZbb, ZllZbb -> ZZ_bb_Sh221
+            #ZZ -> ZZ_Sh221
             if self.debug:
                 self.print_lists()
             self.create_histosRaw()
@@ -771,7 +777,7 @@ class Analysis:
                 self.overlay_histosRaw_by_processInitial()
         # done if doTTbarStudy
 
-        doYields=False
+        doYields=True
         if doYields:
             # remove ttbar_nonallhad from our processInitial
             list_processInitial=[]
@@ -788,7 +794,7 @@ class Analysis:
             if self.debug:
                 print "list_process",self.list_process
             for process in self.list_process:
-                if process=="W" or process=="Z":
+                if process=="W" or process=="Z" or "MadZee" in process or "MadZmumu" in process or process=="ggWW":
                     print "WARNING!!! finding process",process,"will skip them!"
                     continue
                 list_process.append(process)
@@ -797,19 +803,21 @@ class Analysis:
             # reduce category
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
+            self.set_list_category(["2tag2jet_150ptv_SR"]) 
             #self.set_list_category(["2tag3jet_150ptv_SR"]) 
-            self.set_list_category(["0ptag3jet_150ptv_SR"]) 
+            #self.set_list_category(["0ptag3jet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
-            self.set_list_variable(["pTB1"])
-            #self.set_list_variable(["mBB","mva"])
+            #self.set_list_variable(["pTB1"])
+            self.set_list_variable(["mBB"])
+            # self.set_list_variable(["mBB","mva"])
             if self.debug:
                 self.print_lists()
             if True:
                 self.create_histosRaw()
-            return
             # now we want to sum over processInitial for a given process
-            if False:
+            if True:
                 self.create_histosProcess()
+            return
             self.set_list_processMerged()
             if False:
                 self.create_histosProcessMerged()
