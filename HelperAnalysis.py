@@ -170,7 +170,7 @@ class Analysis:
             for histoName in list_histoName:
                 # e.g. ttbar_3ptag5pjet_150ptv_SR_yBB
                 list_histoNameElement=histoName.split("_")
-                if "ttbar_dilep" in histoName or "stopWt_dilep" in histoName:
+                if "ttbar_dilep" in histoName or "stopWt_dilep" in histoName or "ggH125_bb" in histoName or "ggH125_inc" in histoName or "VBFH125_inc" in histoName or "ttbar_spin" in histoName:
                     process=list_histoNameElement[0]+"_"+list_histoNameElement[1] # e.g. "ttbar_dilep or stopWt_dilep
                     category=list_histoNameElement[2]+"_"+list_histoNameElement[3]+"_"+list_histoNameElement[4] # next three elements, eg. 3ptag5pjet_150ptv_SR
                 else:
@@ -181,7 +181,7 @@ class Analysis:
                 variable=histoName.replace(process+"_"+category+"_","") # the rest, tricky as sometimes the name has an _ in it
                 if self.debug:
                     print "histoName",histoName,"list_histoNameElement",list_histoNameElement,"process",process,"category",category,"variable",variable
-                set_process.add(process)
+                set_process.add(category+","+process+","+processInitial)
                 set_category.add(category)
                 set_variable.add(variable)
             # done for loop over histoName
@@ -201,19 +201,25 @@ class Analysis:
                 print "variable",variable
         # create the python file with the lists
         # list_process
-        outputFile=open(self.folderProcessInitial+"/list_process.txt","w")
+        outputFileName=self.folderProcessInitial+"/list_process.txt"
+        os.system("rm -f "+outputFileName)
+        outputFile=open(outputFileName,"w")
         for process in list_process:
             if "QQ2H" in process or "GG2H" in process or process=="UNKNOWN":
                 continue
             outputFile.write(process+"\n")
         outputFile.close()
         # list_category
-        outputFile=open(self.folderProcessInitial+"/list_category.txt","w")
+        outputFileName=self.folderProcessInitial+"/list_category.txt"
+        os.system("rm -f "+outputFileName)
+        outputFile=open(outputFileName,"w")
         for category in list_category:
             outputFile.write(category+"\n")
         outputFile.close()
         # list_variable
-        outputFile=open(self.folderProcessInitial+"/list_variable.txt","w")
+        outputFileName=self.folderProcessInitial+"/list_variable.txt"
+        os.system("rm -f "+outputFileName)
+        outputFile=open(outputFileName,"w")
         for variable in list_variable:
             outputFile.write(variable+"\n")
         outputFile.close()
@@ -268,13 +274,26 @@ class Analysis:
         outputFile=TFile(self.fileNameHistosRaw,"RECREATE")
         outputFile.Close()
         for variable in self.list_variable:
-            for category in self.list_category:
-                for process in self.list_process:
+            if True:
+            #for category in self.list_category:
+                for category_process_processInitial in self.list_process:
+                    category=category_process_processInitial.split(",")[0]
                     if self.debug:
-                        print "process",process
-                    for processInitial in self.list_processInitial:
-                        if self.debug:
-                            print "processInitial",processInitial
+                        print "category",category
+                        print "self.list_category",self.list_category
+                    if category not in self.list_category:
+                        continue
+                    process=category_process_processInitial.split(",")[1]
+                    processInitial=category_process_processInitial.split(",")[2]
+                    if self.debug:
+                        print "category",category,"process",process,"processInitial",processInitial
+                    if True:
+                #for process in self.list_process:
+                #    if self.debug:
+                #        print "process",process
+                #    for processInitial in self.list_processInitial:
+                #        if self.debug:
+                #            print "processInitial",processInitial
                         if self.debug:
                             print "%-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
                         inputFileName=self.folderProcessInitial+"/"+processInitial+".root"
@@ -467,6 +486,112 @@ class Analysis:
                 # done for loop over process
             # done for loop over category
         # done for loop over variable
+    # done function
+
+    def set_list_processA(self):
+        list_process=[
+            "WmH125J",
+            "WpH125J",
+            "ggZllH125",
+            "ggZllH125",
+            "ggZvvH125",
+            "ggZvvH125",
+            "qqWlvH125",
+            "qqZllH125",
+            "qqZllH125",
+            "qqvvlH125",
+            "qqZvvH125",
+            "qqZincH4l",
+            # "ggH",
+            "VBF",
+            "ttH",
+            "WW",
+            "WZ",
+            "ZZ",
+            "ggZZ",
+            "ggWW", # does not exist in 2tag2jet, but in 2tag3jet
+            "ZllZb",
+            "ZvvZbb",
+            "WlvZbb",
+            "ZllZvv",
+            "Wbb",
+            "Wbc",
+            "Wbl",
+            "Wcc",
+            "Wcl",
+            "Wl",
+            "Zbb",
+            "Zbc",
+            "Zbl",
+            "Zcc",
+            "Zcl",
+            "Zl",
+            "ttbar",
+            "stops",
+            "stopt",
+            "stopWt",
+            "tZq",
+            "ttV",
+            "data",
+            # "",
+            ]
+        
+        dict_process_info={
+            "qqZvvHbb":["qqZvvH125",["qqZvvHbbJ_PwPy8MINLO",],],
+            "qqWlvHbb":["qqWlvH125",["qqWlvHbbJ_PwPy8MINLO",],],
+            "ggZvvHbb":["ggZvvH125",["ggZvvHbb_PwPy8",],],
+            "qqZllHbb":["qqZllH125",["qqZllHbbJ_PwPy8MINLO",],],
+            "ggZllHbb":["ggZllH125",["ggZllHbb_PwPy8",],],
+
+            "qqZvvHcc":["qqZvvH125",["qqZvvHccJ_PwPy8MINLO",],],
+
+            "ggZvvHcc":["ggZvvH125",["ggZvvHcc_PwPy8",],],
+
+            "WmH125J":["WmH125J",["qqWlvHccJ_PwPy8MINLO",],],
+            "WpH125J":["WpH125J",["qqWlvHccJ_PwPy8MINLO",],],
+
+            "ggZllH125":["ggZllH125",["ggZllHcc_PwPy8",],],
+
+
+
+
+            "qqZllH125":["qqZllH125",["qqZllHccJ_PwPy8MINLO",],],
+
+
+            "qqZincH4l":["qqZincH4l",["ZincHJZZ4l_PwPy8MINLO",],],
+            "VBF":["VBFH125_inc",["VBFHinc_PwPy8",],],
+            "ttH":["ttH",["ttHinc_aMCatNLOPy8",],],
+            "data":["data",["data15","data16",],],
+            "WW":["WW",["WW_Sh221",],],
+            "WZ":["WZ",["WZ_Sh221",],],
+            "ZZ":["ZZ",["ZZ_Sh221",],],
+            "ggZZ":["ggZZ",["ggZZ_Sh222"],],
+            "ggWW":["ggWW",["ggWW_Sh222"],], # does not exist in 2tag2jet, but in 2tag3jet
+            "ZllZbb":["ZllZbb",["ZZ_bb_Sh221",],],
+            "ZvvZbb":["ZvvZbb",["ZZ_bb_Sh221",],],
+            "WlvZbb":["WlvZbb",["WZ_bb_Sh221",],],
+            "ZllZvv":["llvv",["VV_fulllep_Sh222",],],
+            "Wbb":["Wbb",["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
+            "Wbc":["Wbc",["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
+            "Wbl":["Wbl",["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
+            "Wcc":["Wcc",["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
+            "Wcl":["Wcl",["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
+            "Wl": ["Wl" ,["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
+            "Zbb":["Zbb",["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
+            "Zbc":["Zbc",["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
+            "Zbl":["Zbl",["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
+            "Zcc":["Zcc",["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
+            "Zcl":["Zcl",["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
+            "Zl" :["Zl" ,["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
+            "ttbar" :["ttbar",["ttbar_nonallhad_PwPy8"],],
+            "stops" :["stops",["stops_PwPy"],],
+            "stopt" :["stopt",["stopt_PwPy"],],
+            "stopWt":["stopWt",["stopWt_PwPy",],],
+            "tZq"   :["tZq",["stoptZ_MGPy8",],],
+            "ttV"   :["ttV",["ttV_aMCatNLOPy8",],],
+            # "":[[],],
+            }
+
     # done function
 
     def set_list_processMerged(self):
@@ -753,6 +878,8 @@ class Analysis:
         self.set_fileNameHistosProcessMerged()
         self.create_folderYields()
 
+        #return
+
         #if True:
         #    self.create_histosRaw()
 
@@ -808,12 +935,14 @@ class Analysis:
             #self.set_list_category(["0ptag3jet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
             #self.set_list_variable(["pTB1"])
-            self.set_list_variable(["mBB"])
+            #self.set_list_variable(["mBB"])
             # self.set_list_variable(["mBB","mva"])
-            if self.debug:
+            #if self.debug:
+            if False:
                 self.print_lists()
-            if True:
+            if False:
                 self.create_histosRaw()
+            #return
             # now we want to sum over processInitial for a given process
             if True:
                 self.create_histosProcess()
