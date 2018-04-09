@@ -3634,4 +3634,3 @@ def get_dict_figureOfMerit_histo(sig_h,bkg_h,list_figureOfMerit=["SignalOverBack
     # 
     return dict_figureOfMerit_histo
 # done function
-B
