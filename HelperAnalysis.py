@@ -445,18 +445,27 @@ class Analysis:
         outputFile=TFile(self.fileNameHistosProcess,"RECREATE")
         outputFile.Close()
         for variable in self.list_variable:
+            if "FwdJets" in variable or "SigJets" in variable or variable=="MV2c10_B" or variable=="MV2c10_C" or variable=="MV2c10_Data" or variable=="MV2c10_L" or variable=="btag_weight_B" or variable=="btag_weight_C" or variable=="btag_weight_Data" or variable=="btag_weight_L" or variable=="eff_B" or variable=="eff_C" or variable=="eff_L" or variable=="njets":
+                # they are not defined for 2tag2jet categories, as these do not have forward jets
+                continue 
             counter_variable=0
             for category in self.list_category:
-                for process in self.list_process:
+                for processRenamed in self.list_process:
+                    #if processRenamed!="ttbar":
+                    #    continue
                     counter=0
                     if self.debug:
-                        print "ADRIAN1  %-10s %-10s %-10s" % (variable,category,process)
-                    for processInitial in self.list_processInitial:
+                        print "ADRIAN1  %-10s %-10s %-10s" % (variable,category,processRenamed)
+                    list_processInfo=self.dict_process_info[processRenamed]
+                    #for processInitial in self.list_processInitial:
+                    for processInfo in list_processInfo:
+                        process=processInfo[0]
+                        processInitial=processInfo[1]
                         if self.debug:
                             print "ADRIAN2 %-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
                         inputFileName=self.fileNameHistosRaw
                         histoNameRaw    =self.get_histoNameRaw    (process,category,variable,processInitial)
-                        histoNameProcess=self.get_histoNameInitial(process,category,variable)
+                        histoNameProcess=self.get_histoNameInitial(processRenamed,category,variable)
                         histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameRaw,name=histoNameProcess,returnDummyIfNotFound=True,debug=self.debug)
                         if histo=="dummy":
                             continue
@@ -471,10 +480,14 @@ class Analysis:
                         counter+=1
                     # done for loop over processInitial
                     if self.debug:
-                        print "counter",counter
+                        print "counter final",counter
                     if counter==0:
+                        histoNameRaw    =self.get_histoNameRaw    ("ttbar",category,variable,"ttbar_nonallhad_PwPy8")
+                        histoNameProcess=self.get_histoNameInitial(processRenamed,category,variable)
+                        histoReset=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameRaw,name=histoNameProcess,returnDummyIfNotFound=True,debug=self.debug)
+                        histoReset.Reset()
                         histoProcess=histoReset
-                        histoNameProcess=self.get_histoNameInitial(process,category,variable)
+                        histoNameProcess=self.get_histoNameInitial(processRenamed,category,variable)
                         histoProcess.SetName(histoNameProcess)
                         histoProcess.SetTitle(histoNameProcess)
                         if self.debug:
@@ -488,32 +501,32 @@ class Analysis:
         # done for loop over variable
     # done function
 
-    def set_list_processA(self):
-        list_process=[
-            "WmH125J",
-            "WpH125J",
-            "ggZllH125",
-            "ggZllH125",
-            "ggZvvH125",
-            "ggZvvH125",
-            "qqWlvH125",
-            "qqZllH125",
-            "qqZllH125",
-            "qqvvlH125",
-            "qqZvvH125",
+    def set_list_process_info(self):
+        self.list_process=[
+            "qqZvvHbb",
+            "qqWlvHbb",
+            "ggZvvHbb",
+            "qqZllHbb",
+            "ggZllHbb",
+            "qqZvvHcc",
+            "qqWlvHcc",
+            "ggZvvHcc",
+            "qqZllHcc",
+            "ggZllHcc",
             "qqZincH4l",
-            # "ggH",
+            "ggH",
+            "bbH",
             "VBF",
             "ttH",
             "WW",
             "WZ",
             "ZZ",
             "ggZZ",
-            "ggWW", # does not exist in 2tag2jet, but in 2tag3jet
-            "ZllZb",
-            "ZvvZbb",
-            "WlvZbb",
-            "ZllZvv",
+            "ggWW",
+            #"ZllZb",
+            #"ZvvZbb",
+            #"WlvZbb",
+            #"ZllZvv",
             "Wbb",
             "Wbc",
             "Wbl",
@@ -532,63 +545,225 @@ class Analysis:
             "stopWt",
             "tZq",
             "ttV",
+            "ttVV",
+            "ttt",
+            "tttt",
             "data",
             # "",
             ]
         
-        dict_process_info={
-            "qqZvvHbb":["qqZvvH125",["qqZvvHbbJ_PwPy8MINLO",],],
-            "qqWlvHbb":["qqWlvH125",["qqWlvHbbJ_PwPy8MINLO",],],
-            "ggZvvHbb":["ggZvvH125",["ggZvvHbb_PwPy8",],],
-            "qqZllHbb":["qqZllH125",["qqZllHbbJ_PwPy8MINLO",],],
-            "ggZllHbb":["ggZllH125",["ggZllHbb_PwPy8",],],
-
-            "qqZvvHcc":["qqZvvH125",["qqZvvHccJ_PwPy8MINLO",],],
-
-            "ggZvvHcc":["ggZvvH125",["ggZvvHcc_PwPy8",],],
-
-            "WmH125J":["WmH125J",["qqWlvHccJ_PwPy8MINLO",],],
-            "WpH125J":["WpH125J",["qqWlvHccJ_PwPy8MINLO",],],
-
-            "ggZllH125":["ggZllH125",["ggZllHcc_PwPy8",],],
-
-
-
-
-            "qqZllH125":["qqZllH125",["qqZllHccJ_PwPy8MINLO",],],
-
-
-            "qqZincH4l":["qqZincH4l",["ZincHJZZ4l_PwPy8MINLO",],],
-            "VBF":["VBFH125_inc",["VBFHinc_PwPy8",],],
-            "ttH":["ttH",["ttHinc_aMCatNLOPy8",],],
-            "data":["data",["data15","data16",],],
-            "WW":["WW",["WW_Sh221",],],
-            "WZ":["WZ",["WZ_Sh221",],],
-            "ZZ":["ZZ",["ZZ_Sh221",],],
-            "ggZZ":["ggZZ",["ggZZ_Sh222"],],
-            "ggWW":["ggWW",["ggWW_Sh222"],], # does not exist in 2tag2jet, but in 2tag3jet
-            "ZllZbb":["ZllZbb",["ZZ_bb_Sh221",],],
-            "ZvvZbb":["ZvvZbb",["ZZ_bb_Sh221",],],
-            "WlvZbb":["WlvZbb",["WZ_bb_Sh221",],],
-            "ZllZvv":["llvv",["VV_fulllep_Sh222",],],
-            "Wbb":["Wbb",["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
-            "Wbc":["Wbc",["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
-            "Wbl":["Wbl",["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
-            "Wcc":["Wcc",["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
-            "Wcl":["Wcl",["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
-            "Wl": ["Wl" ,["WenuB_Sh221","WenuC_Sh221","WenuL_Sh221","Wenu_Sh221","WmunuB_Sh221","WmunuC_Sh221","WmunuL_Sh221","Wmunu_Sh221","WtaunuB_Sh221","WtaunuC_Sh221","WtaunuL_Sh221","Wtaunu_Sh221",],],
-            "Zbb":["Zbb",["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
-            "Zbc":["Zbc",["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
-            "Zbl":["Zbl",["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
-            "Zcc":["Zcc",["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
-            "Zcl":["Zcl",["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
-            "Zl" :["Zl" ,["ZnunuB_Sh221","ZnunuC_Sh221","ZnunuL_Sh221","Znunu_Sh221","ZeeB_Sh221","ZeeC_Sh221","ZeeL_Sh221","Zee_Sh221","ZmumuB_Sh221","ZmumuC_Sh221","ZmumuL_Sh221","Zmumu_Sh221","ZtautauB_Sh221","ZtautauC_Sh221","ZtautauL_Sh221","Ztautau_Sh221",],],
-            "ttbar" :["ttbar",["ttbar_nonallhad_PwPy8"],],
-            "stops" :["stops",["stops_PwPy"],],
-            "stopt" :["stopt",["stopt_PwPy"],],
-            "stopWt":["stopWt",["stopWt_PwPy",],],
-            "tZq"   :["tZq",["stoptZ_MGPy8",],],
-            "ttV"   :["ttV",["ttV_aMCatNLOPy8",],],
+        self.dict_process_info={
+            # VHbb
+            "qqZvvHbb":[["qqZvvH125","qqZvvHbbJ_PwPy8MINLO"],],
+            "qqWlvHbb":[["qqWlvH125","qqWlvHbbJ_PwPy8MINLO"],],
+            "ggZvvHbb":[["ggZvvH125","ggZvvHbb_PwPy8"],],
+            "qqZllHbb":[["qqZllH125","qqZllHbbJ_PwPy8MINLO"],],
+            "ggZllHbb":[["ggZllH125","ggZllHbb_PwPy8"],],
+            # VHcc
+            "qqZvvHcc":[["qqZvvH125","qqZvvHccJ_PwPy8MINLO"],],
+            "qqWlvHcc":[["WmH125J"  ,"qqWlvHccJ_PwPy8MINLO"],
+                        ["WpH125J"  ,"qqWlvHccJ_PwPy8MINLO"],],
+            "ggZvvHcc":[["ggZvvH125","ggZvvHcc_PwPy8"],],
+            "qqZllHcc":[["qqZllH125","qqZllHccJ_PwPy8MINLO"],],
+            "ggZllHcc":[["ggZllH125","ggZllHcc_PwPy8"],],
+            # other ZH
+            "qqZincH4l":[["qqZincH4l","ZincHJZZ4l_PwPy8MINLO"],],
+            # non ZH signals
+            "VBF":[["VBFH125_inc","VBFHinc_PwPy8"],],
+            "ggHbb":[["ggH125_bb","ggHbb_PwPy8NNLOPS."],],
+            "ggH":[["ggH125_inc","ggHinc_PwPy8.root"],],
+            "bbH":[["bbH125","bbHinc_aMCatNLOPy8"],],
+            "ttH":[["ttH","ttHinc_aMCatNLOPy8"],],
+            # dibosons
+            "WW":[["WW","WW_Sh221"],],
+            "WZ":[["WZ","WZ_Sh221"],],
+            "ZZ":[["ZZ","ZZ_Sh221"],],
+            "ggZZ":[["ggZZ","ggZZ_Sh222"],],
+            "ggWW":[["ggWW","ggWW_Sh222"],],
+            "ZllZbb":[["ZllZbb","ZZ_bb_Sh221"],],
+            "ZvvZbb":[["ZvvZbb","ZZ_bb_Sh221"],],
+            "WlvZbb":[["WlvZbb","WZ_bb_Sh221"],],
+            "ZllZvv":[["llvv","VV_fulllep_Sh222"],],
+            # W+jets
+            "Wbb":[["Wbb","WenuB_Sh221"],
+                   ["Wbb","WenuC_Sh221"],
+                   ["Wbb","WenuL_Sh221"],
+                   ["Wbb","Wenu_Sh221"],
+                   ["Wbb","WmunuB_Sh221"],
+                   ["Wbb","WmunuC_Sh221"],
+                   ["Wbb","WmunuL_Sh221"],
+                   ["Wbb","Wmunu_Sh221"],
+                   ["Wbb","WtaunuB_Sh221"],
+                   ["Wbb","WtaunuC_Sh221"],
+                   ["Wbb","WtaunuL_Sh221"],
+                   ["Wbb","Wtaunu_Sh221"],],
+            "Wbc":[["Wbc","WenuB_Sh221"],
+                   ["Wbc","WenuC_Sh221"],
+                   ["Wbc","WenuL_Sh221"],
+                   ["Wbc","Wenu_Sh221"],
+                   ["Wbc","WmunuB_Sh221"],
+                   ["Wbc","WmunuC_Sh221"],
+                   ["Wbc","WmunuL_Sh221"],
+                   ["Wbc","Wmunu_Sh221"],
+                   ["Wbc","WtaunuB_Sh221"],
+                   ["Wbc","WtaunuC_Sh221"],
+                   ["Wbc","WtaunuL_Sh221"],
+                   ["Wbc","Wtaunu_Sh221"],],
+            "Wbl":[["Wbl","WenuB_Sh221"],
+                   ["Wbl","WenuC_Sh221"],
+                   ["Wbl","WenuL_Sh221"],
+                   ["Wbl","Wenu_Sh221"],
+                   ["Wbl","WmunuB_Sh221"],
+                   ["Wbl","WmunuC_Sh221"],
+                   ["Wbl","WmunuL_Sh221"],
+                   ["Wbl","Wmunu_Sh221"],
+                   ["Wbl","WtaunuB_Sh221"],
+                   ["Wbl","WtaunuC_Sh221"],
+                   ["Wbl","WtaunuL_Sh221"],
+                   ["Wbl","Wtaunu_Sh221"],],
+            "Wcc":[["Wcc","WenuB_Sh221"],
+                   ["Wcc","WenuC_Sh221"],
+                   ["Wcc","WenuL_Sh221"],
+                   ["Wcc","Wenu_Sh221"],
+                   ["Wcc","WmunuB_Sh221"],
+                   ["Wcc","WmunuC_Sh221"],
+                   ["Wcc","WmunuL_Sh221"],
+                   ["Wcc","Wmunu_Sh221"],
+                   ["Wcc","WtaunuB_Sh221"],
+                   ["Wcc","WtaunuC_Sh221"],
+                   ["Wcc","WtaunuL_Sh221"],
+                   ["Wcc","Wtaunu_Sh221"],],
+            "Wcl":[["Wcl","WenuB_Sh221"],
+                   ["Wcl","WenuC_Sh221"],
+                   ["Wcl","WenuL_Sh221"],
+                   ["Wcl","Wenu_Sh221"],
+                   ["Wcl","WmunuB_Sh221"],
+                   ["Wcl","WmunuC_Sh221"],
+                   ["Wcl","WmunuL_Sh221"],
+                   ["Wcl","Wmunu_Sh221"],
+                   ["Wcl","WtaunuB_Sh221"],
+                   ["Wcl","WtaunuC_Sh221"],
+                   ["Wcl","WtaunuL_Sh221"],
+                   ["Wcl","Wtaunu_Sh221"],],
+            "Wl": [["Wl" ,"WenuB_Sh221"],
+                   ["Wl" ,"WenuC_Sh221"],
+                   ["Wl" ,"WenuL_Sh221"],
+                   ["Wl" ,"Wenu_Sh221"],
+                   ["Wl" ,"WmunuB_Sh221"],
+                   ["Wl" ,"WmunuC_Sh221"],
+                   ["Wl" ,"WmunuL_Sh221"],
+                   ["Wl" ,"Wmunu_Sh221",],
+                   ["Wl" ,"WtaunuB_Sh221"],
+                   ["Wl" ,"WtaunuC_Sh221"],
+                   ["Wl" ,"WtaunuL_Sh221"],
+                   ["Wl" ,"Wtaunu_Sh221"],],
+            "Zbb":[["Zbb","ZnunuB_Sh221"],
+                   ["Zbb","ZnunuC_Sh221"],
+                   ["Zbb","ZnunuL_Sh221"],
+                   ["Zbb","Znunu_Sh221"],
+                   ["Zbb","ZeeB_Sh221"],
+                   ["Zbb","ZeeC_Sh221"],
+                   ["Zbb","ZeeL_Sh221"],
+                   ["Zbb","Zee_Sh221"],
+                   ["Zbb","ZmumuB_Sh221"],
+                   ["Zbb","ZmumuC_Sh221"],
+                   ["Zbb","ZmumuL_Sh221"],
+                   ["Zbb","Zmumu_Sh221"],
+                   ["Zbb","ZtautauB_Sh221"],
+                   ["Zbb","ZtautauC_Sh221"],
+                   ["Zbb","ZtautauL_Sh221"],
+                   ["Zbb","Ztautau_Sh221"],],
+            "Zbc":[["Zbc","ZnunuB_Sh221"],
+                   ["Zbc","ZnunuC_Sh221"],
+                   ["Zbc","ZnunuL_Sh221"],
+                   ["Zbc","Znunu_Sh221"],
+                   ["Zbc","ZeeB_Sh221"],
+                   ["Zbc","ZeeC_Sh221"],
+                   ["Zbc","ZeeL_Sh221"],
+                   ["Zbc","Zee_Sh221"],
+                   ["Zbc","ZmumuB_Sh221"],
+                   ["Zbc","ZmumuC_Sh221"],
+                   ["Zbc","ZmumuL_Sh221"],
+                   ["Zbc","Zmumu_Sh221"],
+                   ["Zbc","ZtautauB_Sh221"],
+                   ["Zbc","ZtautauC_Sh221"],
+                   ["Zbc","ZtautauL_Sh221"],
+                   ["Zbc","Ztautau_Sh221"],],
+            "Zbl":[["Zbl","ZnunuB_Sh221"],
+                   ["Zbl","ZnunuC_Sh221"],
+                   ["Zbl","ZnunuL_Sh221"],
+                   ["Zbl","Znunu_Sh221"],
+                   ["Zbl","ZeeB_Sh221"],
+                   ["Zbl","ZeeC_Sh221"],
+                   ["Zbl","ZeeL_Sh221"],
+                   ["Zbl","Zee_Sh221"],
+                   ["Zbl","ZmumuB_Sh221"],
+                   ["Zbl","ZmumuC_Sh221"],
+                   ["Zbl","ZmumuL_Sh221"],
+                   ["Zbl","Zmumu_Sh221"],
+                   ["Zbl","ZtautauB_Sh221"],
+                   ["Zbl","ZtautauC_Sh221"],
+                   ["Zbl","ZtautauL_Sh221"],
+                   ["Zbl","Ztautau_Sh221"],],
+            "Zcc":[["Zcc","ZnunuB_Sh221"],
+                   ["Zcc","ZnunuC_Sh221"],
+                   ["Zcc","ZnunuL_Sh221"],
+                   ["Zcc","Znunu_Sh221"],
+                   ["Zcc","ZeeB_Sh221"],
+                   ["Zcc","ZeeC_Sh221"],
+                   ["Zcc","ZeeL_Sh221"],
+                   ["Zcc","Zee_Sh221"],
+                   ["Zcc","ZmumuB_Sh221"],
+                   ["Zcc","ZmumuC_Sh221"],
+                   ["Zcc","ZmumuL_Sh221"],
+                   ["Zcc","Zmumu_Sh221"],
+                   ["Zcc","ZtautauB_Sh221"],
+                   ["Zcc","ZtautauC_Sh221"],
+                   ["Zcc","ZtautauL_Sh221"],
+                   ["Zcc","Ztautau_Sh221",]],
+            "Zcl":[["Zcl","ZnunuB_Sh221"],
+                   ["Zcl","ZnunuC_Sh221"],
+                   ["Zcl","ZnunuL_Sh221"],
+                   ["Zcl","Znunu_Sh221"],
+                   ["Zcl","ZeeB_Sh221"],
+                   ["Zcl","ZeeC_Sh221"],
+                   ["Zcl","ZeeL_Sh221"],
+                   ["Zcl","Zee_Sh221"],
+                   ["Zcl","ZmumuB_Sh221"],
+                   ["Zcl","ZmumuC_Sh221"],
+                   ["Zcl","ZmumuL_Sh221"],
+                   ["Zcl","Zmumu_Sh221"],
+                   ["Zcl","ZtautauB_Sh221"],
+                   ["Zcl","ZtautauC_Sh221"],
+                   ["Zcl","ZtautauL_Sh221"],
+                   ["Zcl","Ztautau_Sh221"],],
+            "Zl" :[["Zl" ,"ZnunuB_Sh221"],
+                   ["Zl" ,"ZnunuC_Sh221"],
+                   ["Zl" ,"ZnunuL_Sh221"],
+                   ["Zl" ,"Znunu_Sh221"],
+                   ["Zl" ,"ZeeB_Sh221"],
+                   ["Zl" ,"ZeeC_Sh221"],
+                   ["Zl" ,"ZeeL_Sh221"],
+                   ["Zl" ,"Zee_Sh221"],
+                   ["Zl" ,"ZmumuB_Sh221"],
+                   ["Zl" ,"ZmumuC_Sh221"],
+                   ["Zl" ,"ZmumuL_Sh221"],
+                   ["Zl" ,"Zmumu_Sh221"],
+                   ["Zl" ,"ZtautauB_Sh221"],
+                   ["Zl" ,"ZtautauC_Sh221"],
+                   ["Zl" ,"ZtautauL_Sh221"],
+                   ["Zl" ,"Ztautau_Sh221"],],
+            "ttbar" :[["ttbar","ttbar_nonallhad_PwPy8"],],
+            "stops" :[["stops","stops_PwPy"],],
+            "stopt" :[["stopt","stopt_PwPy"],],
+            "stopWt":[["stopWt","stopWt_PwPy"],],
+            "tZq"   :[["tZq","stoptZ_MGPy8"],],
+            "ttV"   :[["ttV","ttV_aMCatNLOPy8"],],
+            "ttVV"  :[["ttbarWW","ttVV_MGPy8"],],
+            "ttt"   :[["ttt","ttt_MGPy8"],],
+            "tttt"  :[["4topSM","tttt_MGPy8"],],
+            "data"  :[["data","data15"],
+                      ["data","data16"],],
             # "":[[],],
             }
 
@@ -926,7 +1101,8 @@ class Analysis:
                     continue
                 list_process.append(process)
             # done for loop
-            self.list_process=list_process
+            #self.list_process=list_process
+            self.list_process=["ttbar"]
             # reduce category
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
@@ -937,6 +1113,7 @@ class Analysis:
             #self.set_list_variable(["pTB1"])
             #self.set_list_variable(["mBB"])
             # self.set_list_variable(["mBB","mva"])
+            #self.set_list_variable(["EtaFwdJets"])
             #if self.debug:
             if False:
                 self.print_lists()
@@ -945,6 +1122,7 @@ class Analysis:
             #return
             # now we want to sum over processInitial for a given process
             if True:
+                self.set_list_process_info()
                 self.create_histosProcess()
             return
             self.set_list_processMerged()
