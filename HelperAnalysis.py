@@ -1102,24 +1102,27 @@ class Analysis:
                 list_process.append(process)
             # done for loop
             #self.list_process=list_process
-            self.list_process=["ttbar"]
+            #self.list_process=["ttbar"]
+            #self.list_process=["data"]
             # reduce category
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
-            self.set_list_category(["2tag2jet_150ptv_SR"]) 
+            #self.set_list_category(["2tag2jet_150ptv_SR"]) 
             #self.set_list_category(["2tag3jet_150ptv_SR"]) 
             #self.set_list_category(["0ptag3jet_150ptv_SR"]) 
+            self.set_list_category(["0ptag0pjet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
             #self.set_list_variable(["pTB1"])
             #self.set_list_variable(["mBB"])
             # self.set_list_variable(["mBB","mva"])
-            #self.set_list_variable(["EtaFwdJets"])
+            #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
+            self.set_list_variable(["njets","MV2c10_Data",])
             #if self.debug:
-            if False:
+            if True:
                 self.print_lists()
-            if False:
+            if True:
                 self.create_histosRaw()
-            #return
+            return
             # now we want to sum over processInitial for a given process
             if True:
                 self.set_list_process_info()
