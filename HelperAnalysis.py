@@ -30,6 +30,9 @@ class Analysis:
 
     def set_debug(self,debug):
         self.debug=debug
+
+    def set_verbose(self,verbose):
+        self.verbose=verbose
     
     def set_folderInput(self,folderInput):
         self.folderInput=folderInput
@@ -160,9 +163,11 @@ class Analysis:
     def evaluate_content_of_all_processInitial(self):
         if self.debug:
             print "Start evaluate_content_of_all_processInitial()"
+        set_processInitial=Set()
         set_process=Set()
         set_category=Set()
         set_variable=Set()
+        set_all=Set()
         for processInitial in self.list_processInitial:
             if True:
                 print "processInitial",processInitial
@@ -181,15 +186,22 @@ class Analysis:
                 variable=histoName.replace(process+"_"+category+"_","") # the rest, tricky as sometimes the name has an _ in it
                 if self.debug:
                     print "histoName",histoName,"list_histoNameElement",list_histoNameElement,"process",process,"category",category,"variable",variable
-                set_process.add(category+","+process+","+processInitial)
+                set_processInitial.add(processInitial)
+                set_process.add(process)
                 set_category.add(category)
                 set_variable.add(variable)
+                set_all.add(variable+","+category+","+process+","+processInitial)
             # done for loop over histoName
         # done for loop over processInitial
+        list_processInitial=sorted(set_processInitial)
         list_process=sorted(set_process)
         list_category=sorted(set_category)
         list_variable=sorted(set_variable)
+        list_all=sorted(set_all)
         if self.debug:
+            print "list_process",list_process
+            for processInitial in list_processInitial:
+                print "processInitial",processInitial
             print "list_process",list_process
             for process in list_process:
                 print "process",process
@@ -199,7 +211,17 @@ class Analysis:
             print "list_variable",list_variable
             for variable in list_variable:
                 print "variable",variable
+            print "list_all",list_all
+            for all in list_all:
+                print "all",all
         # create the python file with the lists
+        # list_processInitial
+        outputFileName=self.folderProcessInitial+"/list_processInitial.txt"
+        os.system("rm -f "+outputFileName)
+        outputFile=open(outputFileName,"w")
+        for processInitial in list_processInitial:
+            outputFile.write(processInitial+"\n")
+        outputFile.close()
         # list_process
         outputFileName=self.folderProcessInitial+"/list_process.txt"
         os.system("rm -f "+outputFileName)
@@ -223,6 +245,13 @@ class Analysis:
         for variable in list_variable:
             outputFile.write(variable+"\n")
         outputFile.close()
+        # list_all
+        outputFileName=self.folderProcessInitial+"/list_all.txt"
+        os.system("rm -f "+outputFileName)
+        outputFile=open(outputFileName,"w")
+        for all in list_all:
+            outputFile.write(all+"\n")
+        outputFile.close()
     # done function
             
     def set_evaluated_list_process(self):
@@ -242,6 +271,11 @@ class Analysis:
         self.list_variable=get_list_from_file(fileName,self.debug)
     # done function 
 
+    def set_evaluated_list_all(self):
+        fileName=self.folderProcessInitial+"/list_all.txt"
+        self.list_all=get_list_from_file(fileName,self.debug)
+    # done function 
+
     def create_folderHistos(self):
         self.folderHistos=self.folderOutput+"/histos"
         os.system("mkdir -p "+self.folderHistos)
@@ -257,7 +291,8 @@ class Analysis:
     def get_histoNameRaw(self,process,category,variable,processInitial):
         if self.debug:
             print "Start get_histoNameRaw()"
-        histoNameRaw=process+"_"+category+"_"+variable+"_"+processInitial
+        # histoNameRaw=process+"_"+category+"_"+variable+"_"+processInitial
+        histoNameRaw=variable+"_"+category+"_"+process+"_"+processInitial
         if self.debug:
             print "histoNameRaw",histoNameRaw
         return histoNameRaw
@@ -267,49 +302,34 @@ class Analysis:
         self.fileNameHistosRaw=self.folderHistos+"/histosRaw.root"
     # done function
 
-    def create_histosRaw(self):
-        if self.debug:
+    def create_histosRaw(self,option):
+        if self.debug or self.verbose:
             print "Start create_histosRaw()"
         # stores those histograms that exist, and puts them in the same folder
         outputFile=TFile(self.fileNameHistosRaw,"RECREATE")
         outputFile.Close()
-        for variable in self.list_variable:
-            if True:
-            #for category in self.list_category:
-                for category_process_processInitial in self.list_process:
-                    category=category_process_processInitial.split(",")[0]
-                    if self.debug:
-                        print "category",category
-                        print "self.list_category",self.list_category
-                    if category not in self.list_category:
-                        continue
-                    process=category_process_processInitial.split(",")[1]
-                    processInitial=category_process_processInitial.split(",")[2]
-                    if self.debug:
-                        print "category",category,"process",process,"processInitial",processInitial
-                    if True:
-                #for process in self.list_process:
-                #    if self.debug:
-                #        print "process",process
-                #    for processInitial in self.list_processInitial:
-                #        if self.debug:
-                #            print "processInitial",processInitial
-                        if self.debug:
-                            print "%-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
-                        inputFileName=self.folderProcessInitial+"/"+processInitial+".root"
-                        histoNameInitial=self.get_histoNameInitial(process,category,variable)
-                        histoNameRaw    =self.get_histoNameRaw    (process,category,variable,processInitial)
-                        histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameInitial,name=histoNameRaw,returnDummyIfNotFound=True,debug=self.debug)
-                        if histo=="dummy":
-                            continue
-                        outputFile=TFile(self.fileNameHistosRaw,"UPDATE")
-                        histo.SetDirectory(outputFile)
-                        histo.Write()
-                        outputFile.Close()
-                    # done for loop over processInitial
-                # done for loop over process
-            # done for loop over category
-        # done for loop over variable
+        for infoall in self.list_all:
+            list_infoall=infoall.split(",")
+            variable=list_infoall[0]
+            category=list_infoall[1]
+            process=list_infoall[2]
+            processInitial=list_infoall[3]
+            if option=="reduced":
+                if variable not in self.list_variable or category not in self.list_category or process not in self.list_process:
+                    continue
+            if self.debug or self.verbose:
+                print "%-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
+            inputFileName=self.folderProcessInitial+"/"+processInitial+".root"
+            histoNameInitial=self.get_histoNameInitial(process,category,variable)
+            histoNameRaw    =self.get_histoNameRaw    (process,category,variable,processInitial)
+            histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameInitial,name=histoNameRaw,returnDummyIfNotFound=True,debug=self.debug)
+            if histo=="dummy":
+                continue
+            outputFile=TFile(self.fileNameHistosRaw,"UPDATE")
+            histo.SetDirectory(outputFile)
+            histo.Write()
+            outputFile.Close()
+        # done for loop over all
     # done function
 
     def set_folderPlotsHistosRawByProcessInitial(self):
@@ -1017,10 +1037,11 @@ class Analysis:
 
     def print_lists(self):
         print "\n Print our lists:"
-        print "\n list_processInitial",self.list_processInitial
-        print "\n list_process",self.list_process
-        print "\n list_category",self.list_category
         print "\n list_variable",self.list_variable
+        print "\n list_category",self.list_category
+        print "\n list_process",self.list_process
+        print "\n list_processInitial",self.list_processInitial
+        # print "\n list_all",self.list_all
 
     def print_all(self):
         print ""
@@ -1047,6 +1068,7 @@ class Analysis:
         self.set_evaluated_list_process()
         self.set_evaluated_list_category()
         self.set_evaluated_list_variable()
+        self.set_evaluated_list_all()
         self.create_folderHistos()
         self.set_fileNameHistosRaw()
         self.set_fileNameHistosProcess()
@@ -1107,21 +1129,22 @@ class Analysis:
             # reduce category
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
-            #self.set_list_category(["2tag2jet_150ptv_SR"]) 
+            self.set_list_category(["2tag2jet_150ptv_SR"]) 
             #self.set_list_category(["2tag3jet_150ptv_SR"]) 
             #self.set_list_category(["0ptag3jet_150ptv_SR"]) 
-            self.set_list_category(["0ptag0pjet_150ptv_SR"]) 
+            #self.set_list_category(["0ptag0pjet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
             #self.set_list_variable(["pTB1"])
             #self.set_list_variable(["mBB"])
             # self.set_list_variable(["mBB","mva"])
+            self.set_list_variable(["mBBJ"])
             #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
-            self.set_list_variable(["njets","MV2c10_Data",])
+            #self.set_list_variable(["njets","MV2c10_Data",])
             #if self.debug:
-            if True:
+            if self.verbose:
                 self.print_lists()
             if True:
-                self.create_histosRaw()
+                self.create_histosRaw(option="reduced")
             return
             # now we want to sum over processInitial for a given process
             if True:
