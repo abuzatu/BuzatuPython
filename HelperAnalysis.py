@@ -892,79 +892,79 @@ class Analysis:
 
 
         self.dict_processMerged_info={
-            "qqZvvHbb" :["S",0,{"2":1.0,"3":1.0},
+            "qqZvvHbb" :["Signal",0,{"2":1.0,"3":1.0},
                          ["qqZvvHbb"]],
-            "qqZllHbb" :["S",0,{"2":1.0,"3":1.0},
+            "qqZllHbb" :["Signal",0,{"2":1.0,"3":1.0},
                          ["qqZllHbb"]],
-            "ggZvvHbb" :["S",0,{"2":1.0,"3":1.0},
+            "ggZvvHbb" :["Signal",0,{"2":1.0,"3":1.0},
                          ["ggZvvHbb"]],
-            "ggZllHbb" :["S",1,{"2":1.0,"3":1.0},
+            "ggZllHbb" :["Signal",1,{"2":1.0,"3":1.0},
                          ["ggZllHbb"]],
-            "qqWlvHbb" :["S",0,{"2":1.0,"3":1.0},
+            "qqWlvHbb" :["Signal",0,{"2":1.0,"3":1.0},
                          ["qqWlvHbb"]],
-            "qqZvvHcc" :["S",0,{"2":1.0,"3":1.0},
+            "qqZvvHcc" :["Signal",0,{"2":1.0,"3":1.0},
                          ["qqZvvHcc"]],
-            "qqZllHcc" :["S",0,{"2":1.0,"3":1.0},
+            "qqZllHcc" :["Signal",0,{"2":1.0,"3":1.0},
                          ["qqZllHcc"]],
-            "ggZvvHcc" :["S",0,{"2":1.0,"3":1.0},
+            "ggZvvHcc" :["Signal",0,{"2":1.0,"3":1.0},
                          ["ggZvvHcc"]],
-            "ggZllHcc" :["S",1,{"2":1.0,"3":1.0},
+            "ggZllHcc" :["Signal",1,{"2":1.0,"3":1.0},
                          ["ggZllHcc"]],
-            "qqWlvHcc" :["S",0,{"2":1.0,"3":1.0},
+            "qqWlvHcc" :["Signal",0,{"2":1.0,"3":1.0},
                          ["qqWlvHcc"]],
-            "VBF"      :["S",0,{"2":1.0,"3":1.0},
+            "VBF"      :["Signal",0,{"2":1.0,"3":1.0},
                          ["VBF"]],
-            "ttH"      :["S",0,{"2":1.0,"3":1.0},
+            "ttH"      :["Signal",0,{"2":1.0,"3":1.0},
                          ["ttH"]],
-            "qqZincH4l":["S",0,{"2":1.0,"3":1.0},
+            "qqZincH4l":["Signal",0,{"2":1.0,"3":1.0},
                          ["qqZincH4l"]],
-            "ggH"      :["S",0,{"2":1.0,"3":1.0},
+            "ggH"      :["Signal",0,{"2":1.0,"3":1.0},
                          ["ggH"]],
-            "bbH"      :["S",1,{"2":1.0,"3":1.0},
+            "bbH"      :["Signal",1,{"2":1.0,"3":1.0},
                          ["bbH"]],
-            "Wl"       :["B",0,{"2":1.0,"3":1.0},
+            "Wl"       :["Backgr",0,{"2":1.0,"3":1.0},
                          ["Wl"]],
-            "Wcl"      :["B",0,{"2":1.0,"3":1.0},
+            "Wcl"      :["Backgr",0,{"2":1.0,"3":1.0},
                         ["Wcl"]],
-            "Whf"      :["B",0,{"2":1.27,"3":1.27},
+            "Whf"      :["Backgr",0,{"2":1.27,"3":1.27},
                         ["Wbb","Wbc","Wbl","Wcc"]],
-            "Zl"       :["B",0,{"2":1.0,"3":1.0},
+            "Zl"       :["Backgr",0,{"2":1.0,"3":1.0},
                         ["Zl"]],
-            "Zcl"      :["B",0,{"2":1.0,"3":1.0},
+            "Zcl"      :["Backgr",0,{"2":1.0,"3":1.0},
                         ["Zcl"]],
-            "Zhf"      :["B",0,{"2":1.42,"3":1.31},
+            "Zhf"      :["Backgr",0,{"2":1.42,"3":1.31},
                         ["Zbb","Zbc","Zbl","Zcc"]],
-            "ttbar"    :["B",0,{"2":0.97,"3":1.0},
+            "ttbar"    :["Backgr",0,{"2":0.97,"3":1.0},
                          ["ttbar"]],
-            "stop"     :["B",0,{"2":1.0,"3":1.0},
+            "stop"     :["Backgr",0,{"2":1.0,"3":1.0},
                          ["stops","stopt","stopWt"]],
-            "stops"    :["B",0,{"2":1.0,"3":1.0},
+            "stops"    :["Backgr",0,{"2":1.0,"3":1.0},
                          ["stops"]],
-            "stopt"    :["B",0,{"2":1.0,"3":1.0},
+            "stopt"    :["Backgr",0,{"2":1.0,"3":1.0},
                          ["stopt"]],
-            "stopWt"   :["B",0,{"2":1.0,"3":1.0},
+            "stopWt"   :["Backgr",0,{"2":1.0,"3":1.0},
                          ["stopWt"]],
-            "stoptZq"  :["B",0,{"2":1.0,"3":1.0},
+            "stoptZq"  :["Backgr",0,{"2":1.0,"3":1.0},
                          ["stoptZq"]],
-            "diboson"  :["B",1,{"2":1.0,"3":1.0},
+            "diboson"  :["Backgr",1,{"2":1.0,"3":1.0},
                          ["WW","WZ","ZZ","ggWW","ggZZ"]],
-            "WW"       :["B",0,{"2":1.0,"3":1.0},
+            "WW"       :["Backgr",0,{"2":1.0,"3":1.0},
                          ["WW"]],
-            "WZ"       :["B",0,{"2":1.0,"3":1.0},
+            "WZ"       :["Backgr",0,{"2":1.0,"3":1.0},
                          ["WZ"]],
-            "ZZ"       :["B",0,{"2":1.0,"3":1.0},
+            "ZZ"       :["Backgr",0,{"2":1.0,"3":1.0},
                          ["ZZ"]],
-            "ggWW"     :["B",1,{"2":1.0,"3":1.0},
+            "ggWW"     :["Backgr",1,{"2":1.0,"3":1.0},
                          ["ggWW"]],
-            "ggZZ"     :["B",0,{"2":1.0,"3":1.0},
+            "ggZZ"     :["Backgr",0,{"2":1.0,"3":1.0},
                          ["ggZZ"]],
-            "data"     :["D",1,{"2":1.0,"3":1.0},
+            "data"     :["Data",1,{"2":1.0,"3":1.0},
                          ["data"]],
-            "S"        :["Sig",1,{"2":1.0,"3":1.0},
+            "S"        :["SignalSum",1,{"2":1.0,"3":1.0},
                          ["qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqZincH4l","ggH","bbH","VBF","ttH"]],
-            "B"        :["Bkg",1,{"2":1.0,"3":1.0},
+            "B"        :["BackgrSum",1,{"2":1.0,"3":1.0},
                          ["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ"]],
-            "D"        :["Dat",1,{"2":1.0,"3":1.0},
+            "D"        :["DataSum",1,{"2":1.0,"3":1.0},
                          ["data"]],
             }
 
@@ -1036,11 +1036,52 @@ class Analysis:
         os.system(command)
     # done function
 
+    def create_folderResults(self):
+        self.folderResults=self.folderOutput+"/results"
+        command="mkdir -p "+self.folderResults
+        if self.debug:
+            print "command="+command
+        os.system(command)
+    # done function
+
+
+
     def set_list_processType(self):
         self.list_processType="S,B,D,Sig,Bkg,Dat".split(",")
 
-    def create_yield_latex_table(self):
+    def create_results(self):
+        if self.debug or self.verbose:
+            print "Start create_results()"
+        fileName=self.folderResults+"/results.txt"
+        # create a new file
+        f = open(fileName,'w')
         if self.debug:
+            print "Yields:"
+        for variable in self.list_variable:
+            if self.debug:
+                print "variable",variable
+            for category in self.list_category:
+                if self.debug:
+                    print "category",category
+                for processMerged in self.list_processMerged:
+                    if self.debug:
+                        print "processMerged",processMerged
+                    inputFileName=self.fileNameHistosProcessMerged 
+                    histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
+                    histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
+                    integralValueError=get_histo_integral_error(histo,myRange=-1,option="",debug=False) # -1 to include the under/over-flow bins
+                    text="%10s %25s %10s %15.8f %15.8f" % (variable, category, processMerged, integralValueError[0], integralValueError[1])
+                    if self.verbose:
+                        print text
+                    f.write(text+'\n')
+                # done loop over processMerged
+            # done loop over category
+        # done loop over variable
+        f.close()
+    # done function
+
+    def create_yield_latex_table(self):
+        if self.debug or self.verbose:
             print "Start create_yield_latex_table()"
         variable=self.list_variable[0]
         dict_category_processMerged_integralValueError={}
@@ -1048,11 +1089,11 @@ class Analysis:
             print "ADRIAN category",category
             dict_processType_list_tuple={}
             for processType in self.list_processType:
-                if self.debug:
+                if self.debug or self.verbose:
                     print "processType",processType
                 dict_processType_list_tuple[processType]=[]
             for processMerged in self.list_processMergedType:
-                if self.debug:
+                if self.debug or self.verbose:
                     print "processMerged",processMerged
                 inputFileName=self.fileNameHistosProcessMerged 
                 histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
@@ -1063,14 +1104,20 @@ class Analysis:
                 processType=info[0]
                 dict_processType_list_tuple[processType].append(integralValueError)
             # done loop over processMerged
+            continue
             # retrieve the sums
             for processType in self.list_processType:
                 dict_category_processMerged_integralValueError[category+"_"+processType]=sum_error_list(dict_processType_list_tuple[processType],debug=False)
-            if self.debug:
+            if self.debug or self.verbose:
                 print "category",category,"dict_category_processMerged_integralValueError", dict_category_processMerged_integralValueError
+                print "%-10s %20.6f %20.6f" % (category, integralValueError[0], integralValueError[1])
         # done loop over category
         # now the dictionary is filled
         
+        print "ADRIAN DONE"
+
+        return
+
         # we create the latex table
         fileName=self.folderYields+"/table.tex"
         # create a new file
@@ -1170,7 +1217,7 @@ class Analysis:
         self.set_fileNameHistosProcess()
         self.set_fileNameHistosProcessMerged()
         self.create_folderYields()
-
+        self.create_folderResults()
         #return
 
         #if True:
@@ -1239,21 +1286,23 @@ class Analysis:
             #if self.debug:
             if self.verbose:
                 self.print_lists()
-            if True:
+            if False:
                 self.create_histosRaw(option="reduced")
             #return
             # now we want to sum over processInitial for a given process
-            if True:
-                self.set_list_process_info()
+            self.set_list_process_info()
+            if False:
                 self.create_histosProcess()
             #return
-            if True:
-                self.set_list_processMerged()
+            self.set_list_processMerged()
+            if False:
                 self.create_histosProcessMerged()
             #return
-            if True:
-                self.set_list_processType()
+            #self.set_list_processType()
+            if False:
                 self.create_yield_latex_table()
+            if True:
+                self.create_results()
         # done if doYields
 
         #self.set_list_processInitial(["WHlv125J_MINLO"])
