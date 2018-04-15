@@ -175,13 +175,13 @@ class Analysis:
             for histoName in list_histoName:
                 # e.g. ttbar_3ptag5pjet_150ptv_SR_yBB
                 list_histoNameElement=histoName.split("_")
-                if "ttbar_dilep" in histoName or "stopWt_dilep" in histoName or "ggH125_bb" in histoName or "ggH125_inc" in histoName or "VBFH125_inc" in histoName or "ttbar_spin" in histoName:
-                    process=list_histoNameElement[0]+"_"+list_histoNameElement[1] # e.g. "ttbar_dilep or stopWt_dilep
-                    category=list_histoNameElement[2]+"_"+list_histoNameElement[3]+"_"+list_histoNameElement[4] # next three elements, eg. 3ptag5pjet_150ptv_SR
-                else:
-                    # only one word to define the process, e.g. ttbar
-                    process=list_histoNameElement[0] # first element e.g. ttbar
-                    category=list_histoNameElement[1]+"_"+list_histoNameElement[2]+"_"+list_histoNameElement[3] # next three elements, eg. 3ptag5pjet_150ptv_SR
+                #if "ttbar_dilep" in histoName or "stopWt_dilep" in histoName or "ggH125_bb" in histoName or "ggH125_inc" in histoName or "VBFH125_inc" in histoName or "ttbar_spin" in histoName:
+                #    process=list_histoNameElement[0]+"_"+list_histoNameElement[1] # e.g. "ttbar_dilep or stopWt_dilep
+                #    category=list_histoNameElement[2]+"_"+list_histoNameElement[3]+"_"+list_histoNameElement[4] # next three elements, eg. 3ptag5pjet_150ptv_SR
+                #else:
+                # only one word to define the process, e.g. ttbar or ttbarDilep
+                process=list_histoNameElement[0] # first element e.g. ttbar
+                category=list_histoNameElement[1]+"_"+list_histoNameElement[2]+"_"+list_histoNameElement[3] # next three elements, eg. 3ptag5pjet_150ptv_SR
                 # done if
                 variable=histoName.replace(process+"_"+category+"_","") # the rest, tricky as sometimes the name has an _ in it
                 if self.debug:
@@ -288,10 +288,16 @@ class Analysis:
         return histoNameInitial
     # done function
 
+    def get_histoNameProcess(self,variable,category,process):
+        histoNameInitial=variable+"_"+category+"_"+process
+        if self.debug:
+            print "histoNameInitial",histoNameInitial
+        return histoNameInitial
+    # done function
+
     def get_histoNameRaw(self,process,category,variable,processInitial):
         if self.debug:
             print "Start get_histoNameRaw()"
-        # histoNameRaw=process+"_"+category+"_"+variable+"_"+processInitial
         histoNameRaw=variable+"_"+category+"_"+process+"_"+processInitial
         if self.debug:
             print "histoNameRaw",histoNameRaw
@@ -465,9 +471,9 @@ class Analysis:
         outputFile=TFile(self.fileNameHistosProcess,"RECREATE")
         outputFile.Close()
         for variable in self.list_variable:
-            if "FwdJets" in variable or "SigJets" in variable or variable=="MV2c10_B" or variable=="MV2c10_C" or variable=="MV2c10_Data" or variable=="MV2c10_L" or variable=="btag_weight_B" or variable=="btag_weight_C" or variable=="btag_weight_Data" or variable=="btag_weight_L" or variable=="eff_B" or variable=="eff_C" or variable=="eff_L" or variable=="njets":
+            # if "FwdJets" in variable or "SigJets" in variable or variable=="MV2c10_B" or variable=="MV2c10_C" or variable=="MV2c10_Data" or variable=="MV2c10_L" or variable=="btag_weight_B" or variable=="btag_weight_C" or variable=="btag_weight_Data" or variable=="btag_weight_L" or variable=="eff_B" or variable=="eff_C" or variable=="eff_L" or variable=="njets":
                 # they are not defined for 2tag2jet categories, as these do not have forward jets
-                continue 
+                # continue 
             counter_variable=0
             for category in self.list_category:
                 for processRenamed in self.list_process:
@@ -485,7 +491,7 @@ class Analysis:
                             print "ADRIAN2 %-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
                         inputFileName=self.fileNameHistosRaw
                         histoNameRaw    =self.get_histoNameRaw    (process,category,variable,processInitial)
-                        histoNameProcess=self.get_histoNameInitial(processRenamed,category,variable)
+                        histoNameProcess=self.get_histoNameProcess(variable,category,processRenamed)
                         histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameRaw,name=histoNameProcess,returnDummyIfNotFound=True,debug=self.debug)
                         if histo=="dummy":
                             continue
@@ -503,11 +509,10 @@ class Analysis:
                         print "counter final",counter
                     if counter==0:
                         histoNameRaw    =self.get_histoNameRaw    ("ttbar",category,variable,"ttbar_nonallhad_PwPy8")
-                        histoNameProcess=self.get_histoNameInitial(processRenamed,category,variable)
                         histoReset=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameRaw,name=histoNameProcess,returnDummyIfNotFound=True,debug=self.debug)
                         histoReset.Reset()
                         histoProcess=histoReset
-                        histoNameProcess=self.get_histoNameInitial(processRenamed,category,variable)
+                        histoNameProcess=self.get_histoNameProcess(variable,category,processRenamed)
                         histoProcess.SetName(histoNameProcess)
                         histoProcess.SetTitle(histoNameProcess)
                         if self.debug:
@@ -535,6 +540,7 @@ class Analysis:
             "ggZllHcc",
             "qqZincH4l",
             "ggH",
+            #"ggHbb",
             "bbH",
             "VBF",
             "ttH",
@@ -560,10 +566,14 @@ class Analysis:
             "Zcl",
             "Zl",
             "ttbar",
+            #"ttbarOld",
+            #"ttbarDilep",
+            #"ttbarDilepOld",
+            #"ttbarSpin",
             "stops",
             "stopt",
             "stopWt",
-            "tZq",
+            "stoptZq",
             "ttV",
             "ttVV",
             "ttt",
@@ -580,16 +590,15 @@ class Analysis:
             "qqZllHbb":[["qqZllH125","qqZllHbbJ_PwPy8MINLO"],],
             "ggZllHbb":[["ggZllH125","ggZllHbb_PwPy8"],],
             # VHcc
-            "qqZvvHcc":[["qqZvvH125","qqZvvHccJ_PwPy8MINLO"],],
-            "qqWlvHcc":[["WmH125J"  ,"qqWlvHccJ_PwPy8MINLO"],
-                        ["WpH125J"  ,"qqWlvHccJ_PwPy8MINLO"],],
-            "ggZvvHcc":[["ggZvvH125","ggZvvHcc_PwPy8"],],
-            "qqZllHcc":[["qqZllH125","qqZllHccJ_PwPy8MINLO"],],
-            "ggZllHcc":[["ggZllH125","ggZllHcc_PwPy8"],],
+            "qqZvvHcc":[["qqZvvH125cc","qqZvvHccJ_PwPy8MINLO"],],
+            "qqWlvHcc":[["qqWlvH125cc","qqWlvHccJ_PwPy8MINLO"],],
+            "ggZvvHcc":[["ggZvvH125cc","ggZvvHcc_PwPy8"],],
+            "qqZllHcc":[["qqZllH125cc","qqZllHccJ_PwPy8MINLO"],],
+            "ggZllHcc":[["ggZllH125cc","ggZllHcc_PwPy8"],],
             # other ZH
             "qqZincH4l":[["qqZincH4l","ZincHJZZ4l_PwPy8MINLO"],],
             # non ZH signals
-            "VBF":[["VBFH125_inc","VBFHinc_PwPy8"],],
+            "VBF":[["VBFH125Inc","VBFHinc_PwPy8"],],
             "ggHbb":[["ggH125_bb","ggHbb_PwPy8NNLOPS."],],
             "ggH":[["ggH125_inc","ggHinc_PwPy8.root"],],
             "bbH":[["bbH125","bbHinc_aMCatNLOPy8"],],
@@ -774,16 +783,22 @@ class Analysis:
                    ["Zl" ,"ZtautauL_Sh221"],
                    ["Zl" ,"Ztautau_Sh221"],],
             "ttbar" :[["ttbar","ttbar_nonallhad_PwPy8"],],
+            "ttbarOld" :[["ttbar","ttbar_nonallhad_PwPy8_old"],],
+            "ttbarDilep" :[["ttbar","ttbar_dil_PwPy8"],],
+            "ttbarDilepOld" :[["ttbarDilep","ttbar_dil_PwPy8_old"],],
+            "ttbarSpin" :[["ttbarSpin","ttbar_PwPy8_MadSpin"],],
             "stops" :[["stops","stops_PwPy"],],
             "stopt" :[["stopt","stopt_PwPy"],],
             "stopWt":[["stopWt","stopWt_PwPy"],],
-            "tZq"   :[["tZq","stoptZ_MGPy8"],],
+            "stopWtMETFilt":[["stopWt","stopWt_PwPy_METfilt"],],
+            "stoptZq":[["tZq","stoptZ_MGPy8"],],
             "ttV"   :[["ttV","ttV_aMCatNLOPy8"],],
             "ttVV"  :[["ttbarWW","ttVV_MGPy8"],],
             "ttt"   :[["ttt","ttt_MGPy8"],],
             "tttt"  :[["4topSM","tttt_MGPy8"],],
             "data"  :[["data","data15"],
-                      ["data","data16"],],
+                      ["data","data16"],
+                      ["data","data17"]],
             # "":[[],],
             }
 
@@ -792,12 +807,24 @@ class Analysis:
     def set_list_processMerged(self):
         if self.debug:
             print "Start set_list_processMerged()"
+
+        # those stored in .root
         self.list_processMerged=[
-            "qqZvvH",
-            "qqZllH",
-            "ggZvvH",
-            "ggZllH",
-            "qqWH",
+            "qqZvvHbb",
+            "qqZllHbb",
+            "ggZvvHbb",
+            "ggZllHbb",
+            "qqWlvHbb",
+            "qqZvvHcc",
+            "qqZllHcc",
+            "ggZvvHcc",
+            "ggZllHcc",
+            "qqWlvHcc",
+            "qqZincH4l",
+            "ggH",
+            "bbH",
+            "VBF",
+            "ttH",
             "Wl",
             "Wcl",
             "Whf",
@@ -805,73 +832,140 @@ class Analysis:
             "Zcl",
             "Zhf",
             "ttbar",
-            "stop",
-            "diboson",
+            #"stop",
+            "stops",
+            "stopt",
+            "stopWt",
+            "stoptZq",
+            #"diboson",
+            "WW",
+            "WZ",
+            "ZZ",
+            "ggWW",
+            "ggZZ",
             "data",
             "S",
             "B",
             "D",
-            ]
+]
 
+
+
+        # those put in yield table
         self.list_processMergedType=[
-            "qqZvvH",
-            "qqZllH",
-            "ggZvvH",
-            "ggZllH",
-            "qqWH",
-            "Wl",
-            "Wcl",
-            "Whf",
-            "Zl",
-            "Zcl",
+            "qqZvvHbb",
+            "qqWlvHbb",
+            "ggZvvHbb",
+            "qqZllHbb",
+            "ggZllHbb",
+            "qqZvvHcc",
+            "qqWlvHcc",
+            "ggZvvHcc",
+            "qqZllHcc",
+            "ggZllHcc",
+            "VBF",
+            "ttH",
+            "qqZincH4l",
+            "ggH",
+            "bbH",
             "Zhf",
             "ttbar",
-            "stop",
-            "diboson",
+            "Whf",
+            "ZZ",
+            "stopt",
+            "stopWt",
+            "stops",
+            "WZ",
+            "Wcl",
+            "Zcl",
+            "Zl",
+            "Wl",
+            "ggZZ",
+            "WW",
+            "stoptZq",
+            "ggWW",
             "S",
             "B",
             "data",
             ]
 
+
+
         self.dict_processMerged_info={
-            "qqZvvH" :["S",0,{"2":1.0,"3":1.0},
-                       ["qqZvvH125"]],
-            "qqZllH" :["S",0,{"2":1.0,"3":1.0},
-                       ["qqZllH125"]],
-            "ggZvvH" :["S",0,{"2":1.0,"3":1.0},
-                       ["ggZvvH125"]],
-            "ggZllH" :["S",0,{"2":1.0,"3":1.0},
-                       ["ggZllH125"]],
-            "qqWH"   :["S",1,{"2":1.0,"3":1.0},
-                       ["qqWlvH125"]],
-            "Wl"     :["B",0,{"2":1.0,"3":1.0},
-                       ["Wl"]],
-            "Wcl"    :["B",0,{"2":1.0,"3":1.0},
-                       ["Wcl"]],
-            "Whf"    :["B",0,{"2":1.27,"3":1.27},
-                       ["Wbb","Wbc","Wbl","Wcc"]],
-            "Zl"     :["B",0,{"2":1.0,"3":1.0},
-                       ["Zl"]],
-            "Zcl"    :["B",0,{"2":1.0,"3":1.0},
-                       ["Zcl"]],
-            "Zhf"    :["B",0,{"2":1.42,"3":1.31},
-                       ["Zbb","Zbc","Zbl","Zcc"]],
-            "ttbar"  :["B",0,{"2":0.97,"3":1.0}
-                       ,["ttbar"]],
-            "stop"   :["B",0,{"2":1.0,"3":1.0}
-                       ,["stops","stopt","stopWt"]],
-            "diboson":["B",1,{"2":1.0,"3":1.0}
-                       #,["WW","WZ","ZZ","ggWW","ggZZ"]],
-                       ,["WW","WZ","ZZ","ggZZ"]],
-            "data"   :["D",1,{"2":1.0,"3":1.0}
-                       ,["data"]],
-            "S"      :["Sig",1,{"2":1.0,"3":1.0}
-                       ,["qqZvvH125","qqZllH125","ggZvvH125","ggZllH125","qqWlvH125"]],
-            "B"      :["Bkg",1,{"2":1.0,"3":1.0},
-                       # ["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","stops","stopt","stopWt","WW","WZ","ZZ","ggWW","ggZZ"]],
-                       ["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","stops","stopt","stopWt","WW","WZ","ZZ","ggZZ"]],
-            "D"      :["Dat",1,{"2":1.0,"3":1.0},
-                       ["data"]],
+            "qqZvvHbb" :["S",0,{"2":1.0,"3":1.0},
+                         ["qqZvvHbb"]],
+            "qqZllHbb" :["S",0,{"2":1.0,"3":1.0},
+                         ["qqZllHbb"]],
+            "ggZvvHbb" :["S",0,{"2":1.0,"3":1.0},
+                         ["ggZvvHbb"]],
+            "ggZllHbb" :["S",1,{"2":1.0,"3":1.0},
+                         ["ggZllHbb"]],
+            "qqWlvHbb" :["S",0,{"2":1.0,"3":1.0},
+                         ["qqWlvHbb"]],
+            "qqZvvHcc" :["S",0,{"2":1.0,"3":1.0},
+                         ["qqZvvHcc"]],
+            "qqZllHcc" :["S",0,{"2":1.0,"3":1.0},
+                         ["qqZllHcc"]],
+            "ggZvvHcc" :["S",0,{"2":1.0,"3":1.0},
+                         ["ggZvvHcc"]],
+            "ggZllHcc" :["S",1,{"2":1.0,"3":1.0},
+                         ["ggZllHcc"]],
+            "qqWlvHcc" :["S",0,{"2":1.0,"3":1.0},
+                         ["qqWlvHcc"]],
+            "VBF"      :["S",0,{"2":1.0,"3":1.0},
+                         ["VBF"]],
+            "ttH"      :["S",0,{"2":1.0,"3":1.0},
+                         ["ttH"]],
+            "qqZincH4l":["S",0,{"2":1.0,"3":1.0},
+                         ["qqZincH4l"]],
+            "ggH"      :["S",0,{"2":1.0,"3":1.0},
+                         ["ggH"]],
+            "bbH"      :["S",1,{"2":1.0,"3":1.0},
+                         ["bbH"]],
+            "Wl"       :["B",0,{"2":1.0,"3":1.0},
+                         ["Wl"]],
+            "Wcl"      :["B",0,{"2":1.0,"3":1.0},
+                        ["Wcl"]],
+            "Whf"      :["B",0,{"2":1.27,"3":1.27},
+                        ["Wbb","Wbc","Wbl","Wcc"]],
+            "Zl"       :["B",0,{"2":1.0,"3":1.0},
+                        ["Zl"]],
+            "Zcl"      :["B",0,{"2":1.0,"3":1.0},
+                        ["Zcl"]],
+            "Zhf"      :["B",0,{"2":1.42,"3":1.31},
+                        ["Zbb","Zbc","Zbl","Zcc"]],
+            "ttbar"    :["B",0,{"2":0.97,"3":1.0},
+                         ["ttbar"]],
+            "stop"     :["B",0,{"2":1.0,"3":1.0},
+                         ["stops","stopt","stopWt"]],
+            "stops"    :["B",0,{"2":1.0,"3":1.0},
+                         ["stops"]],
+            "stopt"    :["B",0,{"2":1.0,"3":1.0},
+                         ["stopt"]],
+            "stopWt"   :["B",0,{"2":1.0,"3":1.0},
+                         ["stopWt"]],
+            "stoptZq"  :["B",0,{"2":1.0,"3":1.0},
+                         ["stoptZq"]],
+            "diboson"  :["B",1,{"2":1.0,"3":1.0},
+                         ["WW","WZ","ZZ","ggWW","ggZZ"]],
+            "WW"       :["B",0,{"2":1.0,"3":1.0},
+                         ["WW"]],
+            "WZ"       :["B",0,{"2":1.0,"3":1.0},
+                         ["WZ"]],
+            "ZZ"       :["B",0,{"2":1.0,"3":1.0},
+                         ["ZZ"]],
+            "ggWW"     :["B",1,{"2":1.0,"3":1.0},
+                         ["ggWW"]],
+            "ggZZ"     :["B",0,{"2":1.0,"3":1.0},
+                         ["ggZZ"]],
+            "data"     :["D",1,{"2":1.0,"3":1.0},
+                         ["data"]],
+            "S"        :["Sig",1,{"2":1.0,"3":1.0},
+                         ["qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqZincH4l","ggH","bbH","VBF","ttH"]],
+            "B"        :["Bkg",1,{"2":1.0,"3":1.0},
+                         ["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ"]],
+            "D"        :["Dat",1,{"2":1.0,"3":1.0},
+                         ["data"]],
             }
 
     def set_fileNameHistosProcessMerged(self):
@@ -909,9 +1003,9 @@ class Analysis:
                         if self.debug:
                             print "ADRIAN2 %-10s %-10s %-10s %-10s" % (variable,category,processMerged,process)
                         inputFileName=self.fileNameHistosProcess
-                        histoNameProcess      =self.get_histoNameInitial(process,category,variable)
-                        histoNameProcessMerged=self.get_histoNameInitial(processMerged,category,variable)
-                        histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcess,name=histoNameProcessMerged,returnDummyIfNotFound=True,debug=self.debug)
+                        histoNameProcess      =self.get_histoNameProcess(variable,category,process)
+                        histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
+                        histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcess,name=histoNameProcessMerged,returnDummyIfNotFound=False,debug=self.debug)
                         if histo=="dummy":
                             continue
                         if counter==0:
@@ -957,12 +1051,12 @@ class Analysis:
                 if self.debug:
                     print "processType",processType
                 dict_processType_list_tuple[processType]=[]
-            for processMerged in self.list_processMerged:
+            for processMerged in self.list_processMergedType:
                 if self.debug:
                     print "processMerged",processMerged
                 inputFileName=self.fileNameHistosProcessMerged 
-                histoNameProcessMerged=self.get_histoNameInitial(processMerged,category,variable)
-                histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=True,debug=self.debug)
+                histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
+                histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
                 integralValueError=get_histo_integral_error(histo,myRange=-1,option="",debug=False) # -1 to include the under/over-flow bins
                 dict_category_processMerged_integralValueError[category+"_"+processMerged]=integralValueError
                 info=self.dict_processMerged_info[processMerged]
@@ -977,7 +1071,6 @@ class Analysis:
         # done loop over category
         # now the dictionary is filled
         
-
         # we create the latex table
         fileName=self.folderYields+"/table.tex"
         # create a new file
@@ -987,7 +1080,7 @@ class Analysis:
         f.write('\\usepackage{adjustbox}\n')
         f.write('\\usepackage{pdflscape}\n')
         f.write('\\begin{document}\n')
-        f.write('\\begin{frame}{'+ self.name+'}\n')
+        f.write('\\begin{frame}{\\texttt{\\detokenize{'+ self.name+'}}}\n')
         # f.write('\\begin{center}\n')
         f.write('\\begin{landscape} \n')
         f.write('\\adjustbox{max height=\\dimexpr\\textheight-7.0cm\\relax,max width=\\textwidth}\n')
@@ -1014,7 +1107,10 @@ class Analysis:
             text=processMergedType
             for category in self.list_category:
                 myYield=dict_category_processMerged_integralValueError[category+"_"+processMergedType]
-                text+=" & {\\color{orange}%.1f$\pm$%.1f}" % myYield
+                if myYield[0]>0.01:
+                    text+=" & {\\color{orange}%.2f$\pm$%.2f}" % myYield
+                else:
+                    text+=" & {\\color{orange}%.4f$\pm$%.4f}" % myYield
             text+=" \\\\ \n"
             f.write(text)
             if doAddLineAfter:
@@ -1127,9 +1223,9 @@ class Analysis:
             #self.list_process=["ttbar"]
             #self.list_process=["data"]
             # reduce category
-            #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+            self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
-            self.set_list_category(["2tag2jet_150ptv_SR"]) 
+            #self.set_list_category(["2tag2jet_150ptv_SR"]) 
             #self.set_list_category(["2tag3jet_150ptv_SR"]) 
             #self.set_list_category(["0ptag3jet_150ptv_SR"]) 
             #self.set_list_category(["0ptag0pjet_150ptv_SR"]) 
@@ -1137,7 +1233,7 @@ class Analysis:
             #self.set_list_variable(["pTB1"])
             #self.set_list_variable(["mBB"])
             # self.set_list_variable(["mBB","mva"])
-            self.set_list_variable(["mBBJ"])
+            self.set_list_variable(["pTB2"])
             #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             #self.set_list_variable(["njets","MV2c10_Data",])
             #if self.debug:
@@ -1145,17 +1241,19 @@ class Analysis:
                 self.print_lists()
             if True:
                 self.create_histosRaw(option="reduced")
-            return
+            #return
             # now we want to sum over processInitial for a given process
             if True:
                 self.set_list_process_info()
                 self.create_histosProcess()
-            return
-            self.set_list_processMerged()
-            if False:
+            #return
+            if True:
+                self.set_list_processMerged()
                 self.create_histosProcessMerged()
-            self.set_list_processType()
-            self.create_yield_latex_table()
+            #return
+            if True:
+                self.set_list_processType()
+                self.create_yield_latex_table()
         # done if doYields
 
         #self.set_list_processInitial(["WHlv125J_MINLO"])
