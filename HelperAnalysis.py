@@ -471,24 +471,24 @@ class Analysis:
         outputFile=TFile(self.fileNameHistosProcess,"RECREATE")
         outputFile.Close()
         for variable in self.list_variable:
-            # if "FwdJets" in variable or "SigJets" in variable or variable=="MV2c10_B" or variable=="MV2c10_C" or variable=="MV2c10_Data" or variable=="MV2c10_L" or variable=="btag_weight_B" or variable=="btag_weight_C" or variable=="btag_weight_Data" or variable=="btag_weight_L" or variable=="eff_B" or variable=="eff_C" or variable=="eff_L" or variable=="njets":
-                # they are not defined for 2tag2jet categories, as these do not have forward jets
-                # continue 
             counter_variable=0
             for category in self.list_category:
                 for processRenamed in self.list_process:
-                    #if processRenamed!="ttbar":
-                    #    continue
-                    counter=0
                     if self.debug:
-                        print "ADRIAN1  %-10s %-10s %-10s" % (variable,category,processRenamed)
+                        print "processRenamed",processRenamed
+                    counter=0
+                    if self.debug or self.verbose:
+                        print " %-10s %-10s %-10s" % (variable,category,processRenamed)
                     list_processInfo=self.dict_process_info[processRenamed]
-                    #for processInitial in self.list_processInitial:
-                    for processInfo in list_processInfo:
+                    if self.debug or self.verbose:
+                        print "list_processInfo",list_processInfo
+                    list_processInfoToAdd=list_processInfo[0]
+                    dict_jet_SF=list_processInfo[1]
+                    for processInfo in list_processInfoToAdd:
                         process=processInfo[0]
                         processInitial=processInfo[1]
                         if self.debug:
-                            print "ADRIAN2 %-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
+                            print "%-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
                         inputFileName=self.fileNameHistosRaw
                         histoNameRaw    =self.get_histoNameRaw    (process,category,variable,processInitial)
                         histoNameProcess=self.get_histoNameProcess(variable,category,processRenamed)
@@ -540,7 +540,7 @@ class Analysis:
             "ggZllHcc",
             "qqZincH4l",
             "ggH",
-            #"ggHbb",
+            "ggHbb",
             "bbH",
             "VBF",
             "ttH",
@@ -549,10 +549,10 @@ class Analysis:
             "ZZ",
             "ggZZ",
             "ggWW",
-            #"ZllZb",
-            #"ZvvZbb",
-            #"WlvZbb",
-            #"ZllZvv",
+            "ZllZbb",
+            "ZvvZbb",
+            "WlvZbb",
+            "ZllZvv",
             "Wbb",
             "Wbc",
             "Wbl",
@@ -566,10 +566,10 @@ class Analysis:
             "Zcl",
             "Zl",
             "ttbar",
-            #"ttbarOld",
-            #"ttbarDilep",
-            #"ttbarDilepOld",
-            #"ttbarSpin",
+            "ttbarOld",
+            "ttbarDilep",
+            "ttbarDilepOld",
+            "ttbarSpin",
             "stops",
             "stopt",
             "stopWt",
@@ -579,229 +579,297 @@ class Analysis:
             "ttt",
             "tttt",
             "data",
+            "dijet",
             # "",
             ]
         
         self.dict_process_info={
+            # example
+            # "processMine":[[["process","processInitial"],["process2","processInitial2"]],{"2":SF2jet,"3":SF3jet,"4":SF4jet,"5p":SF5pjet}],
             # VHbb
-            "qqZvvHbb":[["qqZvvH125","qqZvvHbbJ_PwPy8MINLO"],],
-            "qqWlvHbb":[["qqWlvH125","qqWlvHbbJ_PwPy8MINLO"],],
-            "ggZvvHbb":[["ggZvvH125","ggZvvHbb_PwPy8"],],
-            "qqZllHbb":[["qqZllH125","qqZllHbbJ_PwPy8MINLO"],],
-            "ggZllHbb":[["ggZllH125","ggZllHbb_PwPy8"],],
+            "qqZvvHbb":[[["qqZvvH125","qqZvvHbbJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "qqWlvHbb":[[["qqWlvH125","qqWlvHbbJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ggZvvHbb":[[["ggZvvH125","ggZvvHbb_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "qqZllHbb":[[["qqZllH125","qqZllHbbJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ggZllHbb":[[["ggZllH125","ggZllHbb_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
             # VHcc
-            "qqZvvHcc":[["qqZvvH125cc","qqZvvHccJ_PwPy8MINLO"],],
-            "qqWlvHcc":[["qqWlvH125cc","qqWlvHccJ_PwPy8MINLO"],],
-            "ggZvvHcc":[["ggZvvH125cc","ggZvvHcc_PwPy8"],],
-            "qqZllHcc":[["qqZllH125cc","qqZllHccJ_PwPy8MINLO"],],
-            "ggZllHcc":[["ggZllH125cc","ggZllHcc_PwPy8"],],
+            "qqZvvHcc":[[["qqZvvH125cc","qqZvvHccJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "qqWlvHcc":[[["qqWlvH125cc","qqWlvHccJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ggZvvHcc":[[["ggZvvH125cc","ggZvvHcc_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "qqZllHcc":[[["qqZllH125cc","qqZllHccJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ggZllHcc":[[["ggZllH125cc","ggZllHcc_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
             # other ZH
-            "qqZincH4l":[["qqZincH4l","ZincHJZZ4l_PwPy8MINLO"],],
+            "qqZincH4l":[[["qqZincH4l","ZincHJZZ4l_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
             # non ZH signals
-            "VBF":[["VBFH125Inc","VBFHinc_PwPy8"],],
-            "ggHbb":[["ggH125_bb","ggHbb_PwPy8NNLOPS."],],
-            "ggH":[["ggH125_inc","ggHinc_PwPy8.root"],],
-            "bbH":[["bbH125","bbHinc_aMCatNLOPy8"],],
-            "ttH":[["ttH","ttHinc_aMCatNLOPy8"],],
+            "VBF":[[["VBFH125Inc","VBFHinc_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ggHbb":[[["ggH125bb","ggHbb_PwPy8NNLOPS"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ggH":[[["ggH125Inc","ggHinc_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "bbH":[[["bbH125","bbHinc_aMCatNLOPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ttH":[[["ttH","ttHinc_aMCatNLOPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            # dijet
+            "dijet":[[["dijetJZW","MJ_Py8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
             # dibosons
-            "WW":[["WW","WW_Sh221"],],
-            "WZ":[["WZ","WZ_Sh221"],],
-            "ZZ":[["ZZ","ZZ_Sh221"],],
-            "ggZZ":[["ggZZ","ggZZ_Sh222"],],
-            "ggWW":[["ggWW","ggWW_Sh222"],],
-            "ZllZbb":[["ZllZbb","ZZ_bb_Sh221"],],
-            "ZvvZbb":[["ZvvZbb","ZZ_bb_Sh221"],],
-            "WlvZbb":[["WlvZbb","WZ_bb_Sh221"],],
-            "ZllZvv":[["llvv","VV_fulllep_Sh222"],],
+            "WW":[[["WW","WW_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "WZ":[[["WZ","WZ_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ZZ":[[["ZZ","ZZ_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ggZZ":[[["ggZZ","ggZZ_Sh222"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ggWW":[[["ggWW","ggWW_Sh222"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ZllZbb":[[["ZllZbb","ZZ_bb_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ZvvZbb":[[["ZvvZbb","ZZ_bb_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "WlvZbb":[[["WlvZbb","WZ_bb_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "ZllZvv":[[["llvv","VV_fulllep_Sh222"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
             # W+jets
-            "Wbb":[["Wbb","WenuB_Sh221"],
-                   ["Wbb","WenuC_Sh221"],
-                   ["Wbb","WenuL_Sh221"],
-                   ["Wbb","Wenu_Sh221"],
-                   ["Wbb","WmunuB_Sh221"],
-                   ["Wbb","WmunuC_Sh221"],
-                   ["Wbb","WmunuL_Sh221"],
-                   ["Wbb","Wmunu_Sh221"],
-                   ["Wbb","WtaunuB_Sh221"],
-                   ["Wbb","WtaunuC_Sh221"],
-                   ["Wbb","WtaunuL_Sh221"],
-                   ["Wbb","Wtaunu_Sh221"],],
-            "Wbc":[["Wbc","WenuB_Sh221"],
-                   ["Wbc","WenuC_Sh221"],
-                   ["Wbc","WenuL_Sh221"],
-                   ["Wbc","Wenu_Sh221"],
-                   ["Wbc","WmunuB_Sh221"],
-                   ["Wbc","WmunuC_Sh221"],
-                   ["Wbc","WmunuL_Sh221"],
-                   ["Wbc","Wmunu_Sh221"],
-                   ["Wbc","WtaunuB_Sh221"],
-                   ["Wbc","WtaunuC_Sh221"],
-                   ["Wbc","WtaunuL_Sh221"],
-                   ["Wbc","Wtaunu_Sh221"],],
-            "Wbl":[["Wbl","WenuB_Sh221"],
-                   ["Wbl","WenuC_Sh221"],
-                   ["Wbl","WenuL_Sh221"],
-                   ["Wbl","Wenu_Sh221"],
-                   ["Wbl","WmunuB_Sh221"],
-                   ["Wbl","WmunuC_Sh221"],
-                   ["Wbl","WmunuL_Sh221"],
-                   ["Wbl","Wmunu_Sh221"],
-                   ["Wbl","WtaunuB_Sh221"],
-                   ["Wbl","WtaunuC_Sh221"],
-                   ["Wbl","WtaunuL_Sh221"],
-                   ["Wbl","Wtaunu_Sh221"],],
-            "Wcc":[["Wcc","WenuB_Sh221"],
-                   ["Wcc","WenuC_Sh221"],
-                   ["Wcc","WenuL_Sh221"],
-                   ["Wcc","Wenu_Sh221"],
-                   ["Wcc","WmunuB_Sh221"],
-                   ["Wcc","WmunuC_Sh221"],
-                   ["Wcc","WmunuL_Sh221"],
-                   ["Wcc","Wmunu_Sh221"],
-                   ["Wcc","WtaunuB_Sh221"],
-                   ["Wcc","WtaunuC_Sh221"],
-                   ["Wcc","WtaunuL_Sh221"],
-                   ["Wcc","Wtaunu_Sh221"],],
-            "Wcl":[["Wcl","WenuB_Sh221"],
-                   ["Wcl","WenuC_Sh221"],
-                   ["Wcl","WenuL_Sh221"],
-                   ["Wcl","Wenu_Sh221"],
-                   ["Wcl","WmunuB_Sh221"],
-                   ["Wcl","WmunuC_Sh221"],
-                   ["Wcl","WmunuL_Sh221"],
-                   ["Wcl","Wmunu_Sh221"],
-                   ["Wcl","WtaunuB_Sh221"],
-                   ["Wcl","WtaunuC_Sh221"],
-                   ["Wcl","WtaunuL_Sh221"],
-                   ["Wcl","Wtaunu_Sh221"],],
-            "Wl": [["Wl" ,"WenuB_Sh221"],
-                   ["Wl" ,"WenuC_Sh221"],
-                   ["Wl" ,"WenuL_Sh221"],
-                   ["Wl" ,"Wenu_Sh221"],
-                   ["Wl" ,"WmunuB_Sh221"],
-                   ["Wl" ,"WmunuC_Sh221"],
-                   ["Wl" ,"WmunuL_Sh221"],
-                   ["Wl" ,"Wmunu_Sh221",],
-                   ["Wl" ,"WtaunuB_Sh221"],
-                   ["Wl" ,"WtaunuC_Sh221"],
-                   ["Wl" ,"WtaunuL_Sh221"],
-                   ["Wl" ,"Wtaunu_Sh221"],],
-            "Zbb":[["Zbb","ZnunuB_Sh221"],
-                   ["Zbb","ZnunuC_Sh221"],
-                   ["Zbb","ZnunuL_Sh221"],
-                   ["Zbb","Znunu_Sh221"],
-                   ["Zbb","ZeeB_Sh221"],
-                   ["Zbb","ZeeC_Sh221"],
-                   ["Zbb","ZeeL_Sh221"],
-                   ["Zbb","Zee_Sh221"],
-                   ["Zbb","ZmumuB_Sh221"],
-                   ["Zbb","ZmumuC_Sh221"],
-                   ["Zbb","ZmumuL_Sh221"],
-                   ["Zbb","Zmumu_Sh221"],
-                   ["Zbb","ZtautauB_Sh221"],
-                   ["Zbb","ZtautauC_Sh221"],
-                   ["Zbb","ZtautauL_Sh221"],
-                   ["Zbb","Ztautau_Sh221"],],
-            "Zbc":[["Zbc","ZnunuB_Sh221"],
-                   ["Zbc","ZnunuC_Sh221"],
-                   ["Zbc","ZnunuL_Sh221"],
-                   ["Zbc","Znunu_Sh221"],
-                   ["Zbc","ZeeB_Sh221"],
-                   ["Zbc","ZeeC_Sh221"],
-                   ["Zbc","ZeeL_Sh221"],
-                   ["Zbc","Zee_Sh221"],
-                   ["Zbc","ZmumuB_Sh221"],
-                   ["Zbc","ZmumuC_Sh221"],
-                   ["Zbc","ZmumuL_Sh221"],
-                   ["Zbc","Zmumu_Sh221"],
-                   ["Zbc","ZtautauB_Sh221"],
-                   ["Zbc","ZtautauC_Sh221"],
-                   ["Zbc","ZtautauL_Sh221"],
-                   ["Zbc","Ztautau_Sh221"],],
-            "Zbl":[["Zbl","ZnunuB_Sh221"],
-                   ["Zbl","ZnunuC_Sh221"],
-                   ["Zbl","ZnunuL_Sh221"],
-                   ["Zbl","Znunu_Sh221"],
-                   ["Zbl","ZeeB_Sh221"],
-                   ["Zbl","ZeeC_Sh221"],
-                   ["Zbl","ZeeL_Sh221"],
-                   ["Zbl","Zee_Sh221"],
-                   ["Zbl","ZmumuB_Sh221"],
-                   ["Zbl","ZmumuC_Sh221"],
-                   ["Zbl","ZmumuL_Sh221"],
-                   ["Zbl","Zmumu_Sh221"],
-                   ["Zbl","ZtautauB_Sh221"],
-                   ["Zbl","ZtautauC_Sh221"],
-                   ["Zbl","ZtautauL_Sh221"],
-                   ["Zbl","Ztautau_Sh221"],],
-            "Zcc":[["Zcc","ZnunuB_Sh221"],
-                   ["Zcc","ZnunuC_Sh221"],
-                   ["Zcc","ZnunuL_Sh221"],
-                   ["Zcc","Znunu_Sh221"],
-                   ["Zcc","ZeeB_Sh221"],
-                   ["Zcc","ZeeC_Sh221"],
-                   ["Zcc","ZeeL_Sh221"],
-                   ["Zcc","Zee_Sh221"],
-                   ["Zcc","ZmumuB_Sh221"],
-                   ["Zcc","ZmumuC_Sh221"],
-                   ["Zcc","ZmumuL_Sh221"],
-                   ["Zcc","Zmumu_Sh221"],
-                   ["Zcc","ZtautauB_Sh221"],
-                   ["Zcc","ZtautauC_Sh221"],
-                   ["Zcc","ZtautauL_Sh221"],
-                   ["Zcc","Ztautau_Sh221",]],
-            "Zcl":[["Zcl","ZnunuB_Sh221"],
-                   ["Zcl","ZnunuC_Sh221"],
-                   ["Zcl","ZnunuL_Sh221"],
-                   ["Zcl","Znunu_Sh221"],
-                   ["Zcl","ZeeB_Sh221"],
-                   ["Zcl","ZeeC_Sh221"],
-                   ["Zcl","ZeeL_Sh221"],
-                   ["Zcl","Zee_Sh221"],
-                   ["Zcl","ZmumuB_Sh221"],
-                   ["Zcl","ZmumuC_Sh221"],
-                   ["Zcl","ZmumuL_Sh221"],
-                   ["Zcl","Zmumu_Sh221"],
-                   ["Zcl","ZtautauB_Sh221"],
-                   ["Zcl","ZtautauC_Sh221"],
-                   ["Zcl","ZtautauL_Sh221"],
-                   ["Zcl","Ztautau_Sh221"],],
-            "Zl" :[["Zl" ,"ZnunuB_Sh221"],
-                   ["Zl" ,"ZnunuC_Sh221"],
-                   ["Zl" ,"ZnunuL_Sh221"],
-                   ["Zl" ,"Znunu_Sh221"],
-                   ["Zl" ,"ZeeB_Sh221"],
-                   ["Zl" ,"ZeeC_Sh221"],
-                   ["Zl" ,"ZeeL_Sh221"],
-                   ["Zl" ,"Zee_Sh221"],
-                   ["Zl" ,"ZmumuB_Sh221"],
-                   ["Zl" ,"ZmumuC_Sh221"],
-                   ["Zl" ,"ZmumuL_Sh221"],
-                   ["Zl" ,"Zmumu_Sh221"],
-                   ["Zl" ,"ZtautauB_Sh221"],
-                   ["Zl" ,"ZtautauC_Sh221"],
-                   ["Zl" ,"ZtautauL_Sh221"],
-                   ["Zl" ,"Ztautau_Sh221"],],
-            "ttbar" :[["ttbar","ttbar_nonallhad_PwPy8"],],
-            "ttbarOld" :[["ttbar","ttbar_nonallhad_PwPy8_old"],],
-            "ttbarDilep" :[["ttbar","ttbar_dil_PwPy8"],],
-            "ttbarDilepOld" :[["ttbarDilep","ttbar_dil_PwPy8_old"],],
-            "ttbarSpin" :[["ttbarSpin","ttbar_PwPy8_MadSpin"],],
-            "stops" :[["stops","stops_PwPy"],],
-            "stopt" :[["stopt","stopt_PwPy"],],
-            "stopWt":[["stopWt","stopWt_PwPy"],],
-            "stopWtMETFilt":[["stopWt","stopWt_PwPy_METfilt"],],
-            "stoptZq":[["tZq","stoptZ_MGPy8"],],
-            "ttV"   :[["ttV","ttV_aMCatNLOPy8"],],
-            "ttVV"  :[["ttbarWW","ttVV_MGPy8"],],
-            "ttt"   :[["ttt","ttt_MGPy8"],],
-            "tttt"  :[["4topSM","tttt_MGPy8"],],
-            "data"  :[["data","data15"],
-                      ["data","data16"],
-                      ["data","data17"]],
-            # "":[[],],
+            "Wbb":[
+                [
+                    ["Wbb","WenuB_Sh221"],
+                    ["Wbb","WenuC_Sh221"],
+                    ["Wbb","WenuL_Sh221"],
+                    ["Wbb","Wenu_Sh221"],
+                    ["Wbb","WmunuB_Sh221"],
+                    ["Wbb","WmunuC_Sh221"],
+                    ["Wbb","WmunuL_Sh221"],
+                    ["Wbb","Wmunu_Sh221"],
+                    ["Wbb","WtaunuB_Sh221"],
+                    ["Wbb","WtaunuC_Sh221"],
+                    ["Wbb","WtaunuL_Sh221"],
+                    ["Wbb","Wtaunu_Sh221"],
+                    ],
+                {"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                ],
+            "Wbc":[
+                [
+                    ["Wbc","WenuB_Sh221"],
+                    ["Wbc","WenuC_Sh221"],
+                    ["Wbc","WenuL_Sh221"],
+                    ["Wbc","Wenu_Sh221"],
+                    ["Wbc","WmunuB_Sh221"],
+                    ["Wbc","WmunuC_Sh221"],
+                    ["Wbc","WmunuL_Sh221"],
+                    ["Wbc","Wmunu_Sh221"],
+                    ["Wbc","WtaunuB_Sh221"],
+                    ["Wbc","WtaunuC_Sh221"],
+                    ["Wbc","WtaunuL_Sh221"],
+                    ["Wbc","Wtaunu_Sh221"],
+                    ],
+                {"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                ],
+            "Wbl":[
+                [
+                    ["Wbl","WenuB_Sh221"],
+                    ["Wbl","WenuC_Sh221"],
+                    ["Wbl","WenuL_Sh221"],
+                    ["Wbl","Wenu_Sh221"],
+                    ["Wbl","WmunuB_Sh221"],
+                    ["Wbl","WmunuC_Sh221"],
+                    ["Wbl","WmunuL_Sh221"],
+                    ["Wbl","Wmunu_Sh221"],
+                    ["Wbl","WtaunuB_Sh221"],
+                    ["Wbl","WtaunuC_Sh221"],
+                    ["Wbl","WtaunuL_Sh221"],
+                    ["Wbl","Wtaunu_Sh221"],
+                    ],
+                {"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                ],
+            "Wcc":[
+                [
+                    ["Wcc","WenuB_Sh221"],
+                    ["Wcc","WenuC_Sh221"],
+                    ["Wcc","WenuL_Sh221"],
+                    ["Wcc","Wenu_Sh221"],
+                    ["Wcc","WmunuB_Sh221"],
+                    ["Wcc","WmunuC_Sh221"],
+                    ["Wcc","WmunuL_Sh221"],
+                    ["Wcc","Wmunu_Sh221"],
+                    ["Wcc","WtaunuB_Sh221"],
+                    ["Wcc","WtaunuC_Sh221"],
+                    ["Wcc","WtaunuL_Sh221"],
+                    ["Wcc","Wtaunu_Sh221"],
+                    ],
+                {"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                ],
+            "Wcl":[
+                [
+                    ["Wcl","WenuB_Sh221"],
+                    ["Wcl","WenuC_Sh221"],
+                    ["Wcl","WenuL_Sh221"],
+                    ["Wcl","Wenu_Sh221"],
+                    ["Wcl","WmunuB_Sh221"],
+                    ["Wcl","WmunuC_Sh221"],
+                    ["Wcl","WmunuL_Sh221"],
+                    ["Wcl","Wmunu_Sh221"],
+                    ["Wcl","WtaunuB_Sh221"],
+                    ["Wcl","WtaunuC_Sh221"],
+                    ["Wcl","WtaunuL_Sh221"],
+                    ["Wcl","Wtaunu_Sh221"],
+                    ],
+                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                ],
+            "Wl": [
+                [
+                    ["Wl" ,"WenuB_Sh221"],
+                    ["Wl" ,"WenuC_Sh221"],
+                    ["Wl" ,"WenuL_Sh221"],
+                    ["Wl" ,"Wenu_Sh221"],
+                    ["Wl" ,"WmunuB_Sh221"],
+                    ["Wl" ,"WmunuC_Sh221"],
+                    ["Wl" ,"WmunuL_Sh221"],
+                    ["Wl" ,"Wmunu_Sh221",],
+                    ["Wl" ,"WtaunuB_Sh221"],
+                    ["Wl" ,"WtaunuC_Sh221"],
+                    ["Wl" ,"WtaunuL_Sh221"],
+                    ["Wl" ,"Wtaunu_Sh221"],
+                    ],
+                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                ],
+            "Zbb":[
+                [
+                    ["Zbb","ZnunuB_Sh221"],
+                    ["Zbb","ZnunuC_Sh221"],
+                    ["Zbb","ZnunuL_Sh221"],
+                    ["Zbb","Znunu_Sh221"],
+                    ["Zbb","ZeeB_Sh221"],
+                    ["Zbb","ZeeC_Sh221"],
+                    ["Zbb","ZeeL_Sh221"],
+                    ["Zbb","Zee_Sh221"],
+                    ["Zbb","ZmumuB_Sh221"],
+                    ["Zbb","ZmumuC_Sh221"],
+                    ["Zbb","ZmumuL_Sh221"],
+                    ["Zbb","Zmumu_Sh221"],
+                    ["Zbb","ZtautauB_Sh221"],
+                    ["Zbb","ZtautauC_Sh221"],
+                    ["Zbb","ZtautauL_Sh221"],
+                    ["Zbb","Ztautau_Sh221"],
+                    ],
+                {"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                ],
+            "Zbc":[
+                [
+                    ["Zbc","ZnunuB_Sh221"],
+                    ["Zbc","ZnunuC_Sh221"],
+                    ["Zbc","ZnunuL_Sh221"],
+                    ["Zbc","Znunu_Sh221"],
+                    ["Zbc","ZeeB_Sh221"],
+                    ["Zbc","ZeeC_Sh221"],
+                    ["Zbc","ZeeL_Sh221"],
+                    ["Zbc","Zee_Sh221"],
+                    ["Zbc","ZmumuB_Sh221"],
+                    ["Zbc","ZmumuC_Sh221"],
+                    ["Zbc","ZmumuL_Sh221"],
+                    ["Zbc","Zmumu_Sh221"],
+                    ["Zbc","ZtautauB_Sh221"],
+                    ["Zbc","ZtautauC_Sh221"],
+                    ["Zbc","ZtautauL_Sh221"],
+                    ["Zbc","Ztautau_Sh221"],
+                    ],
+                {"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                ],
+            "Zbl":[
+                [
+                    ["Zbl","ZnunuB_Sh221"],
+                    ["Zbl","ZnunuC_Sh221"],
+                    ["Zbl","ZnunuL_Sh221"],
+                    ["Zbl","Znunu_Sh221"],
+                    ["Zbl","ZeeB_Sh221"],
+                    ["Zbl","ZeeC_Sh221"],
+                    ["Zbl","ZeeL_Sh221"],
+                    ["Zbl","Zee_Sh221"],
+                    ["Zbl","ZmumuB_Sh221"],
+                    ["Zbl","ZmumuC_Sh221"],
+                    ["Zbl","ZmumuL_Sh221"],
+                    ["Zbl","Zmumu_Sh221"],
+                    ["Zbl","ZtautauB_Sh221"],
+                    ["Zbl","ZtautauC_Sh221"],
+                    ["Zbl","ZtautauL_Sh221"],
+                    ["Zbl","Ztautau_Sh221"],
+                    ],
+                {"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                ],
+            "Zcc":[
+                [
+                    ["Zcc","ZnunuB_Sh221"],
+                    ["Zcc","ZnunuC_Sh221"],
+                    ["Zcc","ZnunuL_Sh221"],
+                    ["Zcc","Znunu_Sh221"],
+                    ["Zcc","ZeeB_Sh221"],
+                    ["Zcc","ZeeC_Sh221"],
+                    ["Zcc","ZeeL_Sh221"],
+                    ["Zcc","Zee_Sh221"],
+                    ["Zcc","ZmumuB_Sh221"],
+                    ["Zcc","ZmumuC_Sh221"],
+                    ["Zcc","ZmumuL_Sh221"],
+                    ["Zcc","Zmumu_Sh221"],
+                    ["Zcc","ZtautauB_Sh221"],
+                    ["Zcc","ZtautauC_Sh221"],
+                    ["Zcc","ZtautauL_Sh221"],
+                    ["Zcc","Ztautau_Sh221"],
+                    ],
+                {"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                ],
+            "Zcl":[
+                [
+                    ["Zcl","ZnunuB_Sh221"],
+                    ["Zcl","ZnunuC_Sh221"],
+                    ["Zcl","ZnunuL_Sh221"],
+                    ["Zcl","Znunu_Sh221"],
+                    ["Zcl","ZeeB_Sh221"],
+                    ["Zcl","ZeeC_Sh221"],
+                    ["Zcl","ZeeL_Sh221"],
+                    ["Zcl","Zee_Sh221"],
+                    ["Zcl","ZmumuB_Sh221"],
+                    ["Zcl","ZmumuC_Sh221"],
+                    ["Zcl","ZmumuL_Sh221"],
+                    ["Zcl","Zmumu_Sh221"],
+                    ["Zcl","ZtautauB_Sh221"],
+                    ["Zcl","ZtautauC_Sh221"],
+                    ["Zcl","ZtautauL_Sh221"],
+                    ["Zcl","Ztautau_Sh221"],
+                    ],
+                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                ],
+            "Zl" :[
+                [
+                    ["Zl" ,"ZnunuB_Sh221"],
+                    ["Zl" ,"ZnunuC_Sh221"],
+                    ["Zl" ,"ZnunuL_Sh221"],
+                    ["Zl" ,"Znunu_Sh221"],
+                    ["Zl" ,"ZeeB_Sh221"],
+                    ["Zl" ,"ZeeC_Sh221"],
+                    ["Zl" ,"ZeeL_Sh221"],
+                    ["Zl" ,"Zee_Sh221"],
+                    ["Zl" ,"ZmumuB_Sh221"],
+                    ["Zl" ,"ZmumuC_Sh221"],
+                    ["Zl" ,"ZmumuL_Sh221"],
+                    ["Zl" ,"Zmumu_Sh221"],
+                    ["Zl" ,"ZtautauB_Sh221"],
+                    ["Zl" ,"ZtautauC_Sh221"],
+                    ["Zl" ,"ZtautauL_Sh221"],
+                    ["Zl" ,"Ztautau_Sh221"],
+                    ],
+                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                ],
+            "ttbar" :[[["ttbar","ttbar_nonallhad_PwPy8"]],{"2":0.97,"3":1.0,"4":1.0,"5p":1.0},],
+            "ttbarOld" :[[["ttbar","ttbar_nonallhad_PwPy8_old"]],{"2":0.97,"3":1.0,"4":1.0,"5p":1.0}],
+            "ttbarDilep" :[[["ttbar","ttbar_dil_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "ttbarDilepOld" :[[["ttbarDilep","ttbar_dil_PwPy8_old"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "ttbarSpin" :[[["ttbarSpin","ttbar_PwPy8_MadSpin"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "stops" :[[["stops","stops_PwPy"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "stopt" :[[["stopt","stopt_PwPy"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "stopWt":[[["stopWt","stopWt_PwPy"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "stopWtMETFilt":[[["stopWt","stopWt_PwPy_METfilt"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "stoptZq":[[["tZq","stoptZ_MGPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "ttV"   :[[["ttV","ttV_aMCatNLOPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "ttVV"  :[[["ttbarWW","ttVV_MGPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "ttt"   :[[["ttt","ttt_MGPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "tttt"  :[[["4topSM","tttt_MGPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "data"  :[
+                [
+                    ["data","data15"],
+                    ["data","data16"],
+                    ["data","data17"],
+                    ],
+                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                ],
             }
-
     # done function
 
     def set_list_processMerged(self):
@@ -809,163 +877,32 @@ class Analysis:
             print "Start set_list_processMerged()"
 
         # those stored in .root
-        self.list_processMerged=[
-            "qqZvvHbb",
-            "qqZllHbb",
-            "ggZvvHbb",
-            "ggZllHbb",
-            "qqWlvHbb",
-            "qqZvvHcc",
-            "qqZllHcc",
-            "ggZvvHcc",
-            "ggZllHcc",
-            "qqWlvHcc",
-            "qqZincH4l",
-            "ggH",
-            "bbH",
-            "VBF",
-            "ttH",
-            "Wl",
-            "Wcl",
+        self.list_processMerged=self.list_process+[
+            "VHbb",
+            "VHcc",
+            "OtherSig",
+            "diboson",
             "Whf",
-            "Zl",
-            "Zcl",
             "Zhf",
-            "ttbar",
-            #"stop",
-            "stops",
-            "stopt",
-            "stopWt",
-            "stoptZq",
-            #"diboson",
-            "WW",
-            "WZ",
-            "ZZ",
-            "ggWW",
-            "ggZZ",
-            "data",
+            "stop",
+            "tt+X",
             "S",
             "B",
             "D",
-]
-
-
-
-        # those put in yield table
-        self.list_processMergedType=[
-            "qqZvvHbb",
-            "qqWlvHbb",
-            "ggZvvHbb",
-            "qqZllHbb",
-            "ggZllHbb",
-            "qqZvvHcc",
-            "qqWlvHcc",
-            "ggZvvHcc",
-            "qqZllHcc",
-            "ggZllHcc",
-            "VBF",
-            "ttH",
-            "qqZincH4l",
-            "ggH",
-            "bbH",
-            "Zhf",
-            "ttbar",
-            "Whf",
-            "ZZ",
-            "stopt",
-            "stopWt",
-            "stops",
-            "WZ",
-            "Wcl",
-            "Zcl",
-            "Zl",
-            "Wl",
-            "ggZZ",
-            "WW",
-            "stoptZq",
-            "ggWW",
-            "S",
-            "B",
-            "data",
             ]
 
-
-
         self.dict_processMerged_info={
-            "qqZvvHbb" :["Signal",0,{"2":1.0,"3":1.0},
-                         ["qqZvvHbb"]],
-            "qqZllHbb" :["Signal",0,{"2":1.0,"3":1.0},
-                         ["qqZllHbb"]],
-            "ggZvvHbb" :["Signal",0,{"2":1.0,"3":1.0},
-                         ["ggZvvHbb"]],
-            "ggZllHbb" :["Signal",1,{"2":1.0,"3":1.0},
-                         ["ggZllHbb"]],
-            "qqWlvHbb" :["Signal",0,{"2":1.0,"3":1.0},
-                         ["qqWlvHbb"]],
-            "qqZvvHcc" :["Signal",0,{"2":1.0,"3":1.0},
-                         ["qqZvvHcc"]],
-            "qqZllHcc" :["Signal",0,{"2":1.0,"3":1.0},
-                         ["qqZllHcc"]],
-            "ggZvvHcc" :["Signal",0,{"2":1.0,"3":1.0},
-                         ["ggZvvHcc"]],
-            "ggZllHcc" :["Signal",1,{"2":1.0,"3":1.0},
-                         ["ggZllHcc"]],
-            "qqWlvHcc" :["Signal",0,{"2":1.0,"3":1.0},
-                         ["qqWlvHcc"]],
-            "VBF"      :["Signal",0,{"2":1.0,"3":1.0},
-                         ["VBF"]],
-            "ttH"      :["Signal",0,{"2":1.0,"3":1.0},
-                         ["ttH"]],
-            "qqZincH4l":["Signal",0,{"2":1.0,"3":1.0},
-                         ["qqZincH4l"]],
-            "ggH"      :["Signal",0,{"2":1.0,"3":1.0},
-                         ["ggH"]],
-            "bbH"      :["Signal",1,{"2":1.0,"3":1.0},
-                         ["bbH"]],
-            "Wl"       :["Backgr",0,{"2":1.0,"3":1.0},
-                         ["Wl"]],
-            "Wcl"      :["Backgr",0,{"2":1.0,"3":1.0},
-                        ["Wcl"]],
-            "Whf"      :["Backgr",0,{"2":1.27,"3":1.27},
-                        ["Wbb","Wbc","Wbl","Wcc"]],
-            "Zl"       :["Backgr",0,{"2":1.0,"3":1.0},
-                        ["Zl"]],
-            "Zcl"      :["Backgr",0,{"2":1.0,"3":1.0},
-                        ["Zcl"]],
-            "Zhf"      :["Backgr",0,{"2":1.42,"3":1.31},
-                        ["Zbb","Zbc","Zbl","Zcc"]],
-            "ttbar"    :["Backgr",0,{"2":0.97,"3":1.0},
-                         ["ttbar"]],
-            "stop"     :["Backgr",0,{"2":1.0,"3":1.0},
-                         ["stops","stopt","stopWt"]],
-            "stops"    :["Backgr",0,{"2":1.0,"3":1.0},
-                         ["stops"]],
-            "stopt"    :["Backgr",0,{"2":1.0,"3":1.0},
-                         ["stopt"]],
-            "stopWt"   :["Backgr",0,{"2":1.0,"3":1.0},
-                         ["stopWt"]],
-            "stoptZq"  :["Backgr",0,{"2":1.0,"3":1.0},
-                         ["stoptZq"]],
-            "diboson"  :["Backgr",1,{"2":1.0,"3":1.0},
-                         ["WW","WZ","ZZ","ggWW","ggZZ"]],
-            "WW"       :["Backgr",0,{"2":1.0,"3":1.0},
-                         ["WW"]],
-            "WZ"       :["Backgr",0,{"2":1.0,"3":1.0},
-                         ["WZ"]],
-            "ZZ"       :["Backgr",0,{"2":1.0,"3":1.0},
-                         ["ZZ"]],
-            "ggWW"     :["Backgr",1,{"2":1.0,"3":1.0},
-                         ["ggWW"]],
-            "ggZZ"     :["Backgr",0,{"2":1.0,"3":1.0},
-                         ["ggZZ"]],
-            "data"     :["Data",1,{"2":1.0,"3":1.0},
-                         ["data"]],
-            "S"        :["SignalSum",1,{"2":1.0,"3":1.0},
-                         ["qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqZincH4l","ggH","bbH","VBF","ttH"]],
-            "B"        :["BackgrSum",1,{"2":1.0,"3":1.0},
-                         ["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ"]],
-            "D"        :["DataSum",1,{"2":1.0,"3":1.0},
-                         ["data"]],
+            "VHbb"     :[["qqZvvHbb","qqWlvHbb","ggZvvHbb","qqZllHbb","ggZllHbb"]],
+            "VHcc"     :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc"]],
+            "OtherSig" :[["qqZincH4l","ggH","bbH","VBF","ttH"]],
+            "diboson"  :[["WW","WZ","ZZ","ggWW","ggZZ"]],
+            "Whf"      :[["Wbb","Wbc","Wbl","Wcc"]],
+            "Zhf"      :[["Zbb","Zbc","Zbl","Zcc"]],
+            "stop"     :[["stops","stopt","stopWt","stoptZq"]],
+            "tt+X"     :[["ttV","ttVV","ttt","tttt"]],
+            "S"        :[["qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqZincH4l","ggH","bbH","VBF","ttH"]],
+            "B"        :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet"]],
+            "D"        :[["data"]],
             }
 
     def set_fileNameHistosProcessMerged(self):
@@ -984,21 +921,22 @@ class Analysis:
                     cat="2"
                 elif "3jet" in category:
                     cat="3"
+                elif "4jet" in category:
+                    cat="4"
+                elif "5pjet" in category:
+                    cat="5p"
                 else:
                     cat="none"   
                 for processMerged in self.list_processMerged:
                     counter=0
-                    if self.debug:
+                    if self.debug or self.verbose:
                         print "ADRIAN1  %-10s %-10s %-10s" % (variable,category,processMerged)
-                    info=self.dict_processMerged_info[processMerged]
-                    dict_cat_SF=info[2]
-                    if cat in dict_cat_SF.keys():
-                        SF=dict_cat_SF[cat]
+                    if processMerged not in self.dict_processMerged_info.keys():
+                        list_process=[processMerged]
                     else:
-                        SF=1.0
-                    if self.debug:
-                        print "SF",SF,"type(SF)",type(SF)
-                    list_process=info[3]
+                        list_process=self.dict_processMerged_info[processMerged][0]
+                    if self.debug or self.verbose:
+                        print "list_process",list_process
                     for process in list_process:
                         if self.debug:
                             print "ADRIAN2 %-10s %-10s %-10s %-10s" % (variable,category,processMerged,process)
@@ -1006,6 +944,10 @@ class Analysis:
                         histoNameProcess      =self.get_histoNameProcess(variable,category,process)
                         histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
                         histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcess,name=histoNameProcessMerged,returnDummyIfNotFound=False,debug=self.debug)
+                        SF=self.dict_process_info[process][1][cat]
+                        if self.debug:
+                            print "SF",SF,"type(SF)",type(SF)
+                        histo.Scale(SF)
                         if histo=="dummy":
                             continue
                         if counter==0:
@@ -1044,10 +986,65 @@ class Analysis:
         os.system(command)
     # done function
 
+    def set_list_processAnalysis(self):
+        self.list_processAnalysis=[
+            "qqZvvHbb",
+            "qqWlvHbb",
+            "ggZvvHbb",
+            "qqZllHbb",
+            "ggZllHbb",
+            "qqZvvHcc",
+            "qqWlvHcc",
+            "ggZvvHcc",
+            "qqZllHcc",
+            "ggZllHcc",
+            "qqZincH4l",
+            "ggH",
+            #"ggHbb",
+            "bbH",
+            "VBF",
+            "ttH",
+            "WW",
+            "WZ",
+            "ZZ",
+            "ggZZ",
+            "ggWW",
+            #"ZllZbb",
+            #"ZvvZbb",
+            #"WlvZbb",
+            #"ZllZvv",
+            "Wbb",
+            "Wbc",
+            "Wbl",
+            "Wcc",
+            "Wcl",
+            "Wl",
+            "Zbb",
+            "Zbc",
+            "Zbl",
+            "Zcc",
+            "Zcl",
+            "Zl",
+            "ttbar",
+            #"ttbarOld",
+            #"ttbarDilep",
+            #"ttbarDilepOld",
+            #"ttbarSpin",
+            "stops",
+            "stopt",
+            "stopWt",
+            "stoptZq",
+            "ttV",
+            "ttVV",
+            "ttt",
+            "tttt",
+            "dijet",
+            "S",
+            "B",
+            "data",
+            ]
 
 
-    def set_list_processType(self):
-        self.list_processType="S,B,D,Sig,Bkg,Dat".split(",")
 
     def get_yieldTuple(self, histo):
         yieldTuple=get_histo_integral_error(histo,myRange=-1,option="",debug=False) # -1 to include the under/over-flow bins
@@ -1187,7 +1184,7 @@ class Analysis:
             for processResult in self.list_processResult:
                 # info=self.dict_processMerged_info[processMergedType]
                 # doAddLineAfter=bool(info[1])
-                if processResult=="bbH" or processResult=="ggWW" or processResult=="data":
+                if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="data":
                     doAddLineAfter=True
                 else:
                     doAddLineAfter=False
@@ -1412,14 +1409,15 @@ class Analysis:
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_150ptv_SR"]) 
             #self.set_list_category(["2tag3jet_150ptv_SR"]) 
+            #self.set_list_category(["2tag5pjet_150ptv_SR"]) 
             #self.set_list_category(["0ptag3jet_150ptv_SR"]) 
             #self.set_list_category(["0ptag0pjet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
             #self.set_list_variable(["pTB1"])
             #self.set_list_variable(["mBB"])
             # self.set_list_variable(["mBB","mva"])
-            # self.set_list_variable(["pTB2"])
-            #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
+            #self.set_list_variable(["pTB2"])
+            self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
             #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             if True:
                 # all variables except those stored only for 0ptag2pjets
@@ -1431,7 +1429,6 @@ class Analysis:
                 # done for loop
                 self.set_list_variable(list_variable)
             # done if
-
             #self.set_list_variable(["njets","MV2c10_Data",])
             #if self.debug:
             if self.verbose:
@@ -1448,16 +1445,16 @@ class Analysis:
             if False:
                 self.create_histosProcessMerged()
             #return
-            #self.set_list_processType()
+            self.set_list_processAnalysis()
             if True:
-                self.list_variable=["mva"]
+                #self.list_variable=["pTB2"]
                 #self.list_category=["2tag2jet_150ptv_SR"]
-                self.list_processResult=self.list_processMergedType+["S/B","SigY_S_B","SigH_S_B"]
+                #self.list_processResult=self.list_processAnalysis+["S/B","SigY_S_B","SigH_S_B"]
+                self.list_processResult=["VHbb","VHcc","VBF","ttH","ggH","bbH","qqZincH4l","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
+                self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
                 #self.list_processResult=["S","B","S/B","SigY_S_B","SigH_S_B"]
-                #self.create_results()
+                self.create_results()
                 self.read_results()
-                self.create_yield_latex_table()
-            if False:
                 self.create_yield_latex_table()
         # done if doYields
 
