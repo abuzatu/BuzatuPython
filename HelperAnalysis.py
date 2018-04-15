@@ -465,7 +465,7 @@ class Analysis:
     # done function
 
     def create_histosProcess(self):
-        if self.debug:
+        if self.debug or self.verbose:
             print "Start create_histosProcess()"
         # now we want to sum over processInitial for a given process
         outputFile=TFile(self.fileNameHistosProcess,"RECREATE")
@@ -973,7 +973,7 @@ class Analysis:
     # done function
 
     def create_histosProcessMerged(self):
-        if self.debug:
+        if self.debug or self.verbose:
             print "Start create_histosProcessMerged()"
         # now we want to sum over process for a given processMerged
         outputFile=TFile(self.fileNameHistosProcessMerged,"RECREATE")
@@ -1049,6 +1049,13 @@ class Analysis:
     def set_list_processType(self):
         self.list_processType="S,B,D,Sig,Bkg,Dat".split(",")
 
+    def get_yieldTuple(self, histo):
+        yieldTuple=get_histo_integral_error(histo,myRange=-1,option="",debug=False) # -1 to include the under/over-flow bins
+        if self.debug:
+            print "yieldTuple= %15.6f +/- %15.6f", yieldTuple
+        return yieldTuple
+    # done function
+
     def create_results(self):
         if self.debug or self.verbose:
             print "Start create_results()"
@@ -1056,31 +1063,162 @@ class Analysis:
         # create a new file
         f = open(fileName,'w')
         if self.debug:
-            print "Yields:"
+            print "Results:"
         for variable in self.list_variable:
             if self.debug:
                 print "variable",variable
             for category in self.list_category:
                 if self.debug:
                     print "category",category
+                dict_processMerged_histo={}
                 for processMerged in self.list_processMerged:
                     if self.debug:
                         print "processMerged",processMerged
                     inputFileName=self.fileNameHistosProcessMerged 
                     histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
                     histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
-                    integralValueError=get_histo_integral_error(histo,myRange=-1,option="",debug=False) # -1 to include the under/over-flow bins
-                    text="%10s %25s %10s %15.8f %15.8f" % (variable, category, processMerged, integralValueError[0], integralValueError[1])
+                    #integralValueError=get_histo_integral_error(histo,myRange=-1,option="",debug=False) # -1 to include the under/over-flow bins
+                    #text="%20s %25s %10s %15.8f %15.8f" % (variable, category, processMerged, integralValueError[0], integralValueError[1])
+                    dict_processMerged_histo[processMerged]=histo
+                    #if self.verbose:
+                    #    print text
+                    #f.write(text+'\n')
+                # done loop over processMerged
+                # have access to the histograms
+                for processResult in self.list_processResult:
+                    if self.verbose:
+                        print "processResult",processResult
+                    if "/" in processResult:
+                        # ratio of yields
+                        processResultNumer=processResult.split("/")[0]
+                        processResultDenom=processResult.split("/")[1]
+                        yieldTupleNumer=self.get_yieldTuple(dict_processMerged_histo[processResultNumer])
+                        yieldTupleDenom=self.get_yieldTuple(dict_processMerged_histo[processResultDenom])
+                        tupleResult=ratioError(yieldTupleNumer[0],yieldTupleNumer[1],yieldTupleDenom[0],yieldTupleDenom[1])
+                    elif "SigY_" in processResult:
+                        # significance sigma B from yields
+                        processResultNumer=processResult.split("_")[1]
+                        processResultDenom=processResult.split("_")[2]
+                        yieldTupleNumer=self.get_yieldTuple(dict_processMerged_histo[processResultNumer])
+                        yieldTupleDenom=self.get_yieldTuple(dict_processMerged_histo[processResultDenom])
+                        tupleResult=significanceSigmaB(yieldTupleNumer[0],yieldTupleNumer[1],yieldTupleDenom[0],yieldTupleDenom[1])
+                    elif "SigH_" in processResult:
+                        # significance sigma B from histogram bins (using shape too)
+                        processResultNumer=processResult.split("_")[1]
+                        processResultDenom=processResult.split("_")[2]
+                        sig_h=dict_processMerged_histo[processResultNumer].Clone()
+                        bkg_h=dict_processMerged_histo[processResultDenom].Clone()
+                        if self.debug:
+                            getBinValues(sig_h)
+                            getBinValues(bkg_h)
+                        figureOfMerit="SignificanceSigmaB"
+                        a=get_dict_figureOfMerit_histo(sig_h,bkg_h,list_figureOfMerit=[figureOfMerit],debug=self.debug)
+                        h=a[figureOfMerit]
+                        tupleResult=add_in_quadrature_bins_of_one_histo(h,IncludeUnderflowOverflowBins=False,debug=False)
+                    else:
+                        # yield of one process already in processMerged
+                        tupleResult=self.get_yieldTuple(dict_processMerged_histo[processResult])
+                    # done if
+                    text="%20s %25s %10s %15.8f %15.8f" % (variable, category, processResult, tupleResult[0], tupleResult[1])
                     if self.verbose:
                         print text
                     f.write(text+'\n')
-                # done loop over processMerged
             # done loop over category
         # done loop over variable
         f.close()
     # done function
 
+    def read_results(self):
+        if self.debug or self.verbose:
+            print "Start read_results()"
+        self.dict_variable_category_processResult_tupleResult={}
+        for line in open(self.folderResults+"/results.txt", 'r'):
+            line=line.rstrip()
+            if self.debug:
+                print "line",line
+            list_line=line.split()
+            variable=list_line[0]
+            category=list_line[1]
+            processResult=list_line[2]
+            tupleResult=(float(list_line[3]),float(list_line[4]))
+            text="%20s %25s %10s %15.8f %15.8f" % (variable, category, processResult, tupleResult[0], tupleResult[1])
+            if self.verbose:
+                print text
+            self.dict_variable_category_processResult_tupleResult[variable+"_"+category+"_"+processResult]=tupleResult
+        # done loop over lines in file
+        # the dictionary is filled
+        # no need to result, as it is private variable of class
+    # done function
+
     def create_yield_latex_table(self):
+        if self.debug or self.verbose:
+            print "Start create_yield_latex_table()"
+        for variable in self.list_variable:
+            if self.debug:
+                print "variable",variable
+                   # we create the latex table
+            fileName=self.folderYields+"/table_"+variable+".tex"
+            # create a new file
+            f = open(fileName,'w')
+            f.write('\\documentclass{beamer}\n')
+            f.write('\\usepackage{tabularx}\n')
+            f.write('\\usepackage{adjustbox}\n')
+            f.write('\\usepackage{pdflscape}\n')
+            f.write('\\begin{document}\n')
+            f.write('\\begin{frame}{\\texttt{\\detokenize{'+ self.name+' '+variable+'}}}\n')
+            # f.write('\\begin{center}\n')
+            f.write('\\begin{landscape} \n')
+            f.write('\\adjustbox{max height=\\dimexpr\\textheight-7.0cm\\relax,max width=\\textwidth}\n')
+            f.write('{\n')
+            text="\\begin{tabular}{|l"
+            for category in self.list_category:
+                text+="|l"
+            text+="|}\n"
+            f.write(text)
+            f.write('\\hline \n')
+            f.write('\\hline \n')
+            text="Process vs Category"
+            for category in self.list_category:
+                text+=" & \\texttt{\\detokenize{"+category+"}}"
+            text+=" \\\\ \n"
+            f.write(text)
+            f.write('\\hline \n')
+            # add one processResult one at a time
+            for processResult in self.list_processResult:
+                # info=self.dict_processMerged_info[processMergedType]
+                # doAddLineAfter=bool(info[1])
+                if processResult=="bbH" or processResult=="ggWW" or processResult=="data":
+                    doAddLineAfter=True
+                else:
+                    doAddLineAfter=False
+                #if self.debug:
+                #    print processMergedType,info[1],type(info[1]),doAddLineAfter,type(doAddLineAfter)
+                text="\\texttt{\\detokenize{"+processResult+"}}"
+                for category in self.list_category:
+                    tupleResult=self.dict_variable_category_processResult_tupleResult[variable+"_"+category+"_"+processResult]
+                    if tupleResult[0]>0.01:
+                        text+=" & {\\color{orange}%.2f$\pm$%.2f}" % tupleResult
+                    else:
+                        text+=" & {\\color{orange}%.4f$\pm$%.4f}" % tupleResult
+                # done loop over category
+                text+=" \\\\ \n"
+                f.write(text)
+                if doAddLineAfter:
+                    f.write('\\hline \n')
+            # done for loop over processResult
+            f.write('\\hline \n')
+            f.write('\\end{tabular}\n')
+            f.write('}\n')
+            f.write('\\end{landscape} \n')
+            # f.write('\\end{center}\n')
+            f.write('\\end{frame}\n')
+            f.write('\\end{document}\n')
+            f.close()
+        # done loop over variable
+    # done function
+
+
+    def create_yield_latex_table2(self):
         if self.debug or self.verbose:
             print "Start create_yield_latex_table()"
         variable=self.list_variable[0]
@@ -1280,8 +1418,20 @@ class Analysis:
             #self.set_list_variable(["pTB1"])
             #self.set_list_variable(["mBB"])
             # self.set_list_variable(["mBB","mva"])
-            self.set_list_variable(["pTB2"])
+            # self.set_list_variable(["pTB2"])
+            #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
             #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
+            if True:
+                # all variables except those stored only for 0ptag2pjets
+                list_variable=[]
+                for variable in self.list_variable:
+                    if "FwdJets" in variable or "SigJets" in variable or variable=="MV2c10_B" or variable=="MV2c10_C" or variable=="MV2c10_Data" or variable=="MV2c10_L" or variable=="btag_weight_B" or variable=="btag_weight_C" or variable=="btag_weight_Data" or variable=="btag_weight_L" or variable=="eff_B" or variable=="eff_C" or variable=="eff_L" or variable=="njets":
+                        continue
+                    list_variable.append(variable)
+                # done for loop
+                self.set_list_variable(list_variable)
+            # done if
+
             #self.set_list_variable(["njets","MV2c10_Data",])
             #if self.debug:
             if self.verbose:
@@ -1299,10 +1449,16 @@ class Analysis:
                 self.create_histosProcessMerged()
             #return
             #self.set_list_processType()
+            if True:
+                self.list_variable=["mva"]
+                #self.list_category=["2tag2jet_150ptv_SR"]
+                self.list_processResult=self.list_processMergedType+["S/B","SigY_S_B","SigH_S_B"]
+                #self.list_processResult=["S","B","S/B","SigY_S_B","SigH_S_B"]
+                #self.create_results()
+                self.read_results()
+                self.create_yield_latex_table()
             if False:
                 self.create_yield_latex_table()
-            if True:
-                self.create_results()
         # done if doYields
 
         #self.set_list_processInitial(["WHlv125J_MINLO"])
