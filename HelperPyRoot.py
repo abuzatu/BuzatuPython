@@ -886,7 +886,7 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
         print "f",type(f),f
         print "fit",fit
 
-    cutnentries=50
+    cutnentries=19
     color=h.GetLineColor()
     if fit=="None":
         None
