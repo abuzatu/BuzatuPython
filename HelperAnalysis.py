@@ -50,6 +50,9 @@ class Analysis:
     def set_do_evaluate_list_processInitial(self,do_evaluate_list_processInitial):
         self.do_evaluate_list_processInitial=do_evaluate_list_processInitial
 
+    def set_do_hadd_all_processInitial_to_produce_fit_inputs(self,do_hadd_all_processInitial_to_produce_fit_inputs):
+        self.do_hadd_all_processInitial_to_produce_fit_inputs=do_hadd_all_processInitial_to_produce_fit_inputs
+
     def set_list_processInitial(self,list_processInitial):
         self.list_processInitial=list_processInitial
 
@@ -82,6 +85,14 @@ class Analysis:
     def create_folderProcessInitial(self):
         self.folderProcessInitial=self.folderOutput+"/processInitial"
         command="mkdir -p "+self.folderProcessInitial
+        if self.debug:
+            print "command="+command
+        os.system(command)
+    # done function
+
+    def create_folderFitInput(self):
+        self.folderFitInput=self.folderOutput+"/fitInput"
+        command="mkdir -p "+self.folderFitInput
         if self.debug:
             print "command="+command
         os.system(command)
@@ -261,6 +272,18 @@ class Analysis:
         for all in list_all:
             outputFile.write(all+"\n")
         outputFile.close()
+    # done function
+
+    def hadd_all_processInitial_to_produce_fit_inputs(self):
+        output=self.folderFitInputs+"/LimitHistograms.VH.vvbb.13TeV.mc16a.AcademiaSinica.v02.root"
+        inputs=""
+        for processInitial in self.list_processInitial:
+            inputs+=" "+self.folderProcessInitial+"/hist-"+processInitial+"-*.root"
+        # done if
+        command="hadd -f "+output+" "+inputs
+        if self.debug:
+            print "command",command
+        # os.system(command)
     # done function
             
     def set_evaluated_list_process(self):
@@ -916,15 +939,15 @@ class Analysis:
         self.dict_processMerged_info={
             "VHbb"     :[["qqZvvHbb","qqWlvHbb","ggZvvHbb","qqZllHbb","ggZllHbb"]],
             "VHcc"     :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc"]],
-            "OtherSig" :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc","qqZincH4l","ggH","bbH","VBF","ttH"]],
+            "OtherSig" :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
             "diboson"  :[["WW","WZ","ZZ","ggWW","ggZZ"]],
             "Whf"      :[["Wbb","Wbc","Wbl","Wcc"]],
             "Zhf"      :[["Zbb","Zbc","Zbl","Zcc"]],
             "stop"     :[["stops","stopt","stopWt","stoptZq"]],
             "tt+X"     :[["ttV","ttVV","ttt","tttt"]],
-            "S"        :[["qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqZincH4l","ggH","bbH","VBF","ttH"]],
-            "B"        :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet"]],
-            "B+S"      :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet","qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqZincH4l","ggH","bbH","VBF","ttH"]],
+            "S"        :[["qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb"]],
+            "B"        :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
+            "B+S"      :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH","qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb"]],
             "D"        :[["data"]],
             }
 
@@ -1450,12 +1473,18 @@ class Analysis:
         self.set_evaluated_list_processInitial()
         if self.do_hadd_processInitial:
             self.hadd_each_processInitial()
+
+        self.create_folderFitInput()
+        dict_vtag_analysis[vtag].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
+
         if self.do_evaluate_content_of_all_processInitial:
             self.evaluate_content_of_all_processInitial()
         self.set_evaluated_list_process()
         self.set_evaluated_list_category()
         self.set_evaluated_list_variable()
         self.set_evaluated_list_all()
+        if self.hadd_all_processInitial_to_produce_fit_inputs:
+            self.hadd_all_processInitial_to_produce_fit_inputs()
         self.create_folderHistos()
         self.set_fileNameHistosRaw()
         self.set_fileNameHistosProcess()
@@ -1470,7 +1499,7 @@ class Analysis:
         if self.doFirst:
             return
 
-        #return
+        return
 
         #if True:
         #    self.create_histosRaw()
