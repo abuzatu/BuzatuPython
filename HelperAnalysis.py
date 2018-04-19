@@ -28,6 +28,9 @@ class Analysis:
 
     ### setters
 
+    def set_vtag(self,vtag):
+        self.vtag=vtag
+
     def set_debug(self,debug):
         self.debug=debug
 
@@ -40,6 +43,9 @@ class Analysis:
     def set_folderOutput(self,folderOutput):
         self.folderOutput=folderOutput
         os.system("mkdir -p "+ self.folderOutput)
+    
+    def set_doFirst(self,doFirst):
+        self.doFirst=doFirst
 
     def set_do_evaluate_list_processInitial(self,do_evaluate_list_processInitial):
         self.do_evaluate_list_processInitial=do_evaluate_list_processInitial
@@ -181,7 +187,10 @@ class Analysis:
                 #else:
                 # only one word to define the process, e.g. ttbar or ttbarDilep
                 process=list_histoNameElement[0] # first element e.g. ttbar
-                category=list_histoNameElement[1]+"_"+list_histoNameElement[2]+"_"+list_histoNameElement[3] # next three elements, eg. 3ptag5pjet_150ptv_SR
+                if "150_200ptv" in histoName:
+                    category=list_histoNameElement[1]+"_"+list_histoNameElement[2]+"_"+list_histoNameElement[3]+"_"+list_histoNameElement[4] # next three elements, eg. 3ptag5pjet_150_200ptv_SR
+                else:
+                    category=list_histoNameElement[1]+"_"+list_histoNameElement[2]+"_"+list_histoNameElement[3] # next three elements, eg. 3ptag5pjet_150ptv_SR or 3ptag5pjet_200ptv_SR
                 # done if
                 variable=histoName.replace(process+"_"+category+"_","") # the rest, tricky as sometimes the name has an _ in it
                 if self.debug:
@@ -348,8 +357,9 @@ class Analysis:
             print "Start set_dict_variable_info()"
         debug_binRange=False
         self.dict_variable_info={
-            "EtaB1":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
-            "EtaB2":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
+            "EtaB1":[get_binRange(-2.5,2.5,0.1,debug_binRange),"EtaB1"],
+            "EtaB2":[get_binRange(-2.5,2.5,0.1,debug_binRange),"EtaB2"],
+            "EtaJ3":[get_binRange(-2.5,2.5,0.1,debug_binRange),"EtaJ3"],
             "EtaFwdJets":[get_binRange(-4.5,4.5,0.1,debug_binRange)],
             "EtaSigJets":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
             "MET":[get_binRange(140,400,10,debug_binRange)+","+get_binRange(400,700,100,debug_binRange)],
@@ -388,6 +398,17 @@ class Analysis:
             "dRB2J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "dRBB":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "mBB":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBNominal":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBOneMu":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBOneMu4GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBOneMu5GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBOneMu6GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBOneMu7GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBOneMu10GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBOneMu12GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBOneMu15GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBOneMu20GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "mBBPtReco":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
             "mBBJ":[get_binRange(40,80,20,debug_binRange)+","+get_binRange(80,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)+","+get_binRange(500,700,50,debug_binRange)+","+get_binRange(700,1000,100,debug_binRange)],
             "maxdRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "mindRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
@@ -879,7 +900,7 @@ class Analysis:
         # those stored in .root
         self.list_processMerged=self.list_process+[
             "VHbb",
-            "VHcc",
+            # "VHcc",
             "OtherSig",
             "diboson",
             "Whf",
@@ -889,12 +910,13 @@ class Analysis:
             "S",
             "B",
             "D",
+            "B+S",
             ]
 
         self.dict_processMerged_info={
             "VHbb"     :[["qqZvvHbb","qqWlvHbb","ggZvvHbb","qqZllHbb","ggZllHbb"]],
             "VHcc"     :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc"]],
-            "OtherSig" :[["qqZincH4l","ggH","bbH","VBF","ttH"]],
+            "OtherSig" :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc","qqZincH4l","ggH","bbH","VBF","ttH"]],
             "diboson"  :[["WW","WZ","ZZ","ggWW","ggZZ"]],
             "Whf"      :[["Wbb","Wbc","Wbl","Wcc"]],
             "Zhf"      :[["Zbb","Zbc","Zbl","Zcc"]],
@@ -902,6 +924,7 @@ class Analysis:
             "tt+X"     :[["ttV","ttVV","ttt","tttt"]],
             "S"        :[["qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqZincH4l","ggH","bbH","VBF","ttH"]],
             "B"        :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet"]],
+            "B+S"      :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet","qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqZincH4l","ggH","bbH","VBF","ttH"]],
             "D"        :[["data"]],
             }
 
@@ -930,7 +953,7 @@ class Analysis:
                 for processMerged in self.list_processMerged:
                     counter=0
                     if self.debug or self.verbose:
-                        print "ADRIAN1  %-10s %-10s %-10s" % (variable,category,processMerged)
+                        print " %-10s %-10s %-10s" % (variable,category,processMerged)
                     if processMerged not in self.dict_processMerged_info.keys():
                         list_process=[processMerged]
                     else:
@@ -939,7 +962,7 @@ class Analysis:
                         print "list_process",list_process
                     for process in list_process:
                         if self.debug:
-                            print "ADRIAN2 %-10s %-10s %-10s %-10s" % (variable,category,processMerged,process)
+                            print "%-10s %-10s %-10s %-10s" % (variable,category,processMerged,process)
                         inputFileName=self.fileNameHistosProcess
                         histoNameProcess      =self.get_histoNameProcess(variable,category,process)
                         histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
@@ -981,6 +1004,14 @@ class Analysis:
     def create_folderResults(self):
         self.folderResults=self.folderOutput+"/results"
         command="mkdir -p "+self.folderResults
+        if self.debug:
+            print "command="+command
+        os.system(command)
+    # done function
+
+    def create_folderPlots(self):
+        self.folderPlots=self.folderOutput+"/plots"
+        command="mkdir -p "+self.folderPlots
         if self.debug:
             print "command="+command
         os.system(command)
@@ -1043,8 +1074,7 @@ class Analysis:
             "B",
             "data",
             ]
-
-
+    # done function
 
     def get_yieldTuple(self, histo):
         yieldTuple=get_histo_integral_error(histo,myRange=-1,option="",debug=False) # -1 to include the under/over-flow bins
@@ -1147,7 +1177,90 @@ class Analysis:
         # no need to result, as it is private variable of class
     # done function
 
-    def create_yield_latex_table(self):
+    def create_yield_latex_table(self,doDocument=True):
+        if self.debug or self.verbose:
+            print "Start create_yield_latex_table()"
+        for variable in self.list_variable:
+            if self.debug:
+                print "variable",variable
+                   # we create the latex table
+            fileName=self.folderYields+"/table_"+variable+".tex"
+            # create a new file
+            f = open(fileName,'w')
+            if doDocument:
+                f.write('\\documentclass{beamer}\n')
+                f.write('\\usepackage{tabularx}\n')
+                f.write('\\usepackage{adjustbox}\n')
+                f.write('\\usepackage{pdflscape}\n')
+                f.write('\\begin{document}\n')
+            # done if
+            f.write('\\begin{frame}{\\texttt{\\detokenize{'+ self.name+' '+variable+'}}}\n')
+            # f.write('\\begin{center}\n')
+            f.write('\\begin{landscape} \n')
+            f.write('\\adjustbox{max height=\\dimexpr\\textheight-7.0cm\\relax,max width=\\textwidth}\n')
+            f.write('{\n')
+            text="\\begin{tabular}{|l"
+            for category in self.list_category:
+                text+="|l"
+            text+="|}\n"
+            f.write(text)
+            f.write('\\hline \n')
+            f.write('\\hline \n')
+            text="Process vs Category"
+            for category in self.list_category:
+                text+=" & \\texttt{\\detokenize{"+category+"}}"
+            text+=" \\\\ \n"
+            f.write(text)
+            f.write('\\hline \n')
+            # add one processResult one at a time
+            for processResult in self.list_processResult:
+                # info=self.dict_processMerged_info[processMergedType]
+                # doAddLineAfter=bool(info[1])
+                if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="data" or processResult=="VHbb":
+                    doAddLineAfter=True
+                else:
+                    doAddLineAfter=False
+                #if self.debug:
+                #    print processMergedType,info[1],type(info[1]),doAddLineAfter,type(doAddLineAfter)
+                if "@" in processResult:
+                    list_processResult=processResult.split("@")
+                    processResult=list_processResult[0]
+                    currentVariable=list_processResult[1]
+                    text="\\texttt{\\detokenize{"+processResult+" "+currentVariable+"}}"
+                else:
+                    # regular processResult
+                    currentVariable=variable
+                    text="\\texttt{\\detokenize{"+processResult+"}}"
+                    nrDigits="2"
+                # done if
+                for category in self.list_category:
+                    tupleResult=self.dict_variable_category_processResult_tupleResult[currentVariable+"_"+category+"_"+processResult]
+                    if tupleResult[0]>0.01:
+                        if "@" in processResult:
+                            text+=" & {\\color{orange}%.2f$\pm$%.2f}" % tupleResult
+                        else:
+                            text+=" & {\\color{orange}%.3f$\pm$%.3f}" % tupleResult
+                    else:
+                        text+=" & {\\color{orange}%.4f$\pm$%.4f}" % tupleResult
+                # done loop over category
+                text+=" \\\\ \n"
+                f.write(text)
+                if doAddLineAfter:
+                    f.write('\\hline \n')
+            # done for loop over processResult
+            f.write('\\hline \n')
+            f.write('\\end{tabular}\n')
+            f.write('}\n')
+            f.write('\\end{landscape} \n')
+            # f.write('\\end{center}\n')
+            f.write('\\end{frame}\n')
+            if doDocument:
+                f.write('\\end{document}\n')
+            f.close()
+        # done loop over variable
+    # done function
+
+    def create_yield_latex_table2(self):
         if self.debug or self.verbose:
             print "Start create_yield_latex_table()"
         for variable in self.list_variable:
@@ -1184,7 +1297,7 @@ class Analysis:
             for processResult in self.list_processResult:
                 # info=self.dict_processMerged_info[processMergedType]
                 # doAddLineAfter=bool(info[1])
-                if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="data":
+                if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="data" or processResult=="OtherSig":
                     doAddLineAfter=True
                 else:
                     doAddLineAfter=False
@@ -1214,98 +1327,94 @@ class Analysis:
         # done loop over variable
     # done function
 
-
-    def create_yield_latex_table2(self):
+    def create_overlaid_variable(self):
         if self.debug or self.verbose:
-            print "Start create_yield_latex_table()"
-        variable=self.list_variable[0]
-        dict_category_processMerged_integralValueError={}
-        for category in self.list_category:
-            print "ADRIAN category",category
-            dict_processType_list_tuple={}
-            for processType in self.list_processType:
-                if self.debug or self.verbose:
-                    print "processType",processType
-                dict_processType_list_tuple[processType]=[]
-            for processMerged in self.list_processMergedType:
-                if self.debug or self.verbose:
-                    print "processMerged",processMerged
-                inputFileName=self.fileNameHistosProcessMerged 
-                histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
-                histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
-                integralValueError=get_histo_integral_error(histo,myRange=-1,option="",debug=False) # -1 to include the under/over-flow bins
-                dict_category_processMerged_integralValueError[category+"_"+processMerged]=integralValueError
-                info=self.dict_processMerged_info[processMerged]
-                processType=info[0]
-                dict_processType_list_tuple[processType].append(integralValueError)
-            # done loop over processMerged
-            continue
-            # retrieve the sums
-            for processType in self.list_processType:
-                dict_category_processMerged_integralValueError[category+"_"+processType]=sum_error_list(dict_processType_list_tuple[processType],debug=False)
-            if self.debug or self.verbose:
-                print "category",category,"dict_category_processMerged_integralValueError", dict_category_processMerged_integralValueError
-                print "%-10s %20.6f %20.6f" % (category, integralValueError[0], integralValueError[1])
-        # done loop over category
-        # now the dictionary is filled
-        
-        print "ADRIAN DONE"
-
-        return
-
-        # we create the latex table
-        fileName=self.folderYields+"/table.tex"
-        # create a new file
-        f = open(fileName,'w')
-        f.write('\\documentclass{beamer}\n')
-        f.write('\\usepackage{tabularx}\n')
-        f.write('\\usepackage{adjustbox}\n')
-        f.write('\\usepackage{pdflscape}\n')
-        f.write('\\begin{document}\n')
-        f.write('\\begin{frame}{\\texttt{\\detokenize{'+ self.name+'}}}\n')
-        # f.write('\\begin{center}\n')
-        f.write('\\begin{landscape} \n')
-        f.write('\\adjustbox{max height=\\dimexpr\\textheight-7.0cm\\relax,max width=\\textwidth}\n')
-        f.write('{\n')
-        text="\\begin{tabular}{|l"
-        for category in self.list_category:
-            text+="|l"
-        text+="|}\n"
-        f.write(text)
-        f.write('\\hline \n')
-        f.write('\\hline \n')
-        text="Process vs Category"
-        for category in self.list_category:
-            text+=" & \\texttt{\\detokenize{"+category+"}}"
-        text+=" \\\\ \n"
-        f.write(text)
-        f.write('\\hline \n')
-        # add processes one at a time
-        for processMergedType in self.list_processMergedType:
-            info=self.dict_processMerged_info[processMergedType]
-            doAddLineAfter=bool(info[1])
+            print "Start create_overlaid_variable()"
+        inputFileName=self.fileNameHistosProcessMerged
+        self.list_processMerged=["qqZvvHbb","qqWlvHbb","ggZvvHbb","WZ","ZZ","ggZZ","ttbar","stop","Whf","Zhf"]
+        #self.debug=True
+        for processMerged in self.list_processMerged:
             if self.debug:
-                print processMergedType,info[1],type(info[1]),doAddLineAfter,type(doAddLineAfter)
-            text=processMergedType
+                print "processMerged",processMerged
             for category in self.list_category:
-                myYield=dict_category_processMerged_integralValueError[category+"_"+processMergedType]
-                if myYield[0]>0.01:
-                    text+=" & {\\color{orange}%.2f$\pm$%.2f}" % myYield
-                else:
-                    text+=" & {\\color{orange}%.4f$\pm$%.4f}" % myYield
-            text+=" \\\\ \n"
-            f.write(text)
-            if doAddLineAfter:
-                f.write('\\hline \n')
-        # done for loop over processMerged
-        f.write('\\hline \n')
-        f.write('\\end{tabular}\n')
-        f.write('}\n')
-        f.write('\\end{landscape} \n')
-        # f.write('\\end{center}\n')
-        f.write('\\end{frame}\n')
-        f.write('\\end{document}\n')
-        f.close()
+                if self.debug:
+                    print "category",category
+                list_tuple_h1D=[]
+                self.list_color=[1,4,2,8,ROOT.kOrange,5,6,7,8,9,10]
+                #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu7GeV","mBBOneMu6GeV","mBBOneMu5GeV","mBBOneMu4GeV","mBBPtReco"]
+                #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu7GeV","mBBOneMu6GeV","mBBOneMu5GeV","mBBOneMu4GeV"]
+                #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV"]
+                #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBPtReco"]
+                #self.list_variable=["mBBOneMu10GeV","mBBOneMu7GeV","mBBOneMu4GeV"]
+                for i,variable in enumerate(self.list_variable):
+                    if self.debug:
+                        print "variable",variable
+                    info=self.dict_variable_info[variable]
+                    # binRange=info[0]
+                    debug_binRange=False
+                    # binRange=get_binRange(5,60,10,debug_binRange)+","+get_binRange(60,140,5,debug_binRange)+","+get_binRange(140,180,10,debug_binRange)
+                    binRange=get_binRange(60,160,5,debug_binRange)
+                    histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
+                    histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
+                    legend=processMerged
+                    histo=get_histo_generic_binRange(histo,binRange=binRange,option="average",debug=False)
+                    #histo=histo.Clone()
+                    #getBinValues(histo,doRescaleMeVtoGeV=False,significantDigits=2,debug=self.debug)
+                    histo.SetLineColor(self.list_color[i])
+                    # histo.SetXTitle(variable)
+                    histo.SetXTitle("mBB [ GeV ]")
+                    histo.SetYTitle("Event density per bin width")
+                    bJetCorr=variable.replace("mBB","")
+                    list_tuple_h1D.append((histo,bJetCorr))
+                # done loop over process
+                outputFileName=self.folderPlots+"/overlay_variable_"+category+"_"+processMerged
+                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf",option="histo+Bukin",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=True,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=False,min_value_ratio=0.5,max_value_ratio=1.5,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to data",plot_option="",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{"+self.name+"}?#bf{"+category+"}?#bf{"+processMerged+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.55,0.50,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=True)
+            # done loop over category
+        # done loop over variable
+    # done function
+
+
+    def create_overlaid_plots(self):
+        if self.debug or self.verbose:
+            print "Start create_overlaid_plots()"
+        inputFileName=self.fileNameHistosProcessMerged
+        self.list_color=[8,4,2,1]
+        for variable in self.list_variable:
+            if self.debug:
+                print "variable",variable
+            if "mBB" in variable or "mva" in variable: 
+                # blinded, do not show data at all
+                list_processMerged="B,S,B+S".split(",")
+            else:
+                # not blinded, include data
+                list_processMerged="B,S,B+S,D".split(",")
+            # done if
+            info=self.dict_variable_info[variable]
+            binRange=info[0]
+            for category in self.list_category:
+                if self.debug:
+                    print "category",category
+                list_tuple_h1D=[]
+                for i,processMerged in enumerate(list_processMerged):
+                    if self.debug:
+                        print "processMerged",processMerged
+                    histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
+                    histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
+                    legend=processMerged
+                    signalScale=50
+                    if processMerged=="S":
+                        histo.Scale(signalScale)
+                        legend+=" x "+str(signalScale)
+                    histo=get_histo_generic_binRange(histo,binRange=binRange,option="average",debug=False)
+                    histo.SetLineColor(self.list_color[i])
+                    histo.SetXTitle(variable)
+                    histo.SetYTitle("Event density per bin width")
+                    list_tuple_h1D.append((histo,legend))
+                # done loop over process
+                outputFileName=self.folderPlots+"/overlay_BDS_"+variable+"_"+category
+                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0.5,max_value_ratio=1.5,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to bkg",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False)
+            # done loop over category
+        # done loop over variable
     # done function
 
     ### print
@@ -1353,6 +1462,14 @@ class Analysis:
         self.set_fileNameHistosProcessMerged()
         self.create_folderYields()
         self.create_folderResults()
+        self.create_folderPlots()
+        self.set_dict_variable_info()
+        self.list_color=[1,4,2,8,ROOT.kOrange]
+        # self.debug=False
+        
+        if self.doFirst:
+            return
+
         #return
 
         #if True:
@@ -1374,7 +1491,6 @@ class Analysis:
                 self.print_lists()
             self.create_histosRaw()
             self.set_folderPlotsHistosRawByProcessInitial()
-            self.set_dict_variable_info()
             if self.do_overlay_histosRaw_by_processInitial:
                 self.overlay_histosRaw_by_processInitial()
         # done if doTTbarStudy
@@ -1405,7 +1521,11 @@ class Analysis:
             #self.list_process=["ttbar"]
             #self.list_process=["data"]
             # reduce category
-            self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+            if "MVA" in self.vtag:
+                self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+            elif "SM" in self.vtag:
+                self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
+                #self.set_list_category(["2tag2jet_150_200ptv_SR"])
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_150ptv_SR"]) 
             #self.set_list_category(["2tag3jet_150ptv_SR"]) 
@@ -1415,9 +1535,15 @@ class Analysis:
             #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
             #self.set_list_variable(["pTB1"])
             #self.set_list_variable(["mBB"])
-            # self.set_list_variable(["mBB","mva"])
+            #self.set_list_variable(["mBB"])
+            #self.set_list_variable(["mBB","mva"])
+            self.set_list_variable(["mBB","mva","MET","SumPtJet","EtaB2"])
             #self.set_list_variable(["pTB2"])
-            self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
+            #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
+            #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
+            #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco","SumPtJet"]
+            #self.list_variable=["mva"]
+            #self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
             #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             if True:
                 # all variables except those stored only for 0ptag2pjets
@@ -1433,29 +1559,55 @@ class Analysis:
             #if self.debug:
             if self.verbose:
                 self.print_lists()
-            if False:
+            doAll=False
+            if doAll:
                 self.create_histosRaw(option="reduced")
             #return
             # now we want to sum over processInitial for a given process
             self.set_list_process_info()
-            if False:
+            if doAll:
                 self.create_histosProcess()
             #return
             self.set_list_processMerged()
-            if False:
+            if doAll:
                 self.create_histosProcessMerged()
             #return
             self.set_list_processAnalysis()
+            if False:
+                if False:
+                    #self.list_category=["2tag2jet_150ptv_SR"]
+                    #self.list_processResult=self.list_processAnalysis
+                    # self.list_processResult=["VHbb","VHcc","VBF","ttH","ggH","bbH","qqZincH4l","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
+                    # self.list_processResult=["S","B","S/B","SigY_S_B","SigH_S_B"]
+                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
+                    self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
+                    self.create_results()
+                if True:
+                    # self.debug=True
+                    self.read_results()
+                    #self.list_category=["2tag2jet_150ptv_SR"]
+                    #self.list_variable=["mBB"]
+                    self.list_variable=["mBB","mva"]
+                    #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
+                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
+                    self.list_processResult=self.list_processResult+["S/B","SigY_S_B"]
+                    # for bJetCorr in "Nominal,OneMu20GeV,OneMu15GeV,OneMu12GeV,OneMu10GeV,OneMu7GeV,OneMu6GeV,OneMu5GeV,OneMu4GeV,PtReco".split(","):
+                    # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
+                    for var in "mBB,mva".split(","):
+                        self.list_processResult=self.list_processResult+["SigH_S_B@"+var]
+                    
+                    self.create_yield_latex_table(doDocument=False)
+                    # self.create_overlaid_variable()
+                # done if
+            # done if
             if True:
-                #self.list_variable=["pTB2"]
-                #self.list_category=["2tag2jet_150ptv_SR"]
-                #self.list_processResult=self.list_processAnalysis+["S/B","SigY_S_B","SigH_S_B"]
-                self.list_processResult=["VHbb","VHcc","VBF","ttH","ggH","bbH","qqZincH4l","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
-                self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
-                #self.list_processResult=["S","B","S/B","SigY_S_B","SigH_S_B"]
-                self.create_results()
-                self.read_results()
-                self.create_yield_latex_table()
+                # do overlay plots of D,B,B+S,S (S is times some value)
+                #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3"]) # don't look yet, as not blinded
+                #self.set_list_variable(["MET"])
+                # self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
+                #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+                #self.set_list_variable(["SumPtJet"])
+                self.create_overlaid_plots()
         # done if doYields
 
         #self.set_list_processInitial(["WHlv125J_MINLO"])
