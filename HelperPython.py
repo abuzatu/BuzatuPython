@@ -1034,6 +1034,11 @@ def ratioError(s,se,b,be,debug=False):
     return (result,error)
 # done function
 
+# ratio of tuple, each tuple nominal and error
+def ratioTuple(tupleNumer,tupleDenom,debug=False):
+    return ratioError(tupleNumer[0],tupleNumer[1],tupleDenom[0],tupleDenom[1],debug=debug)
+# done function
+
 # sensitivity, or s over sqrt(b)
 # slide 37 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
 def sensitivity(s,se,b,be,debug=False):

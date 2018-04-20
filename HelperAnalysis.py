@@ -275,7 +275,7 @@ class Analysis:
     # done function
 
     def hadd_all_processInitial_to_produce_fit_inputs(self):
-        output=self.folderFitInputs+"/LimitHistograms.VH.vvbb.13TeV.mc16a.AcademiaSinica.v02.root"
+        output=self.folderFitInput+"/LimitHistograms.VH.vvbb.13TeV.mc16a.AcademiaSinica.v02.root"
         inputs=""
         for processInitial in self.list_processInitial:
             inputs+=" "+self.folderProcessInitial+"/hist-"+processInitial+"-*.root"
@@ -1475,7 +1475,7 @@ class Analysis:
             self.hadd_each_processInitial()
 
         self.create_folderFitInput()
-        dict_vtag_analysis[vtag].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
+        #dict_vtag_analysis[vtag].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
 
         if self.do_evaluate_content_of_all_processInitial:
             self.evaluate_content_of_all_processInitial()
@@ -1499,7 +1499,7 @@ class Analysis:
         if self.doFirst:
             return
 
-        return
+        # return
 
         #if True:
         #    self.create_histosRaw()
@@ -1566,7 +1566,7 @@ class Analysis:
             #self.set_list_variable(["mBB"])
             #self.set_list_variable(["mBB"])
             #self.set_list_variable(["mBB","mva"])
-            self.set_list_variable(["mBB","mva","MET","SumPtJet","EtaB2"])
+            #self.set_list_variable(["mBB","mva","MET","SumPtJet","EtaB2"])
             #self.set_list_variable(["pTB2"])
             #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
             #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
@@ -1602,7 +1602,7 @@ class Analysis:
                 self.create_histosProcessMerged()
             #return
             self.set_list_processAnalysis()
-            if False:
+            if True:
                 if False:
                     #self.list_category=["2tag2jet_150ptv_SR"]
                     #self.list_processResult=self.list_processAnalysis
@@ -1623,13 +1623,12 @@ class Analysis:
                     # for bJetCorr in "Nominal,OneMu20GeV,OneMu15GeV,OneMu12GeV,OneMu10GeV,OneMu7GeV,OneMu6GeV,OneMu5GeV,OneMu4GeV,PtReco".split(","):
                     # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
                     for var in "mBB,mva".split(","):
-                        self.list_processResult=self.list_processResult+["SigH_S_B@"+var]
-                    
-                    self.create_yield_latex_table(doDocument=False)
+                        self.list_processResult=self.list_processResult+["SigH_S_B@"+var]                 
+                    # self.create_yield_latex_table(doDocument=False)
                     # self.create_overlaid_variable()
                 # done if
             # done if
-            if True:
+            if False:
                 # do overlay plots of D,B,B+S,S (S is times some value)
                 #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3"]) # don't look yet, as not blinded
                 #self.set_list_variable(["MET"])
