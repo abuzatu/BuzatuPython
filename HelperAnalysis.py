@@ -1475,11 +1475,12 @@ class Analysis:
             if "mBB" in variable or "mva" in variable: 
                 # blinded, do not show data at all
                 # list_processMerged="B,S,B+S".split(",")
-                list_processMerged="B,D".split(",")
+                list_processMerged="B,S,B+S,D".split(",")
             else:
                 # not blinded, include data
                 # list_processMerged="B,S,B+S,D,D2".split(",")
-                list_processMerged="B,D".split(",")
+                #list_processMerged="B,D".split(",")
+                list_processMerged="B,S,B+S,D".split(",")
                 # list_processMerged="D,D2".split(",")
             # done if
             info=self.dict_variable_info[variable]
@@ -1502,8 +1503,13 @@ class Analysis:
                     # done if
                     # blind the data
                     if processMerged=="D" or processMerged=="D2":
-
-                        histo=get_histo_blinded(histo,binRange=[60,140],debug=False)
+                        if "mBB" in variable:
+                            histo=get_histo_blinded(histo,binRange=[60,140],debug=False)
+                        elif "mva" in variable:
+                            histo=get_histo_blinded(histo,binRange=[0.7,1.0],debug=False)
+                        else:
+                            None
+                        # done if
                     # done if
                     # rebin, collect overflows, do average
                     debug=False
@@ -1525,6 +1531,8 @@ class Analysis:
                 overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf,png",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=0,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=min_value_ratio,max_value_ratio=max_value_ratio,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to bkg",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False)
             # done loop over category
         # done loop over variable
+        command="$All/BuzatuBash/make_html.sh "+self.folderPlots
+        os.system(command)
     # done function
 
     ### print
@@ -1584,8 +1592,8 @@ class Analysis:
         self.list_color=[1,4,2,8,ROOT.kOrange]
         # self.debug=False
         
-        if self.doFirst:
-            return
+        #if self.doFirst:
+        #    return
 
         #return
 
@@ -1684,7 +1692,7 @@ class Analysis:
             #if self.debug:
             if self.verbose:
                 self.print_lists()
-            doAll=False
+            doAll=True
             if doAll:
                 self.create_histosRaw(option="reduced")
             #return
