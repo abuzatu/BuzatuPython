@@ -1295,6 +1295,11 @@ def get_legend(info,debug):
 # done function
 
 def set_min_max_title_list_tuple_h1D(list_tuple_h1D,max_value,min_value,ignorezero,max_value_factor,min_value_factor,debug):
+    if debug:
+        print "max_value",max_value
+        print "min_value",min_value
+        print "max_value_factor",max_value_factor
+        print "min_value_factor",min_value_factor
     # number of histograms we are overlaying
     num=len(list_tuple_h1D)
     if debug:
@@ -1443,12 +1448,16 @@ def remove_duplicates_from_generic_binRange(binRange="150,200,400",debug=False):
     return binRangeOutput
 # done
 
+# give any bin range, symmetric or asymmetric
+# you can test it with the function defined below this one
+# test_get_histo_generic_binRange(debug=True)
 # actually coded by Root in h.Rebin(nbins,"new name",numpyArrayOfbins)
 # https://root.cern.ch/doc/master/classTH1.html#aff6520fdae026334bf34fa1800946790
 # so can get rid of this
+# the option "average" is deprecated, now rebin with sum, then move overflows to edge bins, and then average out
 def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False):
-    if option!="sum" and option!="average":
-        print "option",option,"not known. Choose sum, average. Will ABORT!!!"
+    if option!="sum" and option!="average2":
+        print "option",option,"not known. Choose sum, average2. Will ABORT!!!"
         assert(False)
     if binRange=="":
         # then do nothing, return as it was
@@ -1478,11 +1487,32 @@ def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False
     result.SetYTitle(h.GetYaxis().GetTitle())
     # loop over each bin of the new histogram
     if debug:
-        print "Start loop over bins of the new (rebinned) histogram"
-    for i in xrange(1,result.GetNbinsX()+1):
-        low=result.GetBinLowEdge(i)
-        width=result.GetBinWidth(i)
-        high=low+width
+        print "Start loop over bins of the new (rebinned) histogram, including underflow and overflow"
+    for i in xrange(0,result.GetNbinsX()+2):
+        if i==0:
+            # underflow
+            low=float("-inf")
+            # width=result.GetBinWidth(i)
+            high=result.GetBinLowEdge(1)
+        elif i==result.GetNbinsX()+1:
+            # overflow
+            low=result.GetBinLowEdge(i)
+            # width=result.GetBinWidth(i)
+            high=float("inf")
+        elif i<0:
+            # bin below underflow
+            print "Bin number can not be negative, will ABORT!!!"
+            assert(False)
+        elif i>result.GetNbinsX()+1:
+            # bin above overflow
+            print "Bin number can not be larger than the overflow bine, will ABORT!!!"
+            assert(False)
+        else:
+            # regular bin
+            low=result.GetBinLowEdge(i)
+            width=result.GetBinWidth(i)
+            high=low+width
+        # done if
         if debug:
             print "bin", i,"low",low,"high",high
         # find all the bins of the initial histogram that are between low and high
@@ -1491,18 +1521,20 @@ def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False
         value=0.0
         error_squared=0.0
         if debug:
-            print "Start loop over bins of the initial histogram"
-        for j in xrange(1,h.GetNbinsX()+1):
+            print "Start loop over bins of the initial histogram, including its underflow and overflow"
+        for j in xrange(0,h.GetNbinsX()+2):
             current_low=h.GetBinLowEdge(j)
             current_width=h.GetBinWidth(j)
             current_high=current_low+current_width
-            #if debug:
-                #print "bin", i,"low","%.10f"%low,"high","%.10f"%high,"bin initial histogram",j,"current_low","%.10f"%current_low,"current_high","%.10f"%current_high,",current_high<=low",current_high<=low,",current_low>=high", current_low>=high,",OR",current_high<=low or current_low>=high
-                #print "bin", i,"current_high","%.10f"%current_high,"low","%.10f"%low,"current_high<=low",current_high<=low,"current_low","%.10f"%current_low,"high","%.10f"%high,"current_low>=high", current_low>=high,",OR",current_high<=low or current_low>=high
+            if False:
+                print "bin", i,"low","%.10f"%low,"high","%.10f"%high,"bin initial histogram",j,"current_low","%.10f"%current_low,"current_high","%.10f"%current_high,",current_high<=low",current_high<=low,",current_low>=high", current_low>=high,",OR",current_high<=low or current_low>=high
+                print "bin", i,"current_high","%.10f"%current_high,"low","%.10f"%low,"current_high<=low",current_high<=low,"current_low","%.10f"%current_low,"high","%.10f"%high,"current_low>=high", current_low>=high,",OR",current_high<=low or current_low>=high
             # skip the bins that not in our range
             epsilon=0.00001 # use epsilon I got errors before to with >= or <= since = comparison did not always work fine for non integers
-            if current_high<low+epsilon or current_low>high-epsilon:
-                continue                
+            if current_high<low+epsilon:
+                continue # add to the underflow bin of the new histogram
+            if current_low>high-epsilon:
+                continue # add to the overflow bin of the new histogram                
             current_value=h.GetBinContent(j)
             current_error=h.GetBinError(j)
             value+=current_value
@@ -1515,6 +1547,9 @@ def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False
         # we need the average value, so divide by the bin width
         error=math.sqrt(error_squared)
         if option=="average":
+            print "the option \"average\" is deprecated, now rebin with sum, then move overflows to edge bins, and then average out. Will ABORT!!! Once you average you can not move the overflows to the edge bins. If you really are sure you do not care about overflow values and you still want the average directly from the rebin, use option average2."
+            assert(False)
+        elif option=="average2":
             value/=width
             error/=width
         elif option=="sum":
@@ -1523,8 +1558,78 @@ def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False
         result.SetBinContent(i,value)
         result.SetBinError(i,error)
     # all done
-    getBinValues(result,doRescaleMeVtoGeV=False,significantDigits=2,debug=debug)
+    getBinValues(result,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
     return result
+# done function
+
+# teest the function from above
+def test_get_histo_generic_binRange(debug=True):
+    h=TH1F("h","h",6,0,6)
+    h.SetBinContent(0,2.0) # underflow
+    h.SetBinContent(1,3.0)
+    h.SetBinContent(2,4.0)
+    h.SetBinContent(3,2.0)
+    h.SetBinContent(4,1.0)
+    h.SetBinContent(5,5.0)
+    h.SetBinContent(6,8.0)
+    h.SetBinContent(7,10.0) # overflow
+    binRange="1,3,5"
+    plotHistogram(h,plot_option="HIST E",filePath=self.folderPlots,fileName="test",extensions="pdf")
+    getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+    h=get_histo_generic_binRange(h,binRange=binRange,option="sum",debug=debug)
+    getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+    plotHistogram(h,plot_option="HIST E",filePath=self.folderPlots,fileName="test2",extensions="pdf")
+# done function
+
+# 
+def get_histo_underflows_in_edge_bins(histo,debug=False):
+    h=histo.Clone()
+    # add underflow in first bin and set underflow to zero
+    list_tuple=[]
+    list_tuple.append((h.GetBinContent(0),h.GetBinError(0))) # underflow
+    list_tuple.append((h.GetBinContent(1),h.GetBinError(1))) # first bin
+    tupleResult=add_in_quadrature_error_list(list_tuple,debug=False)
+    h.SetBinContent(0,0.0)
+    h.SetBinError(0,0.0)
+    h.SetBinContent(1,tupleResult[0])
+    h.SetBinError(1,tupleResult[1])
+    # add overflow in last bin and set overflow to zero
+    list_tuple=[]
+    list_tuple.append((h.GetBinContent(h.GetNbinsX()),h.GetBinError(h.GetNbinsX())))
+    list_tuple.append((h.GetBinContent(h.GetNbinsX()+1),h.GetBinError(h.GetNbinsX()+1)))
+    tupleResult=add_in_quadrature_error_list(list_tuple,debug=False)
+    h.SetBinContent(h.GetNbinsX(),tupleResult[0])
+    h.SetBinError(h.GetNbinsX(),tupleResult[1])
+    h.SetBinContent(h.GetNbinsX()+1,0.0)
+    h.SetBinError(h.GetNbinsX()+1,0.0)
+    # done
+    getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+    return h
+# done function
+
+def get_histo_averaged_per_bin_width(histo,debug=False):
+    # only the regular bins, without the underflow and overflow
+    # as the width would be infinite
+    # we recommend first to move the underflow to the first bin
+    # and the overflow to the last bin
+    # and then average here
+    # and then plot (overlay) the histograms
+    h=histo.Clone()
+    for i in xrange(1,h.GetNbinsX()+1):
+        value=h.GetBinContent(i)
+        error=h.GetBinError(i)
+        width=h.GetBinWidth(i)
+        if debug:
+            print "Bin",i,"before value",value,"error",error,"width",width
+        value/=width
+        error/=width
+        if debug:
+            print "Bin",i,"after value",value,"error",error,"width",width
+        h.SetBinContent(i,value)
+        h.SetBinError(i,error)
+    # done loop over bins
+    getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+    return h
 # done function
 
 def get_histo_smoothed(h,debug):
@@ -1537,9 +1642,10 @@ def get_histo_smoothed(h,debug):
         error=add_in_quadrature_three(h.GetBinError(i-1),h.GetBinError(i),h.GetBinContent(i+1))
         result.SetBinContent(i,value)
         result.SetBinError(i,error)
+    # done loop over bins
+    getBinValues(result,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
     return result
 # done
-
 
 def get_histo_increased_stat_error_with_equivalent_of_systematic_error(h,extraErrorFraction=0.10,debug=False):
     # adding a flat fraction of error say 10% on top of the statistical error
