@@ -32,17 +32,45 @@ import itertools
 # get a string to be used to rebin a histogram
 # 0.0, 5.0, 0.1 - from 0.0 to 5.0 with a step of 0.1
 def get_binRange(initial,end,step,debug=False):
+    if debug:
+        print "Start get_binRange: initial",initial,"end",end,"step",step
     result=str(initial)
     i=initial
-    while i<end:
+    epsilon=0.0001
+    while i+step<=end+epsilon:
         i+=step
-        if i>end:
-            break
+        if abs(i)<0.0001:
+            i=0
         result+=","+str(i)
     if debug:
         print "binRange("+str(initial)+","+str(end)+","+str(step)+")="+result
     return result
 # done function
+
+def remove_duplicates_from_generic_binRange(binRange="150,200,400",debug=False):
+    # evaluate the desired binning
+    # when making the bin range from a sum of several other bin ranges
+    # one ends and the other starts with the same value
+    # in that case, skip one of them, as it gives incorrectly a bin of zero range
+    if debug:
+        print "input binRange",binRange
+    binRangeOutput=""
+    previousEdge=""
+    list_repeatedEdge=[]
+    for i,currentEdge in enumerate(binRange.split(",")):
+        if False:
+            print "previousEdge",previousEdge,"currentEdge",currentEdge
+        if currentEdge!=previousEdge:
+            if i!=0:
+                binRangeOutput+=","
+            binRangeOutput+=currentEdge
+        # done if
+        previousEdge=currentEdge
+    # done for loop over bin edges
+    if debug:
+        print "output binRange",binRangeOutput
+    return binRangeOutput
+# done
 
 #https://www.ics.uci.edu/~alspaugh/cls/shr/regularExpression.html
 def match_regularExpression_in_string(regex, text):
