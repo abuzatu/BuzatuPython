@@ -117,6 +117,8 @@ class Analysis:
         result=p.communicate()
         output=result[0]
         error=result[1]
+        if self.debug:
+            print "result",result
         # 
         set_processInitial=Set()
         for fileName in output.split():
@@ -396,9 +398,11 @@ class Analysis:
             print "Start set_dict_variable_info()"
         debug_binRange=False
 
-        
+        # mBB
         binRange_mBB=get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)
-
+        # mva EPS 2017 https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/SMVHbbPublication2017BkgModelling#BDT_Binning
+        self.binRange_mva2J="-1,-0.91,-0.77,-0.542,-0.268,-0.05,0.094,0.194,0.278,0.358,0.424,0.48,0.53,0.584,0.656,1.0"
+        self.binRange_mva3J="-1,-0.848,-0.676,-0.492,-0.3,-0.126,0.03,0.158,0.272,0.362,0.44,0.51,0.576,0.644,0.722,1.0"
 
         self.dict_variable_info={
             "EtaB1":[get_binRange(-2.5,2.5,0.2,debug_binRange)],
@@ -480,7 +484,8 @@ class Analysis:
             "ActualMuScaled":[get_binRange(0,100,1,debug_binRange)],
             "PileupReweight":[""],
             "RandomRunNumber":[""],
-            "mva":[get_binRange(-1,1,0.05,debug_binRange)],
+            # "mva":[get_binRange(-1,1,0.05,debug_binRange)],
+            "mva":[self.binRange_mva2J],
             "mvadiboson":[get_binRange(-1,1,0.05,debug_binRange)],
             "nTaus":[get_binRange(0,3,1,debug_binRange)],
             "pTB1":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
@@ -1488,6 +1493,14 @@ class Analysis:
             for category in self.list_category:
                 if self.debug:
                     print "category",category
+                if variable=="mva":
+                    if "2jet" in category:
+                        binRange=self.binRange_mva2J
+                    elif "3jet" in category:
+                        binRange=self.binRange_mva3J
+                    else:
+                        binRange=self.binRange_mva3J
+                # done if
                 list_tuple_h1D=[]
                 for i,processMerged in enumerate(list_processMerged):
                     if self.debug:
@@ -1506,7 +1519,7 @@ class Analysis:
                         if "mBB" in variable:
                             histo=get_histo_blinded(histo,binRange=[60,140],debug=False)
                         elif "mva" in variable:
-                            histo=get_histo_blinded(histo,binRange=[0.7,1.0],debug=False)
+                            histo=get_histo_blinded(histo,binRange=[0.5,1.0],debug=False)
                         else:
                             None
                         # done if
@@ -1595,8 +1608,6 @@ class Analysis:
         #if self.doFirst:
         #    return
 
-        #return
-
         #if True:
         #    self.create_histosRaw()
 
@@ -1658,7 +1669,7 @@ class Analysis:
             #self.set_list_category(["2tag3jet_150ptv_SR"]) 
             #self.set_list_category(["2tag5pjet_150ptv_SR"]) 
             #self.set_list_category(["0ptag3jet_150ptv_SR"]) 
-            #self.set_list_category(["0ptag0pjet_150ptv_SR"]) 
+            #self.set_list_category(["0ptag0pjet_150ptv_SR"])
             #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
             #self.set_list_variable(["pTB1"])
             #self.set_list_variable(["mBB"])
@@ -1692,7 +1703,7 @@ class Analysis:
             #if self.debug:
             if self.verbose:
                 self.print_lists()
-            doAll=True
+            doAll=False
             if doAll:
                 self.create_histosRaw(option="reduced")
             #return
@@ -1706,7 +1717,7 @@ class Analysis:
                 self.create_histosProcessMerged(doSF=True)
             #return
             self.set_list_processAnalysis()
-            if doAll:
+            if True:
                 if True:
                     #self.list_category=["2tag2jet_150ptv_SR"]
                     #self.list_processResult=self.list_processAnalysis
@@ -1727,9 +1738,9 @@ class Analysis:
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B"]
                     # for bJetCorr in "Nominal,OneMu20GeV,OneMu15GeV,OneMu12GeV,OneMu10GeV,OneMu7GeV,OneMu6GeV,OneMu5GeV,OneMu4GeV,PtReco".split(","):
                     # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
-                    for var in "mBB,mva".split(","):
+                    for var in "mBB,mva,MET".split(","):
                         self.list_processResult=self.list_processResult+["SigH_S_B@"+var]                 
-                    # self.create_yield_latex_table(doDocument=False)
+                    self.create_yield_latex_table(doDocument=True)
                     # self.create_overlaid_variable()
                 # done if
             # done if
