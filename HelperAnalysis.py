@@ -62,9 +62,6 @@ class Analysis:
     def add_category(self,category):
         self.list_category.append(category)
 
-    def set_list_processInitial(self,list_processInitial):
-        self.list_processInitial=list_processInitial
-
     def set_list_category(self,list_category):
         self.list_category=list_category
 
@@ -98,11 +95,21 @@ class Analysis:
         os.system(command)
     # done function
 
-    def evaluate_list_processInitial(self):
+    def evaluate_list_processInitial(self,option="ReaderBatch"):
         if self.debug:
             print "Start evaluate_list_processInitial()"
+        if option=="ReaderBatch":
+            inputFolder=self.folderInput
+        elif option=="processInitial":
+            inputFolder=self.folderProcessInitial
+        else:
+            print "Option",option,"not known. Will ABORTT!!"
+            assert(False)
+        # done if
+        if self.debug:
+            print "inputFolder",inputFolder
         p = subprocess.Popen(
-            ['ls', self.folderInput],
+            ['ls', inputFolder],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             stdin=subprocess.PIPE
@@ -118,9 +125,18 @@ class Analysis:
             if ".root" not in fileName:
                 print "skipping non *.root file fileName",fileName
                 continue
-            # e.g. hist-data17-3.root
-            list_fileNameElement=fileName.split("-")
-            processInitial=list_fileNameElement[1]
+            if option=="ReaderBatch":
+                # e.g. hist-data17-3.root
+                list_fileNameElement=fileName.split("-")
+                processInitial=list_fileNameElement[1]
+            elif option=="processInitial":
+                # e.g. data17.root
+                list_fileNameElement=fileName.split(".")
+                processInitial=list_fileNameElement[0]
+            else:
+                print "Option",option,"not known. Will ABORTT!!"
+                assert(False)
+            # done if
             if self.debug:
                 print "processInitial",processInitial
             set_processInitial.add(processInitial)
@@ -380,12 +396,13 @@ class Analysis:
             print "Start set_dict_variable_info()"
         debug_binRange=False
         self.dict_variable_info={
-            "EtaB1":[get_binRange(-2.5,2.5,0.1,debug_binRange),"EtaB1"],
-            "EtaB2":[get_binRange(-2.5,2.5,0.1,debug_binRange),"EtaB2"],
-            "EtaJ3":[get_binRange(-2.5,2.5,0.1,debug_binRange),"EtaJ3"],
+            "EtaB1":[get_binRange(-2.5,2.5,0.2,debug_binRange)],
+            "EtaB2":[get_binRange(-2.5,2.5,0.2,debug_binRange)],
+            "EtaJ3":[get_binRange(-4.5,-2.5,0.5,debug_binRange)+","+get_binRange(-2.5,2.5,0.2,debug_binRange)+","+get_binRange(2.5,4.5,0.5,debug_binRange)],
             "EtaFwdJets":[get_binRange(-4.5,4.5,0.1,debug_binRange)],
             "EtaSigJets":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
-            "MET":[get_binRange(140,400,10,debug_binRange)+","+get_binRange(400,700,100,debug_binRange)],
+            # "MET":[get_binRange(150,400,10,debug_binRange)+","+get_binRange(400,700,100,debug_binRange)],
+            "MET":[get_binRange(150,400,10,debug_binRange)],
             "MET_Track":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,100,debug_binRange)],
             "MEff":[get_binRange(280,500,10,debug_binRange)+","+get_binRange(500,1000,20,debug_binRange)],
             "MEff3":[get_binRange(280,500,10,debug_binRange)+","+get_binRange(500,1000,20,debug_binRange)],
@@ -583,6 +600,7 @@ class Analysis:
             "qqZllHcc",
             "ggZllHcc",
             "qqZincH4l",
+            "qqWincH4l",
             "ggH",
             "ggHbb",
             "bbH",
@@ -623,6 +641,7 @@ class Analysis:
             "ttt",
             "tttt",
             "data",
+            "dataB",
             "dijet",
             # "",
             ]
@@ -644,6 +663,7 @@ class Analysis:
             "ggZllHcc":[[["ggZllH125cc","ggZllHcc_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
             # other ZH
             "qqZincH4l":[[["qqZincH4l","ZincHJZZ4l_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "qqWincH4l":[[["qqWmincH4l","WincHJZZ4l_PwPy8MINLO"],["qqWpincH4l","WincHJZZ4l_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
             # non ZH signals
             "VBF":[[["VBFH125Inc","VBFHinc_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
             "ggHbb":[[["ggH125bb","ggHbb_PwPy8NNLOPS"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
@@ -678,7 +698,8 @@ class Analysis:
                     ["Wbb","WtaunuL_Sh221"],
                     ["Wbb","Wtaunu_Sh221"],
                     ],
-                {"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                #{"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
                 ],
             "Wbc":[
                 [
@@ -695,7 +716,8 @@ class Analysis:
                     ["Wbc","WtaunuL_Sh221"],
                     ["Wbc","Wtaunu_Sh221"],
                     ],
-                {"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                #{"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
                 ],
             "Wbl":[
                 [
@@ -712,7 +734,8 @@ class Analysis:
                     ["Wbl","WtaunuL_Sh221"],
                     ["Wbl","Wtaunu_Sh221"],
                     ],
-                {"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                #{"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
                 ],
             "Wcc":[
                 [
@@ -729,7 +752,8 @@ class Analysis:
                     ["Wcc","WtaunuL_Sh221"],
                     ["Wcc","Wtaunu_Sh221"],
                     ],
-                {"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                #{"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
+                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
                 ],
             "Wcl":[
                 [
@@ -784,7 +808,8 @@ class Analysis:
                     ["Zbb","ZtautauL_Sh221"],
                     ["Zbb","Ztautau_Sh221"],
                     ],
-                {"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                #{"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
                 ],
             "Zbc":[
                 [
@@ -805,7 +830,8 @@ class Analysis:
                     ["Zbc","ZtautauL_Sh221"],
                     ["Zbc","Ztautau_Sh221"],
                     ],
-                {"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                #{"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
                 ],
             "Zbl":[
                 [
@@ -826,7 +852,8 @@ class Analysis:
                     ["Zbl","ZtautauL_Sh221"],
                     ["Zbl","Ztautau_Sh221"],
                     ],
-                {"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                #{"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
                 ],
             "Zcc":[
                 [
@@ -847,7 +874,8 @@ class Analysis:
                     ["Zcc","ZtautauL_Sh221"],
                     ["Zcc","Ztautau_Sh221"],
                     ],
-                {"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                #{"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
+                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
                 ],
             "Zcl":[
                 [
@@ -891,8 +919,10 @@ class Analysis:
                     ],
                 {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
                 ],
-            "ttbar" :[[["ttbar","ttbar_nonallhad_PwPy8"]],{"2":0.97,"3":1.0,"4":1.0,"5p":1.0},],
-            "ttbarOld" :[[["ttbar","ttbar_nonallhad_PwPy8_old"]],{"2":0.97,"3":1.0,"4":1.0,"5p":1.0}],
+            #"ttbar" :[[["ttbar","ttbar_nonallhad_PwPy8"]],{"2":0.97,"3":1.0,"4":1.0,"5p":1.0},],
+            "ttbar" :[[["ttbar","ttbar_nonallhad_PwPy8"]],{"2":1.00,"3":1.0,"4":1.0,"5p":1.0},],
+            #"ttbarOld" :[[["ttbar","ttbar_nonallhad_PwPy8_old"]],{"2":0.97,"3":1.0,"4":1.0,"5p":1.0}],
+            "ttbarOld" :[[["ttbar","ttbar_nonallhad_PwPy8_old"]],{"2":1.00,"3":1.0,"4":1.0,"5p":1.0}],
             "ttbarDilep" :[[["ttbar","ttbar_dil_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
             "ttbarDilepOld" :[[["ttbarDilep","ttbar_dil_PwPy8_old"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
             "ttbarSpin" :[[["ttbarSpin","ttbar_PwPy8_MadSpin"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
@@ -913,8 +943,16 @@ class Analysis:
                     ],
                 {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
                 ],
+            "dataB"  :[
+                [
+                    ["data","data15B"],
+                    ["data","data16B"],
+                    ["data","data17"],
+                    ],
+                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                ],
             }
-    # done function
+        # Done
 
     def set_list_processMerged(self):
         if self.debug:
@@ -933,6 +971,7 @@ class Analysis:
             "S",
             "B",
             "D",
+            "D2",
             "B+S",
             ]
 
@@ -949,6 +988,7 @@ class Analysis:
             "B"        :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
             "B+S"      :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH","qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb"]],
             "D"        :[["data"]],
+            "D2"        :[["dataB"]],
             }
 
     def set_fileNameHistosProcessMerged(self):
@@ -1096,6 +1136,7 @@ class Analysis:
             "S",
             "B",
             "data",
+            "dataB",
             ]
     # done function
 
@@ -1401,7 +1442,9 @@ class Analysis:
         if self.debug or self.verbose:
             print "Start create_overlaid_plots()"
         inputFileName=self.fileNameHistosProcessMerged
-        self.list_color=[8,4,2,1]
+        self.list_color=[8,4,2,1,7]
+        min_value_ratio=0.5
+        max_value_ratio=1.5
         for variable in self.list_variable:
             if self.debug:
                 print "variable",variable
@@ -1410,7 +1453,9 @@ class Analysis:
                 list_processMerged="B,S,B+S".split(",")
             else:
                 # not blinded, include data
-                list_processMerged="B,S,B+S,D".split(",")
+                # list_processMerged="B,S,B+S,D,D2".split(",")
+                list_processMerged="B,D".split(",")
+                # list_processMerged="D,D2".split(",")
             # done if
             info=self.dict_variable_info[variable]
             binRange=info[0]
@@ -1428,14 +1473,21 @@ class Analysis:
                     if processMerged=="S":
                         histo.Scale(signalScale)
                         legend+=" x "+str(signalScale)
-                    histo=get_histo_generic_binRange(histo,binRange=binRange,option="average",debug=False)
+                    # done if
+                    debug=False
+                    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
+                    histo=get_histo_underflows_in_edge_bins(histo,debug=debug)
+                    histo=get_histo_averaged_per_bin_width(histo,debug=debug)
+                    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    # 
                     histo.SetLineColor(self.list_color[i])
                     histo.SetXTitle(variable)
                     histo.SetYTitle("Event density per bin width")
                     list_tuple_h1D.append((histo,legend))
                 # done loop over process
                 outputFileName=self.folderPlots+"/overlay_BDS_"+variable+"_"+category
-                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0.5,max_value_ratio=1.5,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to bkg",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False)
+                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=0,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=min_value_ratio,max_value_ratio=max_value_ratio,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to bkg",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False)
             # done loop over category
         # done loop over variable
     # done function
@@ -1469,14 +1521,15 @@ class Analysis:
             print "Start do_all()"
         self.create_folderProcessInitial()
         if self.do_evaluate_list_processInitial:
-            self.evaluate_list_processInitial()
+            self.evaluate_list_processInitial(option="ReaderBatch")
         self.set_evaluated_list_processInitial()
         if self.do_hadd_processInitial:
             self.hadd_each_processInitial()
-
         self.create_folderFitInput()
         #dict_vtag_analysis[vtag].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
-
+        # re-evaluate from the folder output if you put by hand new folders, like data16B
+        if self.do_evaluate_list_processInitial:
+            self.evaluate_list_processInitial(option="processInitial")
         if self.do_evaluate_content_of_all_processInitial:
             self.evaluate_content_of_all_processInitial()
         self.set_evaluated_list_process()
@@ -1499,7 +1552,7 @@ class Analysis:
         if self.doFirst:
             return
 
-        # return
+        #return
 
         #if True:
         #    self.create_histosRaw()
@@ -1541,7 +1594,8 @@ class Analysis:
             if self.debug:
                 print "list_process",self.list_process
             for process in self.list_process:
-                if process=="W" or process=="Z" or "MadZee" in process or "MadZmumu" in process or process=="ggWW":
+                #if process=="W" or process=="Z" or "MadZee" in process or "MadZmumu" in process or process=="ggWW":
+                if process=="W" or process=="Z" or "MadZee" in process or "MadZmumu" in process:
                     print "WARNING!!! finding process",process,"will skip them!"
                     continue
                 list_process.append(process)
@@ -1552,6 +1606,7 @@ class Analysis:
             # reduce category
             if "MVA" in self.vtag:
                 self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+                # self.set_list_category(["2tag2jet_150ptv_SR"]) 
             elif "SM" in self.vtag:
                 self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
                 #self.set_list_category(["2tag2jet_150_200ptv_SR"])
@@ -1567,7 +1622,8 @@ class Analysis:
             #self.set_list_variable(["mBB"])
             #self.set_list_variable(["mBB","mva"])
             #self.set_list_variable(["mBB","mva","MET","SumPtJet","EtaB2"])
-            #self.set_list_variable(["pTB2"])
+            #self.set_list_variable(["EtaB1","EtaB2","EtaJ3","dEtaBB","costheta","AverageMuScaled","nTaus","MET","SumPtJet","pTB1","pTB2","pTJ3"])
+            #self.set_list_variable(["EtaB2"])
             #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
             #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
             #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco","SumPtJet"]
@@ -1602,13 +1658,13 @@ class Analysis:
                 self.create_histosProcessMerged()
             #return
             self.set_list_processAnalysis()
-            if True:
-                if False:
+            if doAll:
+                if True:
                     #self.list_category=["2tag2jet_150ptv_SR"]
                     #self.list_processResult=self.list_processAnalysis
                     # self.list_processResult=["VHbb","VHcc","VBF","ttH","ggH","bbH","qqZincH4l","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
                     # self.list_processResult=["S","B","S/B","SigY_S_B","SigH_S_B"]
-                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
+                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
                     self.create_results()
                 if True:
@@ -1616,9 +1672,10 @@ class Analysis:
                     self.read_results()
                     #self.list_category=["2tag2jet_150ptv_SR"]
                     #self.list_variable=["mBB"]
-                    self.list_variable=["mBB","mva"]
+                    #self.list_variable=["mBB","mva"]
+                    #self.list_variable=["mBB","mva"]
                     #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
-                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
+                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B"]
                     # for bJetCorr in "Nominal,OneMu20GeV,OneMu15GeV,OneMu12GeV,OneMu10GeV,OneMu7GeV,OneMu6GeV,OneMu5GeV,OneMu4GeV,PtReco".split(","):
                     # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
@@ -1628,7 +1685,7 @@ class Analysis:
                     # self.create_overlaid_variable()
                 # done if
             # done if
-            if False:
+            if True:
                 # do overlay plots of D,B,B+S,S (S is times some value)
                 #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3"]) # don't look yet, as not blinded
                 #self.set_list_variable(["MET"])
