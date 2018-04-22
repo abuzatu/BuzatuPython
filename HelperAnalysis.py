@@ -395,10 +395,18 @@ class Analysis:
         if self.debug:
             print "Start set_dict_variable_info()"
         debug_binRange=False
+
+        
+        binRange_mBB=get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)
+
+
         self.dict_variable_info={
             "EtaB1":[get_binRange(-2.5,2.5,0.2,debug_binRange)],
             "EtaB2":[get_binRange(-2.5,2.5,0.2,debug_binRange)],
             "EtaJ3":[get_binRange(-4.5,-2.5,0.5,debug_binRange)+","+get_binRange(-2.5,2.5,0.2,debug_binRange)+","+get_binRange(2.5,4.5,0.5,debug_binRange)],
+            "PhiB1":[""],
+            "PhiB2":[""],
+            "PhiJ3":[""],
             "EtaFwdJets":[get_binRange(-4.5,4.5,0.1,debug_binRange)],
             "EtaSigJets":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
             # "MET":[get_binRange(150,400,10,debug_binRange)+","+get_binRange(400,700,100,debug_binRange)],
@@ -429,38 +437,52 @@ class Analysis:
             "NFwdJets":[get_binRange(2,10,1,debug_binRange)],
             "NSigJets":[get_binRange(2,10,1,debug_binRange)],
             "SumPtJet":[get_binRange(120,400,10,debug_binRange)+","+get_binRange(400,600,20,debug_binRange)],
-            "costheta":[get_binRange(0,1,0.02,debug_binRange)],
+            "costheta":[get_binRange(0,1,0.05,debug_binRange)],
             "dEtaBB":[get_binRange(0,1.5,0.1,debug_binRange)+","+get_binRange(1.5,2.5,0.2,debug_binRange)+","+get_binRange(2.5,4.5,1,debug_binRange)],
-            "dPhiBB":[get_binRange(0,3.2-20*0.032,0.032*2,debug_binRange)],
+            "dPhiBB":[get_binRange(0,3.2-20*0.032,0.032*4,debug_binRange)],
             "dPhiMETMPT":[get_binRange(0,3.15-0.0315*48,0.0315,debug_binRange)],
             "dPhiVBB":[get_binRange(3.2-10*0.032,3.2,0.032,debug_binRange)],
             "dRB1J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "dRB2J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
-            "dRBB":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
-            "mBB":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBNominal":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBOneMu":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBOneMu4GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBOneMu5GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBOneMu6GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBOneMu7GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBOneMu10GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBOneMu12GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBOneMu15GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBOneMu20GeV":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
-            "mBBPtReco":[get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)],
+            "dRBB":[get_binRange(0.4,1.0,0.1,debug_binRange)+","+get_binRange(1.0,5,0.2,debug_binRange)],
+            "mBB":[binRange_mBB],
+            "mBBNominal":[binRange_mBB],
+            "mBBOneMu":[binRange_mBB],
+            "mBBOneMu4GeV":[binRange_mBB],
+            "mBBOneMu5GeV":[binRange_mBB],
+            "mBBOneMu6GeV":[binRange_mBB],
+            "mBBOneMu7GeV":[binRange_mBB],
+            "mBBOneMu10GeV":[binRange_mBB],
+            "mBBOneMu12GeV":[binRange_mBB],
+            "mBBOneMu15GeV":[binRange_mBB],
+            "mBBOneMu20GeV":[binRange_mBB],
+            "mBBAllMu":[binRange_mBB],
+            "mBBOneMu2":[binRange_mBB],
+            "mBBAllMu2":[binRange_mBB],
+            "mBBAllMu2MuR":[binRange_mBB],
+            "mBBAllMu2MuRElR":[binRange_mBB],
+            "mBBPtReco":[binRange_mBB],
+            "nrMuonInJetB1":[get_binRange(0,3,1,debug_binRange)],  
+            "nrMuonInJetB2":[get_binRange(0,3,1,debug_binRange)],  
+            "nrMuonInJetJ3":[get_binRange(0,3,1,debug_binRange)],  
+            #"ptMuonInJetB1":["0,2,4,5,6,7,10,12,15,20,30,50,100"],  
+            #"ptMuonInJetB2":["0,2,4,5,6,7,10,12,15,20,30,50,100"],  
+            #"ptMuonInJetJ3":["0,2,4,5,6,7,10,12,15,20,30,50,100"],  
+            "ptMuonInJetB1":["2,5,7,10,12,15,20,30,50,100"],  
+            "ptMuonInJetB2":["2,5,7,10,12,15,20,30,50,100"],  
+            "ptMuonInJetJ3":["2,5,7,10,12,15,20,30,50,100"],  
             "mBBJ":[get_binRange(40,80,20,debug_binRange)+","+get_binRange(80,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)+","+get_binRange(500,700,50,debug_binRange)+","+get_binRange(700,1000,100,debug_binRange)],
             "maxdRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "mindRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
-            "AverageMu":[get_binRange(0,100,1,debug_binRange)],
-            "AverageMuScaled":[get_binRange(0,100,1,debug_binRange)],
+            "AverageMu":[get_binRange(0,100,2,debug_binRange)],
+            "AverageMuScaled":[get_binRange(6,44,2,debug_binRange)],
             "ActualMu":[get_binRange(0,100,1,debug_binRange)],
             "ActualMuScaled":[get_binRange(0,100,1,debug_binRange)],
             "PileupReweight":[""],
             "RandomRunNumber":[""],
             "mva":[get_binRange(-1,1,0.05,debug_binRange)],
             "mvadiboson":[get_binRange(-1,1,0.05,debug_binRange)],
-            "nTaus":[""],
+            "nTaus":[get_binRange(0,3,1,debug_binRange)],
             "pTB1":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
             "pTB2":[get_binRange(0,140,10,debug_binRange)+","+get_binRange(140,200,20,debug_binRange)],
             "PtFwdJets":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
@@ -479,7 +501,7 @@ class Analysis:
             "METVarL_soft":[""],
             "METVarT":[""],
             "pTJ3":[get_binRange(0,120,10,debug_binRange)+","+get_binRange(120,200,40,debug_binRange)],
-            "yBB":[get_binRange(0,2.5,0.05,debug_binRange)],
+            "yBB":[get_binRange(0,2.5,0.1,debug_binRange)],
             }
     # done function
 
@@ -646,42 +668,48 @@ class Analysis:
             # "",
             ]
         
+        dict_one_SF={"2":1.00,"3":1.00,"4":1.0,"5p":1.0}
+        # EPS 2017 with systematics fit
+        dict_Whf_SF={"2":1.27,"3":1.27,"4":1.0,"5p":1.0}
+        dict_Zhf_SF={"2":1.42,"3":1.31,"4":1.0,"5p":1.0}
+        dict_ttbar_SF={"2":0.97,"3":1.00,"4":1.0,"5p":1.0}
+
         self.dict_process_info={
             # example
             # "processMine":[[["process","processInitial"],["process2","processInitial2"]],{"2":SF2jet,"3":SF3jet,"4":SF4jet,"5p":SF5pjet}],
             # VHbb
-            "qqZvvHbb":[[["qqZvvH125","qqZvvHbbJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "qqWlvHbb":[[["qqWlvH125","qqWlvHbbJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ggZvvHbb":[[["ggZvvH125","ggZvvHbb_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "qqZllHbb":[[["qqZllH125","qqZllHbbJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ggZllHbb":[[["ggZllH125","ggZllHbb_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "qqZvvHbb":[[["qqZvvH125","qqZvvHbbJ_PwPy8MINLO"]],dict_one_SF,],
+            "qqWlvHbb":[[["qqWlvH125","qqWlvHbbJ_PwPy8MINLO"]],dict_one_SF,],
+            "ggZvvHbb":[[["ggZvvH125","ggZvvHbb_PwPy8"]],dict_one_SF,],
+            "qqZllHbb":[[["qqZllH125","qqZllHbbJ_PwPy8MINLO"]],dict_one_SF,],
+            "ggZllHbb":[[["ggZllH125","ggZllHbb_PwPy8"]],dict_one_SF,],
             # VHcc
-            "qqZvvHcc":[[["qqZvvH125cc","qqZvvHccJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "qqWlvHcc":[[["qqWlvH125cc","qqWlvHccJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ggZvvHcc":[[["ggZvvH125cc","ggZvvHcc_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "qqZllHcc":[[["qqZllH125cc","qqZllHccJ_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ggZllHcc":[[["ggZllH125cc","ggZllHcc_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "qqZvvHcc":[[["qqZvvH125cc","qqZvvHccJ_PwPy8MINLO"]],dict_one_SF,],
+            "qqWlvHcc":[[["qqWlvH125cc","qqWlvHccJ_PwPy8MINLO"]],dict_one_SF,],
+            "ggZvvHcc":[[["ggZvvH125cc","ggZvvHcc_PwPy8"]],dict_one_SF,],
+            "qqZllHcc":[[["qqZllH125cc","qqZllHccJ_PwPy8MINLO"]],dict_one_SF,],
+            "ggZllHcc":[[["ggZllH125cc","ggZllHcc_PwPy8"]],dict_one_SF,],
             # other ZH
-            "qqZincH4l":[[["qqZincH4l","ZincHJZZ4l_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "qqWincH4l":[[["qqWmincH4l","WincHJZZ4l_PwPy8MINLO"],["qqWpincH4l","WincHJZZ4l_PwPy8MINLO"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "qqZincH4l":[[["qqZincH4l","ZincHJZZ4l_PwPy8MINLO"]],dict_one_SF,],
+            "qqWincH4l":[[["qqWmincH4l","WincHJZZ4l_PwPy8MINLO"],["qqWpincH4l","WincHJZZ4l_PwPy8MINLO"]],dict_one_SF,],
             # non ZH signals
-            "VBF":[[["VBFH125Inc","VBFHinc_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ggHbb":[[["ggH125bb","ggHbb_PwPy8NNLOPS"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ggH":[[["ggH125Inc","ggHinc_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "bbH":[[["bbH125","bbHinc_aMCatNLOPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ttH":[[["ttH","ttHinc_aMCatNLOPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "VBF":[[["VBFH125Inc","VBFHinc_PwPy8"]],dict_one_SF,],
+            "ggHbb":[[["ggH125bb","ggHbb_PwPy8NNLOPS"]],dict_one_SF,],
+            "ggH":[[["ggH125Inc","ggHinc_PwPy8"]],dict_one_SF,],
+            "bbH":[[["bbH125","bbHinc_aMCatNLOPy8"]],dict_one_SF,],
+            "ttH":[[["ttH","ttHinc_aMCatNLOPy8"]],dict_one_SF,],
             # dijet
-            "dijet":[[["dijetJZW","MJ_Py8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "dijet":[[["dijetJZW","MJ_Py8"]],dict_one_SF,],
             # dibosons
-            "WW":[[["WW","WW_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "WZ":[[["WZ","WZ_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ZZ":[[["ZZ","ZZ_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ggZZ":[[["ggZZ","ggZZ_Sh222"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ggWW":[[["ggWW","ggWW_Sh222"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ZllZbb":[[["ZllZbb","ZZ_bb_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ZvvZbb":[[["ZvvZbb","ZZ_bb_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "WlvZbb":[[["WlvZbb","WZ_bb_Sh221"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
-            "ZllZvv":[[["llvv","VV_fulllep_Sh222"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0},],
+            "WW":[[["WW","WW_Sh221"]],dict_one_SF,],
+            "WZ":[[["WZ","WZ_Sh221"]],dict_one_SF,],
+            "ZZ":[[["ZZ","ZZ_Sh221"]],dict_one_SF,],
+            "ggZZ":[[["ggZZ","ggZZ_Sh222"]],dict_one_SF,],
+            "ggWW":[[["ggWW","ggWW_Sh222"]],dict_one_SF,],
+            "ZllZbb":[[["ZllZbb","ZZ_bb_Sh221"]],dict_one_SF,],
+            "ZvvZbb":[[["ZvvZbb","ZZ_bb_Sh221"]],dict_one_SF,],
+            "WlvZbb":[[["WlvZbb","WZ_bb_Sh221"]],dict_one_SF,],
+            "ZllZvv":[[["llvv","VV_fulllep_Sh222"]],dict_one_SF,],
             # W+jets
             "Wbb":[
                 [
@@ -698,8 +726,7 @@ class Analysis:
                     ["Wbb","WtaunuL_Sh221"],
                     ["Wbb","Wtaunu_Sh221"],
                     ],
-                #{"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
-                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
+                dict_Whf_SF,
                 ],
             "Wbc":[
                 [
@@ -716,8 +743,7 @@ class Analysis:
                     ["Wbc","WtaunuL_Sh221"],
                     ["Wbc","Wtaunu_Sh221"],
                     ],
-                #{"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
-                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
+                dict_Whf_SF,
                 ],
             "Wbl":[
                 [
@@ -734,8 +760,7 @@ class Analysis:
                     ["Wbl","WtaunuL_Sh221"],
                     ["Wbl","Wtaunu_Sh221"],
                     ],
-                #{"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
-                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
+                dict_Whf_SF,
                 ],
             "Wcc":[
                 [
@@ -752,8 +777,7 @@ class Analysis:
                     ["Wcc","WtaunuL_Sh221"],
                     ["Wcc","Wtaunu_Sh221"],
                     ],
-                #{"2":1.27,"3":1.27,"4":1.0,"5p":1.0},
-                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
+                dict_Whf_SF,
                 ],
             "Wcl":[
                 [
@@ -770,7 +794,7 @@ class Analysis:
                     ["Wcl","WtaunuL_Sh221"],
                     ["Wcl","Wtaunu_Sh221"],
                     ],
-                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                dict_one_SF,
                 ],
             "Wl": [
                 [
@@ -787,7 +811,7 @@ class Analysis:
                     ["Wl" ,"WtaunuL_Sh221"],
                     ["Wl" ,"Wtaunu_Sh221"],
                     ],
-                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                dict_one_SF,
                 ],
             "Zbb":[
                 [
@@ -808,8 +832,7 @@ class Analysis:
                     ["Zbb","ZtautauL_Sh221"],
                     ["Zbb","Ztautau_Sh221"],
                     ],
-                #{"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
-                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
+                dict_Zhf_SF
                 ],
             "Zbc":[
                 [
@@ -830,8 +853,7 @@ class Analysis:
                     ["Zbc","ZtautauL_Sh221"],
                     ["Zbc","Ztautau_Sh221"],
                     ],
-                #{"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
-                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
+                dict_Zhf_SF,
                 ],
             "Zbl":[
                 [
@@ -852,8 +874,7 @@ class Analysis:
                     ["Zbl","ZtautauL_Sh221"],
                     ["Zbl","Ztautau_Sh221"],
                     ],
-                #{"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
-                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
+                dict_Zhf_SF,
                 ],
             "Zcc":[
                 [
@@ -874,8 +895,7 @@ class Analysis:
                     ["Zcc","ZtautauL_Sh221"],
                     ["Zcc","Ztautau_Sh221"],
                     ],
-                #{"2":1.42,"3":1.31,"4":1.0,"5p":1.0},
-                {"2":1.00,"3":1.00,"4":1.0,"5p":1.0},
+                dict_Zhf_SF,
                 ],
             "Zcl":[
                 [
@@ -896,7 +916,7 @@ class Analysis:
                     ["Zcl","ZtautauL_Sh221"],
                     ["Zcl","Ztautau_Sh221"],
                     ],
-                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                dict_one_SF,
                 ],
             "Zl" :[
                 [
@@ -917,31 +937,29 @@ class Analysis:
                     ["Zl" ,"ZtautauL_Sh221"],
                     ["Zl" ,"Ztautau_Sh221"],
                     ],
-                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                dict_one_SF,
                 ],
-            #"ttbar" :[[["ttbar","ttbar_nonallhad_PwPy8"]],{"2":0.97,"3":1.0,"4":1.0,"5p":1.0},],
-            "ttbar" :[[["ttbar","ttbar_nonallhad_PwPy8"]],{"2":1.00,"3":1.0,"4":1.0,"5p":1.0},],
-            #"ttbarOld" :[[["ttbar","ttbar_nonallhad_PwPy8_old"]],{"2":0.97,"3":1.0,"4":1.0,"5p":1.0}],
-            "ttbarOld" :[[["ttbar","ttbar_nonallhad_PwPy8_old"]],{"2":1.00,"3":1.0,"4":1.0,"5p":1.0}],
-            "ttbarDilep" :[[["ttbar","ttbar_dil_PwPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "ttbarDilepOld" :[[["ttbarDilep","ttbar_dil_PwPy8_old"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "ttbarSpin" :[[["ttbarSpin","ttbar_PwPy8_MadSpin"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "stops" :[[["stops","stops_PwPy"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "stopt" :[[["stopt","stopt_PwPy"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "stopWt":[[["stopWt","stopWt_PwPy"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "stopWtMETFilt":[[["stopWt","stopWt_PwPy_METfilt"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "stoptZq":[[["tZq","stoptZ_MGPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "ttV"   :[[["ttV","ttV_aMCatNLOPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "ttVV"  :[[["ttbarWW","ttVV_MGPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "ttt"   :[[["ttt","ttt_MGPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
-            "tttt"  :[[["4topSM","tttt_MGPy8"]],{"2":1.0,"3":1.0,"4":1.0,"5p":1.0}],
+            "ttbar" :[[["ttbar","ttbar_nonallhad_PwPy8"]],dict_ttbar_SF,],
+            "ttbarOld" :[[["ttbar","ttbar_nonallhad_PwPy8_old"]],dict_one_SF],
+            "ttbarDilep" :[[["ttbar","ttbar_dil_PwPy8"]],dict_one_SF],
+            "ttbarDilepOld" :[[["ttbarDilep","ttbar_dil_PwPy8_old"]],dict_one_SF],
+            "ttbarSpin" :[[["ttbarSpin","ttbar_PwPy8_MadSpin"]],dict_one_SF],
+            "stops" :[[["stops","stops_PwPy"]],dict_one_SF],
+            "stopt" :[[["stopt","stopt_PwPy"]],dict_one_SF],
+            "stopWt":[[["stopWt","stopWt_PwPy"]],dict_one_SF],
+            "stopWtMETFilt":[[["stopWt","stopWt_PwPy_METfilt"]],dict_one_SF],
+            "stoptZq":[[["tZq","stoptZ_MGPy8"]],dict_one_SF],
+            "ttV"   :[[["ttV","ttV_aMCatNLOPy8"]],dict_one_SF],
+            "ttVV"  :[[["ttbarWW","ttVV_MGPy8"]],dict_one_SF],
+            "ttt"   :[[["ttt","ttt_MGPy8"]],dict_one_SF],
+            "tttt"  :[[["4topSM","tttt_MGPy8"]],dict_one_SF],
             "data"  :[
                 [
                     ["data","data15"],
                     ["data","data16"],
                     ["data","data17"],
                     ],
-                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                dict_one_SF,
                 ],
             "dataB"  :[
                 [
@@ -949,7 +967,7 @@ class Analysis:
                     ["data","data16B"],
                     ["data","data17"],
                     ],
-                {"2":1.0,"3":1.0,"4":1.0,"5p":1.0},
+                dict_one_SF,
                 ],
             }
         # Done
@@ -995,7 +1013,7 @@ class Analysis:
         self.fileNameHistosProcessMerged=self.folderHistos+"/histosProcessMerged.root"
     # done function
 
-    def create_histosProcessMerged(self):
+    def create_histosProcessMerged(self,doSF=True):
         if self.debug or self.verbose:
             print "Start create_histosProcessMerged()"
         # now we want to sum over process for a given processMerged
@@ -1030,7 +1048,13 @@ class Analysis:
                         histoNameProcess      =self.get_histoNameProcess(variable,category,process)
                         histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
                         histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcess,name=histoNameProcessMerged,returnDummyIfNotFound=False,debug=self.debug)
-                        SF=self.dict_process_info[process][1][cat]
+                        if doSF:
+                            if self.debug:
+                                print "process",self.dict_process_info[process][1]
+                                print "cat",cat
+                            SF=self.dict_process_info[process][1][cat]
+                        else:
+                            SF=1.0
                         if self.debug:
                             print "SF",SF,"type(SF)",type(SF)
                         histo.Scale(SF)
@@ -1450,7 +1474,8 @@ class Analysis:
                 print "variable",variable
             if "mBB" in variable or "mva" in variable: 
                 # blinded, do not show data at all
-                list_processMerged="B,S,B+S".split(",")
+                # list_processMerged="B,S,B+S".split(",")
+                list_processMerged="B,D".split(",")
             else:
                 # not blinded, include data
                 # list_processMerged="B,S,B+S,D,D2".split(",")
@@ -1469,25 +1494,35 @@ class Analysis:
                     histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
                     histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
                     legend=processMerged
+                    # scale the signal
                     signalScale=50
                     if processMerged=="S":
                         histo.Scale(signalScale)
                         legend+=" x "+str(signalScale)
                     # done if
+                    # blind the data
+                    if processMerged=="D" or processMerged=="D2":
+
+                        histo=get_histo_blinded(histo,binRange=[60,140],debug=False)
+                    # done if
+                    # rebin, collect overflows, do average
                     debug=False
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
-                    histo=get_histo_underflows_in_edge_bins(histo,debug=debug)
+                    if "ptMuonInJet" in variable:
+                        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
+                    else:
+                        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
                     histo=get_histo_averaged_per_bin_width(histo,debug=debug)
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
-                    # 
+                    # prepare histograms
                     histo.SetLineColor(self.list_color[i])
                     histo.SetXTitle(variable)
                     histo.SetYTitle("Event density per bin width")
                     list_tuple_h1D.append((histo,legend))
                 # done loop over process
                 outputFileName=self.folderPlots+"/overlay_BDS_"+variable+"_"+category
-                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=0,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=min_value_ratio,max_value_ratio=max_value_ratio,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to bkg",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False)
+                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf,png",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=0,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=min_value_ratio,max_value_ratio=max_value_ratio,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to bkg",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False)
             # done loop over category
         # done loop over variable
     # done function
@@ -1606,7 +1641,7 @@ class Analysis:
             # reduce category
             if "MVA" in self.vtag:
                 self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
-                # self.set_list_category(["2tag2jet_150ptv_SR"]) 
+                self.set_list_category(["2tag2jet_150ptv_SR"]) 
             elif "SM" in self.vtag:
                 self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
                 #self.set_list_category(["2tag2jet_150_200ptv_SR"])
@@ -1631,11 +1666,16 @@ class Analysis:
             #self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
             #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             if True:
-                # all variables except those stored only for 0ptag2pjets
+                # only included at the pretag inclusive: on 0ptag2pjet or so
+                string_variable_ignore="EtaFwdJets,EtaSigJets,PtFwdJets,PtSigJets,NFwdJets,NSigJets,MV2c10_B,MV2c10_C,MV2c10_Data,MV2c10_L,btag_weight_B,btag_weight_C,btag_weight_Data,btag_weight_L,eff_B,eff_C,eff_L,njets"
+                string_variable_ignore+=",METSig_hard,RandomRunNumber,PileupReweight,PhiJ3,NTags,NJets,METVarT,METVarL_soft,METVarL_hard,METVarL,METSig_soft,METSig,METRho,METDirectional,METOverSqrtHT,METOverSqrtSumET,AverageMu,ActualMu,ActualMuScaled"
+                list_variable_ignore=string_variable_ignore.split(",")
                 list_variable=[]
                 for variable in self.list_variable:
-                    if "FwdJets" in variable or "SigJets" in variable or variable=="MV2c10_B" or variable=="MV2c10_C" or variable=="MV2c10_Data" or variable=="MV2c10_L" or variable=="btag_weight_B" or variable=="btag_weight_C" or variable=="btag_weight_Data" or variable=="btag_weight_L" or variable=="eff_B" or variable=="eff_C" or variable=="eff_L" or variable=="njets":
+                    if variable in list_variable_ignore:
                         continue
+                    #if "mBB" in variable: # temp
+                    #    continue
                     list_variable.append(variable)
                 # done for loop
                 self.set_list_variable(list_variable)
@@ -1655,7 +1695,7 @@ class Analysis:
             #return
             self.set_list_processMerged()
             if doAll:
-                self.create_histosProcessMerged()
+                self.create_histosProcessMerged(doSF=True)
             #return
             self.set_list_processAnalysis()
             if doAll:

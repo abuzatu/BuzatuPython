@@ -1455,14 +1455,21 @@ def remove_duplicates_from_generic_binRange(binRange="150,200,400",debug=False):
 # https://root.cern.ch/doc/master/classTH1.html#aff6520fdae026334bf34fa1800946790
 # so can get rid of this
 # the option "average" is deprecated, now rebin with sum, then move overflows to edge bins, and then average out
-def get_histo_generic_binRange(h,binRange="150,200,400",option="sum",debug=False):
+def get_histo_generic_binRange(histo,binRange="150,200,400",option="sum",debug=False):
     if option!="sum" and option!="average2":
         print "option",option,"not known. Choose sum, average2. Will ABORT!!!"
         assert(False)
+    h=histo.Clone()
     if binRange=="":
         # then do nothing, return as it was
         # it makes easier to use the same generic function and for some histograms to not actually rebin
         return h
+    elif binRange[0:5]=="Rebin":
+        rebin=binRange.remove("Rebin")
+        return h.Rebin(rebin)
+    else:
+        None
+        # do the actual generic (usually asymmetric) bins below
     # actually start
     if debug:
         print "before removing duplicates:"
@@ -1582,27 +1589,29 @@ def test_get_histo_generic_binRange(debug=True):
 # done function
 
 # 
-def get_histo_underflows_in_edge_bins(histo,debug=False):
+def get_histo_underflows_in_edge_bins(histo,addUnderflow=True,addOverflow=True,debug=False):
     h=histo.Clone()
-    # add underflow in first bin and set underflow to zero
-    list_tuple=[]
-    list_tuple.append((h.GetBinContent(0),h.GetBinError(0))) # underflow
-    list_tuple.append((h.GetBinContent(1),h.GetBinError(1))) # first bin
-    tupleResult=add_in_quadrature_error_list(list_tuple,debug=False)
-    h.SetBinContent(0,0.0)
-    h.SetBinError(0,0.0)
-    h.SetBinContent(1,tupleResult[0])
-    h.SetBinError(1,tupleResult[1])
-    # add overflow in last bin and set overflow to zero
-    list_tuple=[]
-    list_tuple.append((h.GetBinContent(h.GetNbinsX()),h.GetBinError(h.GetNbinsX())))
-    list_tuple.append((h.GetBinContent(h.GetNbinsX()+1),h.GetBinError(h.GetNbinsX()+1)))
-    tupleResult=add_in_quadrature_error_list(list_tuple,debug=False)
-    h.SetBinContent(h.GetNbinsX(),tupleResult[0])
-    h.SetBinError(h.GetNbinsX(),tupleResult[1])
-    h.SetBinContent(h.GetNbinsX()+1,0.0)
-    h.SetBinError(h.GetNbinsX()+1,0.0)
-    # done
+    if addUnderflow:
+        # add underflow in first bin and set underflow to zero
+        list_tuple=[]
+        list_tuple.append((h.GetBinContent(0),h.GetBinError(0))) # underflow
+        list_tuple.append((h.GetBinContent(1),h.GetBinError(1))) # first bin
+        tupleResult=add_in_quadrature_error_list(list_tuple,debug=False)
+        h.SetBinContent(0,0.0)
+        h.SetBinError(0,0.0)
+        h.SetBinContent(1,tupleResult[0])
+        h.SetBinError(1,tupleResult[1])
+    if addOverflow:
+        # add overflow in last bin and set overflow to zero
+        list_tuple=[]
+        list_tuple.append((h.GetBinContent(h.GetNbinsX()),h.GetBinError(h.GetNbinsX())))
+        list_tuple.append((h.GetBinContent(h.GetNbinsX()+1),h.GetBinError(h.GetNbinsX()+1)))
+        tupleResult=add_in_quadrature_error_list(list_tuple,debug=False)
+        h.SetBinContent(h.GetNbinsX(),tupleResult[0])
+        h.SetBinError(h.GetNbinsX(),tupleResult[1])
+        h.SetBinContent(h.GetNbinsX()+1,0.0)
+        h.SetBinError(h.GetNbinsX()+1,0.0)
+    # done if
     getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
     return h
 # done function
@@ -1627,6 +1636,26 @@ def get_histo_averaged_per_bin_width(histo,debug=False):
             print "Bin",i,"after value",value,"error",error,"width",width
         h.SetBinContent(i,value)
         h.SetBinError(i,error)
+    # done loop over bins
+    getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+    return h
+# done function
+
+# blind within an interval, i.e. the most common case of blinding
+def get_histo_blinded(histo,binRange=[40,170],debug=False):
+    h=histo.Clone()
+    low_blind=binRange[0]
+    high_blind=binRange[1]
+    for i in xrange(0,h.GetNbinsX()+2):
+        low=h.GetBinLowEdge(i)
+        width=h.GetBinWidth(i)
+        high=low+width
+        epsilon=0.0001
+        if debug:
+            print "Bin",i,"before low",low,"high",high,"width",width
+        if low_blind<low+epsilon and high-epsilon<high_blind:            
+            h.SetBinContent(i,0.0)
+            h.SetBinError(i,0.0)
     # done loop over bins
     getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
     return h
