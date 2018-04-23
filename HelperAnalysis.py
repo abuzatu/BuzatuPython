@@ -1725,7 +1725,7 @@ class Analysis:
                     # self.list_processResult=["S","B","S/B","SigY_S_B","SigH_S_B"]
                     self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
-                    self.create_results()
+                    # self.create_results()
                 if True:
                     # self.debug=True
                     self.read_results()
@@ -1744,7 +1744,7 @@ class Analysis:
                     # self.create_overlaid_variable()
                 # done if
             # done if
-            if True:
+            if False:
                 # do overlay plots of D,B,B+S,S (S is times some value)
                 #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3"]) # don't look yet, as not blinded
                 #self.set_list_variable(["MET"])
