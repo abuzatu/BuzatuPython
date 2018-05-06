@@ -994,7 +994,7 @@ class Analysis:
             "S",
             "B",
             "D",
-            "D2",
+            #"D2",
             "B+S",
             ]
 
@@ -1011,7 +1011,7 @@ class Analysis:
             "B"        :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
             "B+S"      :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH","qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb"]],
             "D"        :[["data"]],
-            "D2"        :[["dataB"]],
+            #"D2"        :[["dataB"]],
             }
 
     def set_fileNameHistosProcessMerged(self):
@@ -1167,7 +1167,7 @@ class Analysis:
             "data",
             "dataB",
             ]
-    # done function
+    # done functions
 
     def get_yieldTuple(self, histo):
         yieldTuple=get_histo_integral_error(histo,myRange=-1,option="",debug=False) # -1 to include the under/over-flow bins
@@ -1290,7 +1290,7 @@ class Analysis:
             f.write('\\begin{frame}{\\texttt{\\detokenize{'+ self.name+' '+variable+'}}}\n')
             # f.write('\\begin{center}\n')
             f.write('\\begin{landscape} \n')
-            f.write('\\adjustbox{max height=\\dimexpr\\textheight-7.0cm\\relax,max width=\\textwidth}\n')
+            f.write('\\adjustbox{max height=\\dimexpr\\textheight-9.0cm\\relax,max width=\\textwidth}\n')
             f.write('{\n')
             text="\\begin{tabular}{|l"
             for category in self.list_category:
@@ -1424,8 +1424,9 @@ class Analysis:
         if self.debug or self.verbose:
             print "Start create_overlaid_variable()"
         inputFileName=self.fileNameHistosProcessMerged
-        self.list_processMerged=["qqZvvHbb","qqWlvHbb","ggZvvHbb","WZ","ZZ","ggZZ","ttbar","stop","Whf","Zhf"]
-        #self.debug=True
+        #self.list_processMerged=["qqZvvHbb","qqWlvHbb","ggZvvHbb","WZ","ZZ","ggZZ","ttbar","stop","Whf","Zhf"]
+        self.list_processMerged=["qqZvvHbb","qqWlvHbb","ggZvvHbb","WZ","ZZ","ggZZ"]
+        self.debug=False
         for processMerged in self.list_processMerged:
             if self.debug:
                 print "processMerged",processMerged
@@ -1433,24 +1434,38 @@ class Analysis:
                 if self.debug:
                     print "category",category
                 list_tuple_h1D=[]
-                self.list_color=[1,4,2,8,ROOT.kOrange,5,6,7,8,9,10]
-                #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu7GeV","mBBOneMu6GeV","mBBOneMu5GeV","mBBOneMu4GeV","mBBPtReco"]
-                #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu7GeV","mBBOneMu6GeV","mBBOneMu5GeV","mBBOneMu4GeV"]
-                #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV"]
-                #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBPtReco"]
-                #self.list_variable=["mBBOneMu10GeV","mBBOneMu7GeV","mBBOneMu4GeV"]
-                for i,variable in enumerate(self.list_variable):
+                self.list_color=[1,4,2,8,ROOT.kOrange,ROOT.kMagenta,6,7,8,9,10]
+                # list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBAllMu","mBBPtReco"]
+                list_variable=["mBBNominal","mBBOneMu10GeV","mBBOneMu4GeV","mBBPtReco"]
+                for i,variable in enumerate(list_variable):
                     if self.debug:
                         print "variable",variable
+                    if processMerged=="WZ" or processMerged=="WW" or processMerged=="ZZ" or processMerged=="ggWW" or processMerged=="ggZZ":
+                        legend_info=[0.56,0.35,0.88,0.70,72,0.037,0]
+                        text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+category+"; "+processMerged+"}",0.04,13,0.50,0.88,0.05)
+                    else:
+                        legend_info=[0.12,0.35,0.40,0.70,72,0.037,0]
+                        text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+category+"; "+processMerged+"}",0.04,13,0.15,0.88,0.05)
                     info=self.dict_variable_info[variable]
                     # binRange=info[0]
                     debug_binRange=False
+                    debug=False
                     # binRange=get_binRange(5,60,10,debug_binRange)+","+get_binRange(60,140,5,debug_binRange)+","+get_binRange(140,180,10,debug_binRange)
-                    binRange=get_binRange(60,160,5,debug_binRange)
+                    binRange=get_binRange(50,160,5,debug_binRange)
                     histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
                     histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
+                    # rebin, collect overflows, do average
+                    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
+                    if "ptMuonInJet" in variable:
+                        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
+                    else:
+                        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
+                    histo=get_histo_averaged_per_bin_width(histo,debug=debug)
+                    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    # 
                     legend=processMerged
-                    histo=get_histo_generic_binRange(histo,binRange=binRange,option="average",debug=False)
+                    #histo=get_histo_generic_binRange(histo,binRange=binRange,option="average2",debug=self.debug)
                     #histo=histo.Clone()
                     #getBinValues(histo,doRescaleMeVtoGeV=False,significantDigits=2,debug=self.debug)
                     histo.SetLineColor(self.list_color[i])
@@ -1461,32 +1476,34 @@ class Analysis:
                     list_tuple_h1D.append((histo,bJetCorr))
                 # done loop over process
                 outputFileName=self.folderPlots+"/overlay_variable_"+category+"_"+processMerged
-                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf",option="histo+Bukin",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=True,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=False,min_value_ratio=0.5,max_value_ratio=1.5,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to data",plot_option="",plot_option_ratio="HIST",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{"+self.name+"}?#bf{"+category+"}?#bf{"+processMerged+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.55,0.50,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=True)
+                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf,png",option="histo+Bukin",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=True,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,min_multiply=0.9,max_multiply=1.1,YTitleOffset=0.45,doRatioPad=False,min_value_ratio=0.5,max_value_ratio=1.5,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to data",plot_option="",plot_option_ratio="HIST",text_option=text_option,legend_info=legend_info,line_option=([0,0.5,0,0.5],2),debug=self.debug)
             # done loop over category
         # done loop over variable
     # done function
-
 
     def create_overlaid_plots(self):
         if self.debug or self.verbose:
             print "Start create_overlaid_plots()"
         inputFileName=self.fileNameHistosProcessMerged
-        self.list_color=[8,4,2,1,7]
-        min_value_ratio=0.5
-        max_value_ratio=1.5
+        # default
+        list_color=[8,4,2,1,7]
+        min_value_ratio=0.2
+        max_value_ratio=1.7
+        # for BadBatman small differences expected, smaller ratio plots
+        #list_color=[2,1]
+        #min_value_ratio=0.9
+        #max_value_ratio=1.1
         for variable in self.list_variable:
             if self.debug:
                 print "variable",variable
             if "mBB" in variable or "mva" in variable: 
                 # blinded, do not show data at all
-                # list_processMerged="B,S,B+S".split(",")
                 list_processMerged="B,S,B+S,D".split(",")
+                #list_processMerged="D,D2".split(",")
             else:
                 # not blinded, include data
-                # list_processMerged="B,S,B+S,D,D2".split(",")
-                #list_processMerged="B,D".split(",")
                 list_processMerged="B,S,B+S,D".split(",")
-                # list_processMerged="D,D2".split(",")
+                #list_processMerged="D,D2".split(",")
             # done if
             info=self.dict_variable_info[variable]
             binRange=info[0]
@@ -1535,7 +1552,7 @@ class Analysis:
                     histo=get_histo_averaged_per_bin_width(histo,debug=debug)
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     # prepare histograms
-                    histo.SetLineColor(self.list_color[i])
+                    histo.SetLineColor(list_color[i])
                     histo.SetXTitle(variable)
                     histo.SetYTitle("Event density per bin width")
                     list_tuple_h1D.append((histo,legend))
@@ -1544,8 +1561,8 @@ class Analysis:
                 overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf,png",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=0,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=min_value_ratio,max_value_ratio=max_value_ratio,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to bkg",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False)
             # done loop over category
         # done loop over variable
-        command="$All/BuzatuBash/make_html.sh "+self.folderPlots
-        os.system(command)
+        #command="$All/BuzatuBash/make_html.sh "+self.folderPlots
+        #os.system(command)
     # done function
 
     ### print
@@ -1608,6 +1625,8 @@ class Analysis:
         #if self.doFirst:
         #    return
 
+        # return
+
         #if True:
         #    self.create_histosRaw()
 
@@ -1659,11 +1678,11 @@ class Analysis:
             #self.list_process=["data"]
             # reduce category
             if "MVA" in self.vtag:
-                self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+                #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
                 self.set_list_category(["2tag2jet_150ptv_SR"]) 
             elif "SM" in self.vtag:
-                self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
-                #self.set_list_category(["2tag2jet_150_200ptv_SR"])
+                #self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
+                self.set_list_category(["2tag2jet_150_200ptv_SR"])
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_150ptv_SR"]) 
             #self.set_list_category(["2tag3jet_150ptv_SR"]) 
@@ -1700,13 +1719,17 @@ class Analysis:
                 self.set_list_variable(list_variable)
             # done if
             #self.set_list_variable(["njets","MV2c10_Data",])
+            # self.set_list_variable(["mBBNominal","mBBOneMu","mBBPtReco"])    
+            #self.set_list_variable(["mBBNominal","mBBOneMu4GeV","mBBOneMu10GeV","mBBPtReco"])    
+            #self.set_list_variable(["AverageMuScaled","MET","SumPtJet","EtaB1","EtaB2","EtaB3","pTB1","pTB2","pTJ3","nrMuonInJetB1","nrMuonInJetB2","nrMuonInJetB2","dRBB","])    
+            #self.set_list_variable(["AverageMuScaled","MET","SumPtJet","EtaB1","EtaB2","EtaJ3","pTB1","pTB2","pTJ3","dRBB","mBB","mva"])    
             #if self.debug:
             if self.verbose:
                 self.print_lists()
             doAll=False
             if doAll:
                 self.create_histosRaw(option="reduced")
-            #return
+            # return
             # now we want to sum over processInitial for a given process
             self.set_list_process_info()
             if doAll:
@@ -1723,9 +1746,11 @@ class Analysis:
                     #self.list_processResult=self.list_processAnalysis
                     # self.list_processResult=["VHbb","VHcc","VBF","ttH","ggH","bbH","qqZincH4l","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
                     # self.list_processResult=["S","B","S/B","SigY_S_B","SigH_S_B"]
-                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
+                    # self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
+                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
-                    # self.create_results()
+                    if False:
+                        self.create_results()
                 if True:
                     # self.debug=True
                     self.read_results()
@@ -1734,14 +1759,23 @@ class Analysis:
                     #self.list_variable=["mBB","mva"]
                     #self.list_variable=["mBB","mva"]
                     #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
-                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
+                    #self.list_variable=["mBBNominal","mBBOneMu","mBBAllMu","mBBPtReco"]
+                    #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBAllMu","mBBPtReco"]
+                    #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV"]
+                    #list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBAllMu","mBBPtReco"]
+                    list_variable=["mBBNominal","mBBOneMu10GeV","mBBOneMu4GeV","mBBPtReco"]
+                    #list_variable=["mBB","mva"]
+                    #self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
+                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B"]
                     # for bJetCorr in "Nominal,OneMu20GeV,OneMu15GeV,OneMu12GeV,OneMu10GeV,OneMu7GeV,OneMu6GeV,OneMu5GeV,OneMu4GeV,PtReco".split(","):
                     # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
-                    for var in "mBB,mva,MET".split(","):
+                    #for var in "mBB,mva,MET".split(","):
+                    #for var in "mBBNominal".split(","):
+                    for var in list_variable:
                         self.list_processResult=self.list_processResult+["SigH_S_B@"+var]                 
-                    self.create_yield_latex_table(doDocument=True)
-                    # self.create_overlaid_variable()
+                    #self.create_yield_latex_table(doDocument=False)
+                    self.create_overlaid_variable()
                 # done if
             # done if
             if False:
