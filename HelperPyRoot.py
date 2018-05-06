@@ -1880,7 +1880,7 @@ def get_interpolated_graph_for_histo(h,debug):
 # for statistical error band
 # code example: https://www.desy.de/~stanescu/my-tmp/plotUpDownSys.C
 # its plot:https://www.desy.de/~stanescu/my-tmp/AFII/Nom-Up-Down-A500-tb050/jes1_h_ttbar_chi2_m_inc_res_mu.png
-def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; Hinv analysis}?#bf{"+"category"+"}?#bf{"+"systematicStem"+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False):
+def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,min_multiply=0.9,max_multiply=1.4,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; Hinv analysis}?#bf{"+"category"+"}?#bf{"+"systematicStem"+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False):
     if debug:
         print "Start overlayHistograms(...)"
         print "option",option
@@ -1892,7 +1892,7 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
         print "Start set_min_max_title_list_tuple_h1D()"
         for tuple_h1D in list_tuple_h1D:
             print "legend",tuple_h1D[1],"min",tuple_h1D[0].GetMinimum(),"max",tuple_h1D[0].GetMaximum()
-    set_min_max_title_list_tuple_h1D(list_tuple_h1D,max_value,min_value,ignorezero,1.5,0.9,debug)
+    set_min_max_title_list_tuple_h1D(list_tuple_h1D,max_value,min_value,ignorezero,max_multiply,min_multiply,debug)
     if debug:
         print "End set_min_max_title_list_tuple_h1D()"
         for tuple_h1D in list_tuple_h1D:
