@@ -1436,7 +1436,8 @@ class Analysis:
                 list_tuple_h1D=[]
                 self.list_color=[1,4,2,8,ROOT.kOrange,ROOT.kMagenta,6,7,8,9,10]
                 # list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBAllMu","mBBPtReco"]
-                list_variable=["mBBNominal","mBBOneMu10GeV","mBBOneMu4GeV","mBBPtReco"]
+                # list_variable=["mBBNominal","mBBOneMu10GeV","mBBOneMu4GeV","mBBPtReco"]
+                list_variable=self.list_variable
                 for i,variable in enumerate(list_variable):
                     if self.debug:
                         print "variable",variable
@@ -1476,7 +1477,7 @@ class Analysis:
                     list_tuple_h1D.append((histo,bJetCorr))
                 # done loop over process
                 outputFileName=self.folderPlots+"/overlay_variable_"+category+"_"+processMerged
-                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf,png",option="histo+Bukin",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=True,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,min_multiply=0.9,max_multiply=1.1,YTitleOffset=0.45,doRatioPad=False,min_value_ratio=0.5,max_value_ratio=1.5,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to data",plot_option="",plot_option_ratio="HIST",text_option=text_option,legend_info=legend_info,line_option=([0,0.5,0,0.5],2),debug=self.debug)
+                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="eps,pdf,png",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=True,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,min_multiply=0.9,max_multiply=1.1,YTitleOffset=0.45,doRatioPad=False,min_value_ratio=0.5,max_value_ratio=1.5,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to data",plot_option="",plot_option_ratio="HIST",text_option=text_option,legend_info=legend_info,line_option=([0,0.5,0,0.5],2),debug=self.debug)
             # done loop over category
         # done loop over variable
     # done function
@@ -1625,7 +1626,7 @@ class Analysis:
         #if self.doFirst:
         #    return
 
-        # return
+        #return
 
         #if True:
         #    self.create_histosRaw()
@@ -1678,8 +1679,8 @@ class Analysis:
             #self.list_process=["data"]
             # reduce category
             if "MVA" in self.vtag:
-                #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
-                self.set_list_category(["2tag2jet_150ptv_SR"]) 
+                self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+                #self.set_list_category(["2tag2jet_150ptv_SR"]) 
             elif "SM" in self.vtag:
                 #self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
                 self.set_list_category(["2tag2jet_150_200ptv_SR"])
@@ -1701,6 +1702,7 @@ class Analysis:
             #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
             #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco","SumPtJet"]
             #self.list_variable=["mva"]
+            self.list_variable=["mva","mBB"]
             #self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
             #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             if True:
@@ -1741,7 +1743,7 @@ class Analysis:
             #return
             self.set_list_processAnalysis()
             if True:
-                if True:
+                if False:
                     #self.list_category=["2tag2jet_150ptv_SR"]
                     #self.list_processResult=self.list_processAnalysis
                     # self.list_processResult=["VHbb","VHcc","VBF","ttH","ggH","bbH","qqZincH4l","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
@@ -1749,7 +1751,7 @@ class Analysis:
                     # self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
                     self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
-                    if False:
+                    if True:
                         self.create_results()
                 if True:
                     # self.debug=True
@@ -1763,7 +1765,7 @@ class Analysis:
                     #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBAllMu","mBBPtReco"]
                     #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV"]
                     #list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBAllMu","mBBPtReco"]
-                    list_variable=["mBBNominal","mBBOneMu10GeV","mBBOneMu4GeV","mBBPtReco"]
+                    #list_variable=["mBBNominal","mBBOneMu10GeV","mBBOneMu4GeV","mBBPtReco"]
                     #list_variable=["mBB","mva"]
                     #self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
                     self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
@@ -1774,8 +1776,8 @@ class Analysis:
                     #for var in "mBBNominal".split(","):
                     for var in list_variable:
                         self.list_processResult=self.list_processResult+["SigH_S_B@"+var]                 
-                    #self.create_yield_latex_table(doDocument=False)
-                    self.create_overlaid_variable()
+                    self.create_yield_latex_table(doDocument=False)
+                    #self.create_overlaid_variable()
                 # done if
             # done if
             if False:
