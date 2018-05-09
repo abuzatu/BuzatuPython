@@ -1876,6 +1876,61 @@ def get_interpolated_graph_for_histo(h,debug):
     return result
 # done function
 
+# useful for cut flow comparison bin by bin
+# often differences are so small, example of output below
+# that only plotting the ratio with many digits shows a difference
+# bin    i                          label  content 31-01  content 31-10    ratio 31-10
+# bin    0                      underflow           0.00           0.00      0.0000000
+# bin    1           Preselection initial     3525398.00     3525398.00      1.0000000
+# bin    2               Preselection GRL     3513744.00     3513744.00      1.0000000
+# bin    3             Preselection hasPV     3513744.00     3513744.00      1.0000000
+# bin    4      Preselection isCleanEvent     3503329.00     3503329.00      1.0000000
+# bin    5      Preselection jet cleaning     3445409.00     3445409.00      1.0000000
+# bin    6            Preselection lepton     3324129.00     3324130.00      1.0000003
+# bin    7               Preselection jet     2269819.00     2269839.00      1.0000088
+# bin    8            Preselection fatjet      887356.00      887357.00      1.0000011
+# bin    9    Preselection jet OR fat-jet     2287089.00     2287108.00      1.0000083
+# bin   10                  MET > 100 GeV       83053.00       82561.00      0.9940761
+# bin   11          120GeV < MET < 160GeV       36198.00       35971.00      0.9937289
+# bin   12          160GeV < MET < 200GeV       28031.00       27860.00      0.9938996
+# bin   13                   MET > 200GeV       18824.00       18730.00      0.9950064
+# bin   14                       overflow           0.00           0.00      0.0000000
+# 
+def compareHistogramsWitLabelsBinByBin(list_tuple_h1D,fileName="file.txt",debug=True):
+    f=open(fileName,"w")
+    histoRef=list_tuple_h1D[0][0]
+    NBins=histoRef.GetNbinsX()
+    text="bin %4s %30s" %  ("i", "label")
+    for i,(histo,vtag) in enumerate(list_tuple_h1D):
+        text+="%15s" % ("content "+vtag)
+        if i>0:
+            text+="%15s" % ("ratio "+vtag)
+    f.write(text+"\n")
+    for j in xrange(0,NBins+2): 
+        # including under/over-flow bins
+        if j==0:
+            label="underflow"
+        elif j==NBins+1:
+            label="overflow"
+        else:
+            label=histo.GetXaxis().GetBinLabel(j)
+        text="bin %4.0f %30s" % (j, label)
+        # loop over the histograms to compare
+        list_content=[]
+        for i,(histo,vtag) in enumerate(list_tuple_h1D):
+            if debug:
+                print i,"vtag",vtag,"histo",histo
+            content=histo.GetBinContent(j)
+            error=histo.GetBinError(j)
+            list_content.append(content)
+            text+="%15.2f" % (content)
+            if i>0:
+                text+="%15.7f" % (ratio(content,list_content[0]))
+        # done loop over histograms
+        f.write(text+"\n")
+    # done loop over bins
+    f.close()
+# done function
 
 # for statistical error band
 # code example: https://www.desy.de/~stanescu/my-tmp/plotUpDownSys.C
