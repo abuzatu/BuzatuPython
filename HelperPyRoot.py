@@ -1896,7 +1896,7 @@ def get_interpolated_graph_for_histo(h,debug):
 # bin   13                   MET > 200GeV       18824.00       18730.00      0.9950064
 # bin   14                       overflow           0.00           0.00      0.0000000
 # 
-def compareHistogramsWitLabelsBinByBin(list_tuple_h1D,fileName="file.txt",debug=True):
+def compareHistogramsWithLabelsBinByBin(list_tuple_h1D,fileName="file.txt",debug=True):
     f=open(fileName,"w")
     histoRef=list_tuple_h1D[0][0]
     NBins=histoRef.GetNbinsX()
