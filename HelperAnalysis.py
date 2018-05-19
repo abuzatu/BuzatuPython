@@ -584,7 +584,12 @@ class Analysis:
                         if histo=="dummy":
                             continue
                         if counter_variable==0:
+                            if self.debug:
+                                print "counter_variable=0"
+                                print "type(histo)",type(histo)
                             histoReset=histo.Clone()
+                            if self.debug:
+                                print "type(histoReset)",type(histoReset)
                             histoReset.Reset()
                         counter_variable+=1
                         if counter==0:
@@ -668,8 +673,8 @@ class Analysis:
             "ttt",
             "tttt",
             "data",
-            "dataB",
-            "dijet",
+            #"dataB",
+            #"dijet",
             # "",
             ]
         
@@ -706,11 +711,11 @@ class Analysis:
             # dijet
             "dijet":[[["dijetJZW","MJ_Py8"]],dict_one_SF,],
             # dibosons
-            "WW":[[["WW","WW_Sh221"]],dict_one_SF,],
-            "WZ":[[["WZ","WZ_Sh221"]],dict_one_SF,],
-            "ZZ":[[["ZZ","ZZ_Sh221"]],dict_one_SF,],
-            "ggZZ":[[["ggZZ","ggZZ_Sh222"]],dict_one_SF,],
-            "ggWW":[[["ggWW","ggWW_Sh222"]],dict_one_SF,],
+            "WW":[[["WW","WqqWlv_Sh221"]],dict_one_SF,],
+            "ggWW":[[["ggWW","ggWqqWlv_Sh222"]],dict_one_SF,],
+            "WZ":[[["WZ","WqqZvv_Sh221"],["WZ","WqqZll_Sh221"],["WZ","WlvZqq_Sh221"]],dict_one_SF,],
+            "ZZ":[[["ZZ","ZqqZvv_Sh221"],["ZZ","ZqqZll_Sh221"]],dict_one_SF,],
+            "ggZZ":[[["ggZZ","ggZqqZvv_Sh222"],["ggZZ","ggZqqZll_Sh222"]],dict_one_SF,],
             "ZllZbb":[[["ZllZbb","ZZ_bb_Sh221"]],dict_one_SF,],
             "ZvvZbb":[[["ZvvZbb","ZZ_bb_Sh221"]],dict_one_SF,],
             "WlvZbb":[[["WlvZbb","WZ_bb_Sh221"]],dict_one_SF,],
@@ -949,9 +954,9 @@ class Analysis:
             "ttbarDilep" :[[["ttbar","ttbar_dil_PwPy8"]],dict_one_SF],
             "ttbarDilepOld" :[[["ttbarDilep","ttbar_dil_PwPy8_old"]],dict_one_SF],
             "ttbarSpin" :[[["ttbarSpin","ttbar_PwPy8_MadSpin"]],dict_one_SF],
-            "stops" :[[["stops","stops_PwPy"]],dict_one_SF],
-            "stopt" :[[["stopt","stopt_PwPy"]],dict_one_SF],
-            "stopWt":[[["stopWt","stopWt_PwPy"]],dict_one_SF],
+            "stops" :[[["stops","stops_PwPy8"]],dict_one_SF],
+            "stopt" :[[["stopt","stopt_PwPy8"]],dict_one_SF],
+            "stopWt":[[["stopWt","stopWt_PwPy8"]],dict_one_SF],
             "stopWtMETFilt":[[["stopWt","stopWt_PwPy_METfilt"]],dict_one_SF],
             "stoptZq":[[["tZq","stoptZ_MGPy8"]],dict_one_SF],
             "ttV"   :[[["ttV","ttV_aMCatNLOPy8"]],dict_one_SF],
@@ -985,7 +990,7 @@ class Analysis:
         self.list_processMerged=self.list_process+[
             "VHbb",
             # "VHcc",
-            "OtherSig",
+            "OtherHiggs",
             "diboson",
             "Whf",
             "Zhf",
@@ -1001,15 +1006,15 @@ class Analysis:
         self.dict_processMerged_info={
             "VHbb"     :[["qqZvvHbb","qqWlvHbb","ggZvvHbb","qqZllHbb","ggZllHbb"]],
             "VHcc"     :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc"]],
-            "OtherSig" :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
+            "OtherHiggs" :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
             "diboson"  :[["WW","WZ","ZZ","ggWW","ggZZ"]],
             "Whf"      :[["Wbb","Wbc","Wbl","Wcc"]],
             "Zhf"      :[["Zbb","Zbc","Zbl","Zcc"]],
             "stop"     :[["stops","stopt","stopWt","stoptZq"]],
             "tt+X"     :[["ttV","ttVV","ttt","tttt"]],
             "S"        :[["qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb"]],
-            "B"        :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
-            "B+S"      :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","dijet","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH","qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb"]],
+            "B"        :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
+            "B+S"      :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH","qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb"]],
             "D"        :[["data"]],
             #"D2"        :[["dataB"]],
             }
@@ -1161,7 +1166,7 @@ class Analysis:
             "ttVV",
             "ttt",
             "tttt",
-            "dijet",
+            #"dijet",
             "S",
             "B",
             "data",
@@ -1309,7 +1314,7 @@ class Analysis:
             for processResult in self.list_processResult:
                 # info=self.dict_processMerged_info[processMergedType]
                 # doAddLineAfter=bool(info[1])
-                if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="data" or processResult=="VHbb":
+                if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="stop" or processResult=="data" or processResult=="VHbb":
                     doAddLineAfter=True
                 else:
                     doAddLineAfter=False
@@ -1390,7 +1395,7 @@ class Analysis:
             for processResult in self.list_processResult:
                 # info=self.dict_processMerged_info[processMergedType]
                 # doAddLineAfter=bool(info[1])
-                if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="data" or processResult=="OtherSig":
+                if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="stop" or processResult=="data" or processResult=="OtherHiggs":
                     doAddLineAfter=True
                 else:
                     doAddLineAfter=False
@@ -1600,7 +1605,7 @@ class Analysis:
         if self.do_hadd_processInitial:
             self.hadd_each_processInitial()
         self.create_folderFitInput()
-        #dict_vtag_analysis[vtag].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
+        # dict_vtag_analysis[vtag].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
         # re-evaluate from the folder output if you put by hand new folders, like data16B
         if self.do_evaluate_list_processInitial:
             self.evaluate_list_processInitial(option="processInitial")
@@ -1679,11 +1684,12 @@ class Analysis:
             #self.list_process=["data"]
             # reduce category
             if "MVA" in self.vtag:
-                self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
-                #self.set_list_category(["2tag2jet_150ptv_SR"]) 
+                # self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+                self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
+                # self.set_list_category(["2tag2jet_150ptv_SR"]) 
             elif "SM" in self.vtag:
-                #self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
-                self.set_list_category(["2tag2jet_150_200ptv_SR"])
+                self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
+                # self.set_list_category(["2tag2jet_150_200ptv_SR"])
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_150ptv_SR"]) 
             #self.set_list_category(["2tag3jet_150ptv_SR"]) 
@@ -1728,7 +1734,7 @@ class Analysis:
             #if self.debug:
             if self.verbose:
                 self.print_lists()
-            doAll=False
+            doAll=True
             if doAll:
                 self.create_histosRaw(option="reduced")
             # return
@@ -1736,20 +1742,21 @@ class Analysis:
             self.set_list_process_info()
             if doAll:
                 self.create_histosProcess()
-            #return
+            # return
             self.set_list_processMerged()
             if doAll:
                 self.create_histosProcessMerged(doSF=True)
-            #return
+            # return
             self.set_list_processAnalysis()
             if True:
-                if False:
+                if True:
                     #self.list_category=["2tag2jet_150ptv_SR"]
                     #self.list_processResult=self.list_processAnalysis
                     # self.list_processResult=["VHbb","VHcc","VBF","ttH","ggH","bbH","qqZincH4l","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
                     # self.list_processResult=["S","B","S/B","SigY_S_B","SigH_S_B"]
-                    # self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
-                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
+                    # self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
+                    # self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
+                    self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","S","B","data"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
                     if True:
                         self.create_results()
@@ -1767,8 +1774,9 @@ class Analysis:
                     #list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBAllMu","mBBPtReco"]
                     #list_variable=["mBBNominal","mBBOneMu10GeV","mBBOneMu4GeV","mBBPtReco"]
                     #list_variable=["mBB","mva"]
-                    #self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
-                    self.list_processResult=["VHbb","OtherSig","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
+                    #self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
+                    # self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
+                    self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","S","B","data"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B"]
                     # for bJetCorr in "Nominal,OneMu20GeV,OneMu15GeV,OneMu12GeV,OneMu10GeV,OneMu7GeV,OneMu6GeV,OneMu5GeV,OneMu4GeV,PtReco".split(","):
                     # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
@@ -1780,7 +1788,8 @@ class Analysis:
                     #self.create_overlaid_variable()
                 # done if
             # done if
-            if False:
+            # return
+            if True:
                 # do overlay plots of D,B,B+S,S (S is times some value)
                 #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3"]) # don't look yet, as not blinded
                 #self.set_list_variable(["MET"])
