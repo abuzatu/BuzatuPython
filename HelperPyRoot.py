@@ -2392,6 +2392,69 @@ def plotMultiGraph(list_graphs,canvas_size,legend_position,factor_maximum,plot_o
     return None
 # ended function
 
+# make stacked plots
+# give list of tuple of histograms
+# besides info needed for overlayHistograms (histogram and legend) we need more info
+# if it is S, B or D, and if we want to scale it by some number (default 1)
+# then we hard code the way we want this plot to look like
+def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.17,0.88,0.88,72,0.037,0],debug=False):
+    if debug:
+        print "Start stackHistograms"
+    stack=THStack(stackName,"")
+    legend=get_legend(legend_info,debug)
+    legend.SetBorderSize(0)
+    dict_processType_histoSum={}
+    for tuple_h1D in list_tuple_h1D:
+        histo=tuple_h1D[0]
+        process=tuple_h1D[1]
+        processType=tuple_h1D[2]
+        SF=tuple_h1D[3]
+        if processType=="B":
+            stack.Add(histo)
+            legend.AddEntry(histo,process,"f")
+        elif processType=="S":
+            if processType in dict_processType_histoSum:
+                dict_processType_histoSum[processType].Add(histo)
+            else:
+                dict_processType_histoSum[processType]=histo
+                if processType=="S":
+                    legendName="Sig VH x 5"
+                    dict_processType_histoSum[processType].SetFillStyle(0)
+                    dict_processType_histoSum[processType].SetLineWidth(3)
+                legend.AddEntry(histo,legendName,"f")
+        elif processType=="D":
+            None
+        else:
+            print "processType",processType,"not known. Choose S or B. Will ABORT!!!"
+            assert(False)
+        # end if processType
+    # done loop over tuple_h1D
+    # create space at the top for text
+    maximum = stack.GetMaximum()*1.40
+    minimum = 0.00001
+    stack.SetMaximum(maximum)
+    stack.SetMinimum(minimum)
+    c=TCanvas("c","c",600,400)
+    # plot the stack
+    stack.Draw("hist")
+    stack.GetXaxis().SetTitle(histo.GetXaxis().GetTitle())
+    stack.GetYaxis().SetTitle(histo.GetYaxis().GetTitle())
+    #stack.GetYaxis().SetTitle("Number of events per bin width")
+    # overlay the signal
+    dict_processType_histoSum["S"].Scale(5)
+    dict_processType_histoSum["S"].Draw("hist same")
+    # add the legend
+    legend.Draw("same")
+    # add text at the top
+    setupTextOnPlot(*text_option)
+    # save the canvas in files with what extensions we want
+    for extension in extensions.split(","):
+        c.Print(outputFileName+"."+extension)
+    # ended for over extensions
+    return None
+
+# done function
+
 def overlapHistograms(hist_1, hist_2, do_print):
     # get the standard deviation and mean of the 1st histogram
     hist_1_rms=hist_1.GetRMS()
