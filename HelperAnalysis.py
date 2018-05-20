@@ -373,7 +373,7 @@ class Analysis:
             if option=="reduced":
                 if variable not in self.list_variable or category not in self.list_category or process not in self.list_process:
                     continue
-            if self.debug or self.verbose:
+            if self.debug:
                 print "%-10s %-10s %-10s %-10s" % (variable,category,process,processInitial)
             inputFileName=self.folderProcessInitial+"/"+processInitial+".root"
             histoNameInitial=self.get_histoNameInitial(process,category,variable)
@@ -450,6 +450,7 @@ class Analysis:
             "dRB2J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "dRBB":[get_binRange(0.4,1.0,0.1,debug_binRange)+","+get_binRange(1.0,5,0.2,debug_binRange)],
             "mBB":[binRange_mBB],
+            "mBBMVA":[binRange_mBB],
             "mBBNominal":[binRange_mBB],
             "mBBOneMu":[binRange_mBB],
             "mBBOneMu4GeV":[binRange_mBB],
@@ -565,10 +566,10 @@ class Analysis:
                     if self.debug:
                         print "processRenamed",processRenamed
                     counter=0
-                    if self.debug or self.verbose:
+                    if self.debug:
                         print " %-10s %-10s %-10s" % (variable,category,processRenamed)
                     list_processInfo=self.dict_process_info[processRenamed]
-                    if self.debug or self.verbose:
+                    if self.debug:
                         print "list_processInfo",list_processInfo
                     list_processInfoToAdd=list_processInfo[0]
                     dict_jet_SF=list_processInfo[1]
@@ -985,8 +986,11 @@ class Analysis:
 
     def set_dict_processMerged_stackColor(self):
         self.dict_processMerged_stackColor={
+            "S":ROOT.kRed,
+            "B":ROOT.kBlue-10,
+            "D":ROOT.kBlack,
             "VHbb":ROOT.kRed,
-            "OtherHiggs":ROOT.kGray+1,
+            "otherHiggs":ROOT.kGray+1,
             "diboson":ROOT.kGray,
             "Whf":ROOT.kGreen+3,
             "Wcl":ROOT.kGreen-6,
@@ -996,7 +1000,7 @@ class Analysis:
             "Zl":ROOT.kAzure-9,
             "ttbar":ROOT.kOrange,
             "stop":ROOT.kOrange-1,
-            "tt+X":ROOT.kOrange-7,
+            "ttX":ROOT.kOrange-7,
             "data":ROOT.kBlack,
             }
     # done function
@@ -1010,33 +1014,31 @@ class Analysis:
         self.list_processMerged=self.list_process+[
             "VHbb",
             # "VHcc",
-            "OtherHiggs",
+            "otherHiggs",
             "diboson",
             "Whf",
             "Zhf",
             "stop",
-            "tt+X",
+            "ttX",
             "S",
             "B",
             "D",
-            #"D2",
-            "B+S",
+            # "BplusS",
             ]
 
         self.dict_processMerged_info={
             "VHbb"     :[["qqZvvHbb","qqWlvHbb","ggZvvHbb","qqZllHbb","ggZllHbb"]],
             "VHcc"     :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc"]],
-            "OtherHiggs" :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
+            "otherHiggs" :[["qqZvvHcc","qqWlvHcc","ggZvvHcc","qqZllHcc","ggZllHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
             "diboson"  :[["WW","WZ","ZZ","ggWW","ggZZ"]],
             "Whf"      :[["Wbb","Wbc","Wbl","Wcc"]],
             "Zhf"      :[["Zbb","Zbc","Zbl","Zcc"]],
             "stop"     :[["stops","stopt","stopWt","stoptZq"]],
-            "tt+X"     :[["ttV","ttVV","ttt","tttt"]],
+            "ttX"     :[["ttV","ttVV","ttt","tttt"]],
             "S"        :[["qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb"]],
             "B"        :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH"]],
-            "B+S"      :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH","qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb"]],
+            "BplusS"      :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttVV","ttt","tttt","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","qqZvvHcc","qqZllHcc","ggZvvHcc","ggZllHcc","qqWlvHcc","qqWincH4l","qqZincH4l","ggH","bbH","VBF","ttH","qqZvvHbb","qqZllHbb","ggZvvHbb","ggZllHbb","qqWlvHbb"]],
             "D"        :[["data"]],
-            #"D2"        :[["dataB"]],
             }
 
     def set_fileNameHistosProcessMerged(self):
@@ -1051,6 +1053,8 @@ class Analysis:
         outputFile.Close()
         for variable in self.list_variable:
             for category in self.list_category:
+            if self.verbose:
+                print "variable",variable,"category",category
                 if "2jet" in category:
                     cat="2"
                 elif "3jet" in category:
@@ -1061,16 +1065,22 @@ class Analysis:
                     cat="5p"
                 else:
                     cat="none"   
+                if self.debug:
+                    print "cat",cat
                 for processMerged in self.list_processMerged:
                     counter=0
-                    if self.debug or self.verbose:
+                    if self.debug:
                         print " %-10s %-10s %-10s" % (variable,category,processMerged)
                     if processMerged not in self.dict_processMerged_info.keys():
+                        if self.debug:
+                            print "processMerged",processMerged,"is not in  self.dict_processMerged_info"
                         list_process=[processMerged]
                     else:
+                        if self.debug:
+                            print "processMerged",processMerged,"is not in  self.dict_processMerged_info"
                         list_process=self.dict_processMerged_info[processMerged][0]
-                    if self.debug or self.verbose:
-                        print "list_process",list_process
+                    if self.debug:
+                        print "processMerged",processMerged,"list_process",list_process
                     for process in list_process:
                         if self.debug:
                             print "%-10s %-10s %-10s %-10s" % (variable,category,processMerged,process)
@@ -1086,7 +1096,7 @@ class Analysis:
                         else:
                             SF=1.0
                         if self.debug:
-                            print "SF",SF,"type(SF)",type(SF)
+                            print "Scale histo with SF",SF,"type(SF)",type(SF)
                         histo.Scale(SF)
                         if histo=="dummy":
                             continue
@@ -1095,11 +1105,9 @@ class Analysis:
                         else:
                             histoProcessMerged.Add(histo)
                         counter+=1
-                    # done for loop over processInitial
+                    # done for loop over process that need to be summed to get processMerged
                     if self.debug:
                         print "counter",counter
-                    # now scale the histogram with the SF
-                    histoProcessMerged.Scale(SF)
                     # store the histogram
                     outputFile=TFile(self.fileNameHistosProcessMerged,"UPDATE")
                     histoProcessMerged.SetDirectory(outputFile)
@@ -1415,7 +1423,7 @@ class Analysis:
             for processResult in self.list_processResult:
                 # info=self.dict_processMerged_info[processMergedType]
                 # doAddLineAfter=bool(info[1])
-                if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="stop" or processResult=="data" or processResult=="OtherHiggs":
+                if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="stop" or processResult=="data" or processResult=="otherHiggs":
                     doAddLineAfter=True
                 else:
                     doAddLineAfter=False
@@ -1512,7 +1520,8 @@ class Analysis:
             print "Start create_overlaid_plots()"
         inputFileName=self.fileNameHistosProcessMerged
         # default
-        list_color=[8,4,2,1,7]
+        list_color=[8,4,2,1] # B,S,BplusS,D
+        list_color=[8,4,1] # B,S,D
         min_value_ratio=0.2
         max_value_ratio=1.7
         # for BadBatman small differences expected, smaller ratio plots
@@ -1524,12 +1533,12 @@ class Analysis:
                 print "variable",variable
             if "mBB" in variable or "mva" in variable: 
                 # blinded, do not show data at all
-                list_processMerged="B,S,B+S,D".split(",")
-                #list_processMerged="D,D2".split(",")
+                # list_processMerged="B,S,BplusS,D".split(",")
+                list_processMerged="B,S,D".split(",")
             else:
                 # not blinded, include data
-                list_processMerged="B,S,B+S,D".split(",")
-                #list_processMerged="D,D2".split(",")
+                # list_processMerged="B,S,BplusS,D".split(",")
+                list_processMerged="B,S,D".split(",")
             # done if
             if variable in self.dict_variable_info.keys():
                 info=self.dict_variable_info[variable]
@@ -1557,17 +1566,17 @@ class Analysis:
                     histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
                     legend=processMerged
                     # scale the signal
-                    signalScale=50
+                    signalScale=5
                     if processMerged=="S":
                         histo.Scale(signalScale)
                         legend+=" x "+str(signalScale)
                     # done if
                     # blind the data
-                    if processMerged=="D" or processMerged=="D2":
+                    if processMerged=="D" or processMerged=="data":
                         if "mBB" in variable:
                             histo=get_histo_blinded(histo,binRange=[80,140],debug=False)
                         elif "mva" in variable:
-                            histo=get_histo_blinded(histo,binRange=[0.5,1.0],debug=False)
+                            histo=get_histo_blinded(histo,binRange=[0.3,1.0],debug=False)
                         else:
                             None
                         # done if
@@ -1589,7 +1598,7 @@ class Analysis:
                     list_tuple_h1D.append((histo,legend))
                 # done loop over process
                 outputFileName=self.folderPlots+"/overlay_BDS_"+variable+"_"+category
-                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf,png",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=0,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=min_value_ratio,max_value_ratio=max_value_ratio,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to bkg",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False)
+                overlayHistograms(list_tuple_h1D,fileName=outputFileName,extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=0,max_value=-1,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=min_value_ratio,max_value_ratio=max_value_ratio,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to bkg",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False)
             # done loop over category
         # done loop over variable
         #command="$All/BuzatuBash/make_html.sh "+self.folderPlots
@@ -1597,8 +1606,6 @@ class Analysis:
     # done function
 
     def create_stacked_plots(self):
-        initial=self.debug
-        self.debug=True
         if self.verbose:
             print "Start create_stacked_plots()"
         inputFileName=self.fileNameHistosProcessMerged
@@ -1625,28 +1632,26 @@ class Analysis:
                     # done if
                 # done if
                 list_tuple_h1D=[]
-                # list_processStack=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","data"]
-                # list_processStack=["OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop"]
-                list_processStack=["Zl","Zcl","Zhf","Wl","Wcl","Whf","stop","tt+X","ttbar","diboson","OtherHiggs","VHbb","data"]
+                list_processStack=["Zl","Zcl","Zhf","Wl","Wcl","Whf","stop","ttX","ttbar","diboson","otherHiggs","VHbb","data"]
                 for i,processMerged in enumerate(list_processStack):
                     if self.debug:
                         print "processMerged",processMerged
                     histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
                     histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
-                    if processMerged=="VHbb":
+                    if processMerged=="VHbb" or processMerged=="S":
                         processType="S"
-                    elif processMerged=="data":
+                    elif processMerged=="data" or processMerged=="D":
                         processType="D"
                     else:
                         processType="B"
                     # done if
                     SF=1.0
                     # blind the data
-                    if processMerged=="data" or processMerged=="D" or processMerged=="D2":
+                    if processMerged=="data" or processMerged=="D":
                         if "mBB" in variable:
                             histo=get_histo_blinded(histo,binRange=[80,140],debug=False)
                         elif "mva" in variable:
-                            histo=get_histo_blinded(histo,binRange=[0.5,1.0],debug=False)
+                            histo=get_histo_blinded(histo,binRange=[0.3,1.0],debug=False)
                         else:
                             None
                         # done if
@@ -1675,7 +1680,6 @@ class Analysis:
                 stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.25,0.88,0.88,72,0.037,0],debug=self.debug)
             # done loop over category
         # done loop over variable
-        self.debug=initial
     # done function
 
 
@@ -1802,28 +1806,29 @@ class Analysis:
                 print "Neither MVA, nor CUT are not found in stem",self.stem,". Will ABORT!!!"
                 assert(False)
             # done if
-            #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
-            #self.set_list_category(["2tag2jet_150ptv_SR"]) 
-            #self.set_list_category(["2tag3jet_150ptv_SR"]) 
-            #self.set_list_category(["2tag5pjet_150ptv_SR"]) 
-            #self.set_list_category(["0ptag3jet_150ptv_SR"]) 
-            #self.set_list_category(["0ptag0pjet_150ptv_SR"])
-            #self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
-            #self.set_list_variable(["pTB1"])
-            #self.set_list_variable(["mBB"])
-            #self.set_list_variable(["mBB"])
-            #self.set_list_variable(["mBB","mva"])
-            #self.set_list_variable(["mBB","mva","MET","SumPtJet","EtaB2"])
-            #self.set_list_variable(["EtaB1","EtaB2","EtaJ3","dEtaBB","costheta","AverageMuScaled","nTaus","MET","SumPtJet","pTB1","pTB2","pTJ3"])
-            #self.set_list_variable(["EtaB2"])
-            #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
-            #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
-            #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco","SumPtJet"]
-            #self.list_variable=["mva"]
-            #self.list_variable=["mva","mBB"]
-            self.list_variable=["mBB"]
-            #self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
-            #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
+            # self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
+            # self.set_list_category(["2tag2jet_150ptv_SR"]) 
+            # self.set_list_category(["2tag3jet_150ptv_SR"]) 
+            # self.set_list_category(["2tag5pjet_150ptv_SR"]) 
+            # self.set_list_category(["0ptag3jet_150ptv_SR"]) 
+            # self.set_list_category(["0ptag0pjet_150ptv_SR"])
+            # self.set_list_category(["2tag2jet_0ptv_SR","2tag3jet_0ptv_SR"]) # with do merge ptv bins get this name convention
+            # self.set_list_variable(["pTB1"])
+            # self.set_list_variable(["mBB"])
+            # self.set_list_variable(["mBB"])
+            # self.set_list_variable(["mBB","mva"])
+            # self.set_list_variable(["mBB","mva","MET","SumPtJet","EtaB2"])
+            # self.set_list_variable(["EtaB1","EtaB2","EtaJ3","dEtaBB","costheta","AverageMuScaled","nTaus","MET","SumPtJet","pTB1","pTB2","pTJ3"])
+            # self.set_list_variable(["EtaB2"])
+            # self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
+            # self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
+            # self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco","SumPtJet"]
+            # self.list_variable=["mva"]
+            # self.list_variable=["mva","mBB"]
+            # self.list_variable=["mBB","MET","pTB1"]
+            # self.list_variable=["MET"]
+            # self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
+            # self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             if True:
                 # only included at the pretag inclusive: on 0ptag2pjet or so
                 string_variable_ignore="EtaFwdJets,EtaSigJets,PtFwdJets,PtSigJets,NFwdJets,NSigJets,MV2c10_B,MV2c10_C,MV2c10_Data,MV2c10_L,btag_weight_B,btag_weight_C,btag_weight_Data,btag_weight_L,eff_B,eff_C,eff_L,njets"
@@ -1839,12 +1844,12 @@ class Analysis:
                 # done for loop
                 self.set_list_variable(list_variable)
             # done if
-            #self.set_list_variable(["njets","MV2c10_Data",])
+            # self.set_list_variable(["njets","MV2c10_Data",])
             # self.set_list_variable(["mBBNominal","mBBOneMu","mBBPtReco"])    
-            #self.set_list_variable(["mBBNominal","mBBOneMu4GeV","mBBOneMu10GeV","mBBPtReco"])    
-            #self.set_list_variable(["AverageMuScaled","MET","SumPtJet","EtaB1","EtaB2","EtaB3","pTB1","pTB2","pTJ3","nrMuonInJetB1","nrMuonInJetB2","nrMuonInJetB2","dRBB","])    
-            #self.set_list_variable(["AverageMuScaled","MET","SumPtJet","EtaB1","EtaB2","EtaJ3","pTB1","pTB2","pTJ3","dRBB","mBB","mva"])    
-            #if self.debug:
+            # self.set_list_variable(["mBBNominal","mBBOneMu4GeV","mBBOneMu10GeV","mBBPtReco"])    
+            # self.set_list_variable(["AverageMuScaled","MET","SumPtJet","EtaB1","EtaB2","EtaB3","pTB1","pTB2","pTJ3","nrMuonInJetB1","nrMuonInJetB2","nrMuonInJetB2","dRBB","])    
+            # self.set_list_variable(["AverageMuScaled","MET","SumPtJet","EtaB1","EtaB2","EtaJ3","pTB1","pTB2","pTJ3","dRBB","mBB","mva"])    
+            # if self.debug:
             if self.verbose:
                 self.print_lists()
             doAll=True
@@ -1857,66 +1862,47 @@ class Analysis:
                 self.create_histosProcess()
             # return
             self.set_list_processMerged()
-            if doAll and False:
+            if doAll and True:
                 self.create_histosProcessMerged(doSF=True)
             # return
             self.set_list_processAnalysis()
-            if False:
+            if True:
                 if True:
-                    #self.list_category=["2tag2jet_150ptv_SR"]
-                    #self.list_processResult=self.list_processAnalysis
-                    # self.list_processResult=["VHbb","VHcc","VBF","ttH","ggH","bbH","qqZincH4l","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
-                    # self.list_processResult=["S","B","S/B","SigY_S_B","SigH_S_B"]
-                    # self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
-                    # self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
-                    self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","S","B","data"]
+                    self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
                     if True:
                         self.create_results()
                 if True:
-                    # self.debug=True
                     self.read_results()
-                    #self.list_category=["2tag2jet_150ptv_SR"]
-                    #self.list_variable=["mBB"]
-                    #self.list_variable=["mBB","mva"]
-                    #self.list_variable=["mBB","mva"]
-                    #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
-                    #self.list_variable=["mBBNominal","mBBOneMu","mBBAllMu","mBBPtReco"]
-                    #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBAllMu","mBBPtReco"]
-                    #self.list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV"]
-                    #list_variable=["mBBNominal","mBBOneMu20GeV","mBBOneMu10GeV","mBBOneMu4GeV","mBBAllMu","mBBPtReco"]
-                    #list_variable=["mBBNominal","mBBOneMu10GeV","mBBOneMu4GeV","mBBPtReco"]
-                    #list_variable=["mBB","mva"]
-                    #self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data","dataB"]
-                    # self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","dijet","S","B","data"]
-                    self.list_processResult=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","S","B","data"]
+                    self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B"]
                     # for bJetCorr in "Nominal,OneMu20GeV,OneMu15GeV,OneMu12GeV,OneMu10GeV,OneMu7GeV,OneMu6GeV,OneMu5GeV,OneMu4GeV,PtReco".split(","):
                     # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
-                    #for var in "mBB,mva,MET".split(","):
-                    #for var in "mBBNominal".split(","):
+                    # for var in "mBB,mva,MET".split(","):
+                    # for var in "mBBNominal".split(","):
                     for var in list_variable:
                         self.list_processResult=self.list_processResult+["SigH_S_B@"+var]                 
                     self.create_yield_latex_table(doDocument=False)
-                    #self.create_overlaid_variable()
+                    # self.create_overlaid_variable()
                 # done if
             # done if
             # return
             if True:
-                # do overlay plots of D,B,B+S,S (S is times some value)
-                #self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3"]) # don't look yet, as not blinded
-                #self.set_list_variable(["MET"])
+                # self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3"]) # don't look yet, as not blinded
+                # self.set_list_variable(["MET"])
                 # self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
-                #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
-                #self.set_list_variable(["SumPtJet"])
-                #self.create_overlaid_plots()
+                # self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+                # self.set_list_variable(["SumPtJet"])
+                # do overlay plots of D,B,BplusS,S (S is times some value)
+                # self.create_overlaid_plots()
+                # do stack plots of signal, background, data (S is times some value)
                 self.create_stacked_plots()
         # done if doYields
 
-        #self.set_list_processInitial(["WHlv125J_MINLO"])
-        #self.set_list_processInitial(["ZeeL_v221"])
-        #self.evaluate_content_of_one_processInitial("WHlv125J_MINLO","False")
-        #self.print_all()
+        # self.set_list_processInitial(["WHlv125J_MINLO"])
+        # self.set_list_processInitial(["ZeeL_v221"])
+        # self.evaluate_content_of_one_processInitial("WHlv125J_MINLO","False")
+        # self.print_all()
 
     ### done methods
 
