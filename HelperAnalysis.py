@@ -981,6 +981,26 @@ class Analysis:
                 ],
             }
         # Done
+    # done function
+
+    def set_dict_processMerged_stackColor(self):
+        self.dict_processMerged_stackColor={
+            "VHbb":ROOT.kRed,
+            "OtherHiggs":ROOT.kGray+1,
+            "diboson":ROOT.kGray,
+            "Whf":ROOT.kGreen+3,
+            "Wcl":ROOT.kGreen-6,
+            "Wl":ROOT.kGreen-9,
+            "Zhf":ROOT.kAzure+2,
+            "Zcl":ROOT.kAzure-8,
+            "Zl":ROOT.kAzure-9,
+            "ttbar":ROOT.kOrange,
+            "stop":ROOT.kOrange-1,
+            "tt+X":ROOT.kOrange-7,
+            "data":ROOT.kBlack,
+            }
+    # done function
+
 
     def set_list_processMerged(self):
         if self.debug:
@@ -1516,6 +1536,7 @@ class Analysis:
                 binRange=info[0]
             else:
                 binRange=""
+            # done if
             for category in self.list_category:
                 if self.debug:
                     print "category",category
@@ -1526,6 +1547,7 @@ class Analysis:
                         binRange=self.binRange_mva3J
                     else:
                         binRange=self.binRange_mva3J
+                    # done if
                 # done if
                 list_tuple_h1D=[]
                 for i,processMerged in enumerate(list_processMerged):
@@ -1543,7 +1565,7 @@ class Analysis:
                     # blind the data
                     if processMerged=="D" or processMerged=="D2":
                         if "mBB" in variable:
-                            histo=get_histo_blinded(histo,binRange=[60,140],debug=False)
+                            histo=get_histo_blinded(histo,binRange=[80,140],debug=False)
                         elif "mva" in variable:
                             histo=get_histo_blinded(histo,binRange=[0.5,1.0],debug=False)
                         else:
@@ -1573,6 +1595,87 @@ class Analysis:
         #command="$All/BuzatuBash/make_html.sh "+self.folderPlots
         #os.system(command)
     # done function
+
+    def create_stacked_plots(self):
+        initial=self.debug
+        self.debug=True
+        if self.verbose:
+            print "Start create_stacked_plots()"
+        inputFileName=self.fileNameHistosProcessMerged
+        self.set_dict_processMerged_stackColor()
+        for variable in self.list_variable:
+            if self.debug:
+                print "variable",variable
+            if variable in self.dict_variable_info.keys():
+                info=self.dict_variable_info[variable]
+                binRange=info[0]
+            else:
+                binRange=""
+            # done if
+            for category in self.list_category:
+                if self.debug:
+                    print "category",category
+                if variable=="mva":
+                    if "2jet" in category:
+                        binRange=self.binRange_mva2J
+                    elif "3jet" in category:
+                        binRange=self.binRange_mva3J
+                    else:
+                        binRange=self.binRange_mva3J
+                    # done if
+                # done if
+                list_tuple_h1D=[]
+                # list_processStack=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","data"]
+                # list_processStack=["OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop"]
+                list_processStack=["Zl","Zcl","Zhf","Wl","Wcl","Whf","stop","tt+X","ttbar","diboson","OtherHiggs","VHbb"]
+                for i,processMerged in enumerate(list_processStack):
+                    if self.debug:
+                        print "processMerged",processMerged
+                    histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
+                    histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
+                    if processMerged=="VHbb":
+                        processType="S"
+                    elif processMerged=="data":
+                        processType=="D"
+                    else:
+                        processType="B"
+                    # done if
+                    SF=1.0
+                    # blind the data
+                    if processMerged=="data" or processMerged=="D" or processMerged=="D2":
+                        if "mBB" in variable:
+                            histo=get_histo_blinded(histo,binRange=[80,140],debug=False)
+                        elif "mva" in variable:
+                            histo=get_histo_blinded(histo,binRange=[0.5,1.0],debug=False)
+                        else:
+                            None
+                        # done if
+                    # done if
+                                        # rebin, collect overflows, do average
+                    debug=False
+                    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
+                    if "ptMuonInJet" in variable:
+                        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
+                    else:
+                        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
+                    histo=get_histo_averaged_per_bin_width(histo,debug=debug)
+                    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    # prepare histograms
+                    color=self.dict_processMerged_stackColor[processMerged]
+                    histo.SetLineColor(color)
+                    histo.SetFillColor(color)
+                    histo.SetXTitle(variable)
+                    histo.SetYTitle("Event density per bin width")
+                    list_tuple_h1D.append((histo,processMerged,processType,SF))
+                # done loop over processMerged
+                outputFileName=self.folderPlots+"/stack_"+variable+"_"+category
+                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.25,0.88,0.88,72,0.037,0],debug=self.debug)
+            # done loop over category
+        # done loop over variable
+        self.debug=initial
+    # done function
+
 
     ### print
 
@@ -1688,8 +1791,8 @@ class Analysis:
             # reduce category
             if "MVA" in self.stem:
                 # self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
-                self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
-                # self.set_list_category(["2tag2jet_150ptv_SR"]) 
+                #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
+                self.set_list_category(["2tag2jet_150ptv_SR"]) 
             elif "CUT" in self.stem:
                 self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
                 # self.set_list_category(["2tag2jet_150_200ptv_SR"])
@@ -1716,7 +1819,7 @@ class Analysis:
             #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco","SumPtJet"]
             #self.list_variable=["mva"]
             #self.list_variable=["mva","mBB"]
-            #self.list_variable=["mBB"]
+            self.list_variable=["mBB"]
             #self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
             #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             if True:
@@ -1743,20 +1846,20 @@ class Analysis:
             if self.verbose:
                 self.print_lists()
             doAll=True
-            if doAll:
+            if doAll and False:
                 self.create_histosRaw(option="reduced")
             # return
             # now we want to sum over processInitial for a given process
             self.set_list_process_info()
-            if doAll:
+            if doAll and False:
                 self.create_histosProcess()
             # return
             self.set_list_processMerged()
-            if doAll:
+            if doAll and False:
                 self.create_histosProcessMerged(doSF=True)
             # return
             self.set_list_processAnalysis()
-            if True:
+            if False:
                 if True:
                     #self.list_category=["2tag2jet_150ptv_SR"]
                     #self.list_processResult=self.list_processAnalysis
@@ -1804,7 +1907,8 @@ class Analysis:
                 # self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
                 #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
                 #self.set_list_variable(["SumPtJet"])
-                self.create_overlaid_plots()
+                #self.create_overlaid_plots()
+                self.create_stacked_plots()
         # done if doYields
 
         #self.set_list_processInitial(["WHlv125J_MINLO"])
