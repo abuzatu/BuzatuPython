@@ -28,8 +28,8 @@ class Analysis:
 
     ### setters
 
-    def set_vtag(self,vtag):
-        self.vtag=vtag
+    def set_stem(self,stem):
+        self.stem=stem
 
     def set_debug(self,debug):
         self.debug=debug
@@ -1511,8 +1511,11 @@ class Analysis:
                 list_processMerged="B,S,B+S,D".split(",")
                 #list_processMerged="D,D2".split(",")
             # done if
-            info=self.dict_variable_info[variable]
-            binRange=info[0]
+            if variable in self.dict_variable_info.keys():
+                info=self.dict_variable_info[variable]
+                binRange=info[0]
+            else:
+                binRange=""
             for category in self.list_category:
                 if self.debug:
                     print "category",category
@@ -1605,7 +1608,7 @@ class Analysis:
         if self.do_hadd_processInitial:
             self.hadd_each_processInitial()
         self.create_folderFitInput()
-        # dict_vtag_analysis[vtag].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
+        # dict_stem_analysis[stem].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
         # re-evaluate from the folder output if you put by hand new folders, like data16B
         if self.do_evaluate_list_processInitial:
             self.evaluate_list_processInitial(option="processInitial")
@@ -1683,13 +1686,17 @@ class Analysis:
             #self.list_process=["ttbar"]
             #self.list_process=["data"]
             # reduce category
-            if "MVA" in self.vtag:
+            if "MVA" in self.stem:
                 # self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
                 self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
                 # self.set_list_category(["2tag2jet_150ptv_SR"]) 
-            elif "SM" in self.vtag:
+            elif "CUT" in self.stem:
                 self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
                 # self.set_list_category(["2tag2jet_150_200ptv_SR"])
+            else:
+                print "Neither MVA, nor CUT are not found in stem",self.stem,". Will ABORT!!!"
+                assert(False)
+            # done if
             #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
             #self.set_list_category(["2tag2jet_150ptv_SR"]) 
             #self.set_list_category(["2tag3jet_150ptv_SR"]) 
@@ -1708,7 +1715,8 @@ class Analysis:
             #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco"]
             #self.list_variable=["mBBNominal","mBBOneMu","mBBPtReco","SumPtJet"]
             #self.list_variable=["mva"]
-            self.list_variable=["mva","mBB"]
+            #self.list_variable=["mva","mBB"]
+            #self.list_variable=["mBB"]
             #self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
             #self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             if True:
