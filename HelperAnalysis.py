@@ -1627,7 +1627,7 @@ class Analysis:
                 list_tuple_h1D=[]
                 # list_processStack=["VHbb","OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop","data"]
                 # list_processStack=["OtherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","tt+X","stop"]
-                list_processStack=["Zl","Zcl","Zhf","Wl","Wcl","Whf","stop","tt+X","ttbar","diboson","OtherHiggs","VHbb"]
+                list_processStack=["Zl","Zcl","Zhf","Wl","Wcl","Whf","stop","tt+X","ttbar","diboson","OtherHiggs","VHbb","data"]
                 for i,processMerged in enumerate(list_processStack):
                     if self.debug:
                         print "processMerged",processMerged
@@ -1636,7 +1636,7 @@ class Analysis:
                     if processMerged=="VHbb":
                         processType="S"
                     elif processMerged=="data":
-                        processType=="D"
+                        processType="D"
                     else:
                         processType="B"
                     # done if
@@ -1651,7 +1651,7 @@ class Analysis:
                             None
                         # done if
                     # done if
-                                        # rebin, collect overflows, do average
+                    # rebin, collect overflows, do average
                     debug=False
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
@@ -1667,10 +1667,12 @@ class Analysis:
                     histo.SetFillColor(color)
                     histo.SetXTitle(variable)
                     histo.SetYTitle("Event density per bin width")
+                    if self.debug:
+                        print "histo",histo,"processMerged",processMerged,"processType",processType,"SF",SF
                     list_tuple_h1D.append((histo,processMerged,processType,SF))
                 # done loop over processMerged
                 outputFileName=self.folderPlots+"/stack_"+variable+"_"+category
-                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.25,0.88,0.88,72,0.037,0],debug=self.debug)
+                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.25,0.88,0.88,72,0.037,0],debug=self.debug)
             # done loop over category
         # done loop over variable
         self.debug=initial

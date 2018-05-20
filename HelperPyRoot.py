@@ -2403,29 +2403,33 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     stack=THStack(stackName,"")
     legend=get_legend(legend_info,debug)
     legend.SetBorderSize(0)
-    dict_processType_histoSum={}
+    dict_processType_histo={}
     for tuple_h1D in list_tuple_h1D:
         histo=tuple_h1D[0]
         process=tuple_h1D[1]
         processType=tuple_h1D[2]
         SF=tuple_h1D[3]
-        if processType=="B":
+        if debug:
+            print "histo",histo,"process",process,"processType",processType,"SF",SF
+        if processType=="B" or processType=="S":
             stack.Add(histo)
             legend.AddEntry(histo,process,"f")
-        elif processType=="S":
-            if processType in dict_processType_histoSum:
-                dict_processType_histoSum[processType].Add(histo)
-            else:
-                dict_processType_histoSum[processType]=histo
-                if processType=="S":
-                    legendName="Sig VH x 5"
-                    dict_processType_histoSum[processType].SetFillStyle(0)
-                    dict_processType_histoSum[processType].SetLineWidth(3)
-                legend.AddEntry(histo,legendName,"f")
+            if processType=="S":
+                dict_processType_histo[processType]=histo.Clone("S_overlay")
+                dict_processType_histo[processType].SetFillStyle(0)
+                dict_processType_histo[processType].SetLineWidth(3)
+                S_scale=5
+                dict_processType_histo[processType].Scale(S_scale)
+                legendName=process+" x %.0f" % (S_scale)
+                legend.AddEntry(histo,legendName,"l")
+            # done if
         elif processType=="D":
-            None
+            dict_processType_histo[processType]=histo
+            dict_processType_histo[processType].SetFillStyle(0)
+            dict_processType_histo[processType].SetMarkerStyle(ROOT.kFullCircle)
+            legend.AddEntry(histo,process,"p")
         else:
-            print "processType",processType,"not known. Choose S or B. Will ABORT!!!"
+            print "processType",processType,"not known. Choose S, B or D. Will ABORT!!!"
             assert(False)
         # end if processType
     # done loop over tuple_h1D
@@ -2439,10 +2443,10 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     stack.Draw("hist")
     stack.GetXaxis().SetTitle(histo.GetXaxis().GetTitle())
     stack.GetYaxis().SetTitle(histo.GetYaxis().GetTitle())
-    #stack.GetYaxis().SetTitle("Number of events per bin width")
     # overlay the signal
-    dict_processType_histoSum["S"].Scale(5)
-    dict_processType_histoSum["S"].Draw("hist same")
+    dict_processType_histo["S"].Draw("hist same")
+    # overlay the data
+    dict_processType_histo["D"].Draw("p same")
     # add the legend
     legend.Draw("same")
     # add text at the top
