@@ -1489,7 +1489,7 @@ def get_histo_generic_binRange(histo,binRange="150,200,400",option="sum",debug=F
     if debug:
         print "histoName",histoName,"histoTitle",histoTitle,"histoNrBins",histoNrBins
     # create a histogram with this binning
-    result=TH1F(histoName,histoTitle,histoNrBins, nparray_binRange)
+    result=TH1F(histoName+"_rebin",histoTitle+"_rebin",histoNrBins, nparray_binRange)
     result.SetXTitle(h.GetXaxis().GetTitle())
     result.SetYTitle(h.GetYaxis().GetTitle())
     # loop over each bin of the new histogram
@@ -2433,24 +2433,31 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
             assert(False)
         # end if processType
     # done loop over tuple_h1D
-    # create space at the top for text
-    maximum = stack.GetMaximum()*1.40
-    minimum = 0.00001
-    stack.SetMaximum(maximum)
-    stack.SetMinimum(minimum)
     c=TCanvas("c","c",600,400)
     # plot the stack
     stack.Draw("hist")
     stack.GetXaxis().SetTitle(histo.GetXaxis().GetTitle())
     stack.GetYaxis().SetTitle(histo.GetYaxis().GetTitle())
+    currentMaximum=stack.GetMaximum()
     # overlay the signal
-    dict_processType_histo["S"].Draw("hist same")
+    if "S" in dict_processType_histo.keys():
+        dict_processType_histo["S"].Draw("hist same")
+        if dict_processType_histo["S"].GetMaximum()>currentMaximum:
+            currentMaximum=dict_processType_histo["S"].GetMaximum()
     # overlay the data
-    dict_processType_histo["D"].Draw("p same")
+    if "D" in dict_processType_histo.keys():
+        dict_processType_histo["D"].Draw("p same")
+        if dict_processType_histo["D"].GetMaximum()>currentMaximum:
+            currentMaximum=dict_processType_histo["D"].GetMaximum()
     # add the legend
     legend.Draw("same")
     # add text at the top
     setupTextOnPlot(*text_option)
+    # create space at the top for text
+    maximum = currentMaximum*1.40
+    minimum = 0.00001
+    stack.SetMaximum(maximum)
+    stack.SetMinimum(minimum)
     # save the canvas in files with what extensions we want
     for extension in extensions.split(","):
         c.Print(outputFileName+"."+extension)
