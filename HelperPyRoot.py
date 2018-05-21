@@ -2397,7 +2397,273 @@ def plotMultiGraph(list_graphs,canvas_size,legend_position,factor_maximum,plot_o
 # besides info needed for overlayHistograms (histogram and legend) we need more info
 # if it is S, B or D, and if we want to scale it by some number (default 1)
 # then we hard code the way we want this plot to look like
-def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.17,0.88,0.88,72,0.037,0],debug=False):
+def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),debug=False):
+    if debug:
+        print "Start stackHistograms"
+
+    # create canvas
+    c=TCanvas("c","c",950,700)
+    c.cd()
+    p1=TPad("p2","p2",0.00,0.30,0.75,1.00) # top left (stacked plots)
+    p2=TPad("p1","p1",0.00,0.00,0.75,0.30) # bottom left (ratio pad)
+    p3=TPad("p3","p3",0.75,0.00,1.00,1.00) # right (legends) p3
+    p1.Draw()
+    p2.Draw()
+    p3.Draw()
+    p1.SetTopMargin(0.05)
+    p1.SetBottomMargin(0.05)
+    p1.SetRightMargin(0.08)
+    p2.SetBottomMargin(0.3)
+    p2.SetTopMargin(0)
+    p2.SetRightMargin(0.08)
+    p3.SetTopMargin(0)
+    p3.SetLeftMargin(0)
+    p3.SetBottomMargin(0)
+    p3.SetRightMargin(0)
+
+    # p1 - top left (stacked plots)
+    p1.cd()
+
+    # first create and plot the stack (background and signal)
+    stack=THStack(stackName,stackName)
+    dict_process_histoStack={}
+    list_process_histoStack=[]
+    for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+        if debug:
+            print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
+        if processType=="B" or processType=="S":
+            list_process_histoStack.append(process)
+            dict_process_histoStack[process]=histo.Clone(histo.GetName()+"_stack")
+            dict_process_histoStack[process].Scale(SF)
+            dict_process_histoStack[process].SetLineWidth(2)
+            dict_process_histoStack[process].SetLineColor(color)
+            dict_process_histoStack[process].SetFillColor(color)
+            stack.Add(dict_process_histoStack[process])
+        # done if
+    # done for loop over histograms
+    stack.Draw("hist")
+
+    # then draw overlaid all the MC processes we want (either signal or MC), and with their chosen scale
+    # if scale==0, it means we do not want them overlaid
+    dict_process_histoOverlayMC={}
+    dict_process_scaleOverlayMC={}
+    list_process_histoOverlayMC=[]
+    for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+        if debug:
+            print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
+        if (processType=="B" or processType=="S") and (scale>0):
+            dict_process_scaleOverlayMC[process]=scale
+            list_process_histoOverlayMC.append(process)
+            dict_process_histoOverlayMC[process]=histo.Clone(histo.GetName()+"_overlay")
+            dict_process_histoOverlayMC[process].Scale(SF)
+            dict_process_histoOverlayMC[process].Scale(scale)
+            dict_process_histoOverlayMC[process].SetLineWidth(2)
+            dict_process_histoOverlayMC[process].SetFillStyle(0)
+            dict_process_histoOverlayMC[process].SetLineColor(color)
+            dict_process_histoOverlayMC[process].Draw("hist same")
+        # done if
+    # done for loop over histograms
+        
+    # then draw overlaid the data
+    # if scale==0, it means we do not want them overlaid
+    dict_process_histoOverlayData={}
+    list_process_histoOverlayData=[]
+    for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+        if debug:
+            print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
+        if processType=="D":
+            list_process_histoOverlayData.append(process)
+            dict_process_histoOverlayData[process]=histo.Clone(histo.GetName()+"_overlay")
+            dict_process_histoOverlayData[process].Scale(SF)
+            dict_process_histoOverlayData[process].SetMarkerStyle(20)
+            dict_process_histoOverlayData[process].SetLineWidth(2)
+            dict_process_histoOverlayData[process].SetLineColor(color)
+            dict_process_histoOverlayData[process].Draw("ep same")
+        # done if
+    # done for loop over histograms
+
+    # p3 - legends
+    p3.cd()
+
+    legendTop=TLegend(0.01,0.317,0.965,0.965);
+    legendTop.SetFillColor(0)
+    legendTop.SetBorderSize(1)
+    legendTop.SetTextSize(0.08)
+    for process in list_process_histoOverlayData:
+        legendTop.AddEntry(dict_process_histoOverlayData[process],process,"lp")
+    for process in reversed(list_process_histoStack):
+        legendTop.AddEntry(dict_process_histoStack[process],process,"f")
+    for process in list_process_histoOverlayMC:
+        legendTop.AddEntry(dict_process_histoOverlayMC[process],process+" x %.0f" % (dict_process_scaleOverlayMC[process]),"l")
+    legendTop.Draw("same")
+
+    # save the canvas in files with what extensions we want
+    for extension in extensions.split(","):
+        c.Print(outputFileName+"."+extension)
+    # ended for over extensions
+    return None
+# done function
+
+
+# make stacked plots
+# give list of tuple of histograms
+# besides info needed for overlayHistograms (histogram and legend) we need more info
+# if it is S, B or D, and if we want to scale it by some number (default 1)
+# then we hard code the way we want this plot to look like
+def stackHistograms3(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.17,0.88,0.88,72,0.037,0],debug=False):
+    if debug:
+        print "Start stackHistograms"
+
+    # create canvas
+    c=TCanvas("c","c",950,700)
+    c.cd()
+    p1=TPad("p1","p1",0.00,0.00,0.75,0.30) # bottom left (ratio pad)
+    p2=TPad("p2","p2",0.00,0.30,0.75,1.00) # top left (stacked plots)
+    p3=TPad("p3","p3",0.75,0.00,1.00,1.00) # right (legends)
+    p1.Draw()
+    p2.Draw()
+    p3.Draw()
+    p1.SetBottomMargin(0.3)
+    p1.SetTopMargin(0)
+    p1.SetRightMargin(0.08)
+    p2.SetTopMargin(0.05)
+    p2.SetBottomMargin(0.02)
+    p2.SetRightMargin(0.08)
+    p3.SetTopMargin(0)
+    p3.SetLeftMargin(0)
+    p3.SetBottomMargin(0)
+    p3.SetRightMargin(0)
+
+    #  top left (stacked plots)
+    p2.cd()
+
+    # first create and plot the stack (background and signal)
+    stack=THStack(stackName,stackName)
+    for (histo,process,processType,SF) in list_tuple_h1D:
+        if debug:
+            print "histo",histo,"process",process,"processType",processType,"SF",SF
+        if processType=="B" or processType=="S":
+            stack.Add(histo)  
+    # done for loop over histograms
+
+
+    #dict_processType_histo={}
+    #for (histo,process,processType,SF) in list_tuple_h1D:
+    #    if debug:
+    #        print "histo",histo,"process",process,"processType",processType,"SF",SF
+    #    if processType=="B" or processType=="S":
+    #        stack.Add(histo)
+    #    if processType=="S":
+    #        dict_processType_histo[processType]=histo.Clone("S_overlay")
+    #    if processType=="D":
+    #        dict_processType_histo[processType]=histo.Clone("D_overlay")
+    # done loop over the initial histograms
+
+
+
+
+    # then overlay the signal
+    S_scale=5
+
+    # then overlay the data
+
+    # then the text at the top
+
+    # then the chi2 info
+
+
+    dict_processType_histo={}
+    S_scale=5
+    for tuple_h1D in list_tuple_h1D:
+        histo=tuple_h1D[0]
+        process=tuple_h1D[1]
+        processType=tuple_h1D[2]
+        SF=tuple_h1D[3]
+        if debug:
+            print "histo",histo,"process",process,"processType",processType,"SF",SF
+        if processType=="B" or processType=="S":
+            stack.Add(histo)
+            if processType=="S":
+                dict_processType_histo[processType]=histo.Clone("S_overlay")
+                dict_processType_histo[processType].SetFillStyle(0)
+                dict_processType_histo[processType].SetLineWidth(2)
+                dict_processType_histo[processType].Scale(S_scale)
+            # done if
+        elif processType=="D":
+            dict_processType_histo[processType]=histo
+            dict_processType_histo[processType].SetFillStyle(0)
+            dict_processType_histo[processType].SetMarkerStyle(ROOT.kFullCircle)
+            #legend.AddEntry(histo,process,"lp")
+        else:
+            print "processType",processType,"not known. Choose S, B or D. Will ABORT!!!"
+            assert(False)
+        # end if processType
+    # done loop over tuple_h1D
+
+
+    # plot the stack
+    stack.Draw("hist")
+    stack.GetXaxis().SetTitle(histo.GetXaxis().GetTitle())
+    stack.GetYaxis().SetTitle(histo.GetYaxis().GetTitle())
+    currentMaximum=stack.GetMaximum()
+    # overlay the signal
+    if "S" in dict_processType_histo.keys():
+        dict_processType_histo["S"].Draw("hist same")
+        if dict_processType_histo["S"].GetMaximum()>currentMaximum:
+            currentMaximum=dict_processType_histo["S"].GetMaximum()
+    # overlay the data
+    if "D" in dict_processType_histo.keys():
+        dict_processType_histo["D"].Draw("p same")
+        if dict_processType_histo["D"].GetMaximum()>currentMaximum:
+            currentMaximum=dict_processType_histo["D"].GetMaximum()
+    # add text at the top
+    setupTextOnPlot(*text_option)
+    # create space at the top for text
+    maximum = currentMaximum*1.40
+    minimum = 0.00001
+    stack.SetMaximum(maximum)
+    stack.SetMinimum(minimum)
+
+    p3.cd()
+    # add the legend
+    legend=get_legend(legend_info,debug)
+    legend.SetBorderSize(1)
+    if "D" in dict_processType_histo.keys():
+        legend.AddEntry(dict_processType_histo["D"],process,"lp")
+    # for tuple_h1D in list_tuple_h1D:
+    S_name=""
+    for (histo,process,processType,SF) in reversed(list_tuple_h1D):
+        if process=="data":
+            continue
+        #histo=tuple_h1D[0]
+        ##process=tuple_h1D[1]
+        #processType=tuple_h1D[2]
+        #SF=tuple_h1D[3]
+        if debug:
+            print "histo",histo,"process",process,"processType",processType,"SF",SF
+        legend.AddEntry(histo,process,"f")
+        if processType=="S":
+            S_name=process
+    if "S" in dict_processType_histo.keys():
+        legendName=S_name+" x %.0f" % (S_scale)
+        legend.AddEntry(dict_processType_histo["S"],legendName,"l")
+
+    legend.Draw("same")
+    # legend.AddEntry(histo,process,"lp")
+
+    # save the canvas in files with what extensions we want
+    for extension in extensions.split(","):
+        c.Print(outputFileName+"."+extension)
+    # ended for over extensions
+    return None
+# done function
+
+# make stacked plots
+# give list of tuple of histograms
+# besides info needed for overlayHistograms (histogram and legend) we need more info
+# if it is S, B or D, and if we want to scale it by some number (default 1)
+# then we hard code the way we want this plot to look like
+def stackHistograms2(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.17,0.88,0.88,72,0.037,0],debug=False):
     if debug:
         print "Start stackHistograms"
     stack=THStack(stackName,"")
@@ -2463,7 +2729,6 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
         c.Print(outputFileName+"."+extension)
     # ended for over extensions
     return None
-
 # done function
 
 def overlapHistograms(hist_1, hist_2, do_print):

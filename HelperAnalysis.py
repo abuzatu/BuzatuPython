@@ -984,25 +984,25 @@ class Analysis:
         # Done
     # done function
 
-    def set_dict_processMerged_stackColor(self):
-        self.dict_processMerged_stackColor={
-            "S":ROOT.kRed,
-            "B":ROOT.kBlue-10,
-            "D":ROOT.kBlack,
-            "VHbb":ROOT.kRed,
-            "otherHiggs":ROOT.kGray+1,
-            "diboson":ROOT.kGray,
-            "Whf":ROOT.kGreen+3,
-            "Wcl":ROOT.kGreen-6,
-            "Wl":ROOT.kGreen-9,
-            "Zhf":ROOT.kAzure+2,
-            "Zcl":ROOT.kAzure-8,
-            "Zl":ROOT.kAzure-9,
-            "ttbar":ROOT.kOrange,
-            "stop":ROOT.kOrange-1,
-            "ttX":ROOT.kOrange-7,
-            "data":ROOT.kBlack,
+    def set_dict_processMerged_stackInfo(self):
+        # stackInfo: processType (S,B,D), color, SF, if overlay what is the scale (0 means no overlay), 
+        self.dict_processMerged_stackInfo={
+            "Zl"        :["B",ROOT.kAzure-9,1.0,0],
+            "Zcl"       :["B",ROOT.kAzure-8,1.0,0],
+            "Zhf"       :["B",ROOT.kAzure+2,1.0,0],
+            "Wl"        :["B",ROOT.kGreen-9,1.0,0],
+            "Wcl"       :["B",ROOT.kGreen-6,1.0,0],
+            "Whf"       :["B",ROOT.kGreen+3,1.0,0],
+            "stop"      :["B",ROOT.kOrange-1,1.0,0],
+            "ttX"       :["B",ROOT.kOrange-7,1.0,0],
+            "ttbar"     :["B",ROOT.kOrange,1.0,0],
+            "otherHiggs":["B",ROOT.kGray+1,1.0,0],
+            "diboson"   :["B",ROOT.kGray,1.0,2],
+            "VHbb"      :["S",ROOT.kRed,1.0,2],
+            "data"      :["D",ROOT.kBlack,1.0,1],
             }
+        #
+        self.list_processStack=["Zl","Zcl","Zhf","Wl","Wcl","Whf","stop","ttX","ttbar","diboson","otherHiggs","VHbb","data"]
     # done function
 
 
@@ -1053,8 +1053,8 @@ class Analysis:
         outputFile.Close()
         for variable in self.list_variable:
             for category in self.list_category:
-            if self.verbose:
-                print "variable",variable,"category",category
+                if self.verbose:
+                    print "variable",variable,"category",category
                 if "2jet" in category:
                     cat="2"
                 elif "3jet" in category:
@@ -1609,7 +1609,7 @@ class Analysis:
         if self.verbose:
             print "Start create_stacked_plots()"
         inputFileName=self.fileNameHistosProcessMerged
-        self.set_dict_processMerged_stackColor()
+        self.set_dict_processMerged_stackInfo()
         for variable in self.list_variable:
             if self.debug:
                 print "variable",variable
@@ -1632,20 +1632,11 @@ class Analysis:
                     # done if
                 # done if
                 list_tuple_h1D=[]
-                list_processStack=["Zl","Zcl","Zhf","Wl","Wcl","Whf","stop","ttX","ttbar","diboson","otherHiggs","VHbb","data"]
-                for i,processMerged in enumerate(list_processStack):
+                for i,processMerged in enumerate(self.list_processStack):
                     if self.debug:
                         print "processMerged",processMerged
                     histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
                     histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
-                    if processMerged=="VHbb" or processMerged=="S":
-                        processType="S"
-                    elif processMerged=="data" or processMerged=="D":
-                        processType="D"
-                    else:
-                        processType="B"
-                    # done if
-                    SF=1.0
                     # blind the data
                     if processMerged=="data" or processMerged=="D":
                         if "mBB" in variable:
@@ -1667,17 +1658,18 @@ class Analysis:
                     histo=get_histo_averaged_per_bin_width(histo,debug=debug)
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     # prepare histograms
-                    color=self.dict_processMerged_stackColor[processMerged]
-                    histo.SetLineColor(color)
-                    histo.SetFillColor(color)
-                    histo.SetXTitle(variable)
-                    histo.SetYTitle("Event density per bin width")
-                    if self.debug:
-                        print "histo",histo,"processMerged",processMerged,"processType",processType,"SF",SF
-                    list_tuple_h1D.append((histo,processMerged,processType,SF))
+                    list_info=self.dict_processMerged_stackInfo[processMerged]
+                    #histo.SetLineColor(color)
+                    #histo.SetFillColor(color)
+                    #histo.SetXTitle(variable)
+                    #histo.SetYTitle("Event density per bin width")
+                    #if self.debug:
+                    #    print "histo",histo,"processMerged",processMerged,"processType",processType,"SF",SF
+                    list_tuple_h1D.append((histo,processMerged,list_info))
                 # done loop over processMerged
                 outputFileName=self.folderPlots+"/stack_"+variable+"_"+category
-                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.25,0.88,0.88,72,0.037,0],debug=self.debug)
+                # stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.25,0.88,0.88,72,0.037,0],debug=self.debug)
+                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),debug=True)
             # done loop over category
         # done loop over variable
     # done function
@@ -1826,7 +1818,7 @@ class Analysis:
             # self.list_variable=["mva"]
             # self.list_variable=["mva","mBB"]
             # self.list_variable=["mBB","MET","pTB1"]
-            # self.list_variable=["MET"]
+            self.list_variable=["mBB"]
             # self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
             # self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             if True:
@@ -1862,11 +1854,11 @@ class Analysis:
                 self.create_histosProcess()
             # return
             self.set_list_processMerged()
-            if doAll and True:
+            if doAll and False:
                 self.create_histosProcessMerged(doSF=True)
             # return
             self.set_list_processAnalysis()
-            if True:
+            if doAll and False:
                 if True:
                     self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
