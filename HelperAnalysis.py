@@ -1566,17 +1566,17 @@ class Analysis:
                     histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
                     legend=processMerged
                     # scale the signal
-                    signalScale=5
-                    if processMerged=="S":
-                        histo.Scale(signalScale)
-                        legend+=" x "+str(signalScale)
+                    #signalScale=5
+                    #if processMerged=="S":
+                    #    histo.Scale(signalScale)
+                    #    legend+=" x "+str(signalScale)
                     # done if
                     # blind the data
                     if processMerged=="D" or processMerged=="data":
                         if "mBB" in variable:
-                            histo=get_histo_blinded(histo,binRange=[80,140],debug=False)
+                            histo=get_histo_blinded_from_binRange(histo,binRange=[80,140],debug=False)
                         elif "mva" in variable:
-                            histo=get_histo_blinded(histo,binRange=[0.3,1.0],debug=False)
+                            histo=get_histo_blinded_from_binRange(histo,binRange=[0.3,1.0],debug=False)
                         else:
                             None
                         # done if
@@ -1637,14 +1637,22 @@ class Analysis:
                         print "processMerged",processMerged
                     histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
                     histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
+                    if "mBB" in variable and variable!="mBBJ":
+                        blinding=["range",[80,140]]
+                    elif variable=="mva" or variable=="mvadiboson":
+                        blinding=["range",[0.3,1.0]]
+                    else:
+                        blinding=["threshold",0.05]
+                    # done if
+
                     # blind the data
-                    if processMerged=="data" or processMerged=="D":
-                        if "mBB" in variable:
-                            histo=get_histo_blinded(histo,binRange=[80,140],debug=False)
-                        elif "mva" in variable:
-                            histo=get_histo_blinded(histo,binRange=[0.3,1.0],debug=False)
-                        else:
-                            None
+                    #if processMerged=="data" or processMerged=="D":
+                        #if "mBB" in variable:
+                        #    histo=get_histo_blinded_from_binRange(histo,binRange=[80,140],debug=False)
+                        #elif "mva" in variable:
+                        #    histo=get_histo_blinded_from_binRange(histo,binRange=[0.3,1.0],debug=False)
+                        #else:
+                        #    None
                         # done if
                     # done if
                     # rebin, collect overflows, do average
@@ -1655,7 +1663,7 @@ class Analysis:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
                     else:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
-                    histo=get_histo_averaged_per_bin_width(histo,debug=debug)
+                    #histo=get_histo_averaged_per_bin_width(histo,debug=debug)
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     # prepare histograms
                     list_info=self.dict_processMerged_stackInfo[processMerged]
@@ -1669,7 +1677,8 @@ class Analysis:
                 # done loop over processMerged
                 outputFileName=self.folderPlots+"/stack_"+variable+"_"+category
                 # stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.25,0.88,0.88,72,0.037,0],debug=self.debug)
-                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),debug=True)
+                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",blinding=blinding,doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),debug=False)
+                print "outside stackHistograms"
             # done loop over category
         # done loop over variable
     # done function
@@ -1818,7 +1827,7 @@ class Analysis:
             # self.list_variable=["mva"]
             # self.list_variable=["mva","mBB"]
             # self.list_variable=["mBB","MET","pTB1"]
-            self.list_variable=["mBB"]
+            # self.list_variable=["MET","pTB1","mBB","pTB2","EtaB1"]
             # self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
             # self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             if True:
@@ -1889,6 +1898,7 @@ class Analysis:
                 # self.create_overlaid_plots()
                 # do stack plots of signal, background, data (S is times some value)
                 self.create_stacked_plots()
+                print "outside create_stacked_plots()"
         # done if doYields
 
         # self.set_list_processInitial(["WHlv125J_MINLO"])

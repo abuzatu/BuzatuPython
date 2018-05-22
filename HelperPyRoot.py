@@ -1641,8 +1641,23 @@ def get_histo_averaged_per_bin_width(histo,debug=False):
     return h
 # done function
 
+def get_list_of_blinded_bins_from_signal_and_background_histograms(histoS,histoB,threshold=0.05,debug=False):
+    result=[]
+    for i in xrange(0,histoS.GetNbinsX()+2):
+        s=histoS.GetBinContent(i)
+        b=histoB.GetBinContent(i)
+        if ratio(s,b)>threshold:
+            result.append(i)
+            if debug:
+                print "blinded bin i",i,"low",histoS.GetBinLowEdge(i),"high",histoS.GetBinLowEdge(i)+histoS.GetBinWidth(i)
+    # done for loop over bins
+    if debug:
+        print "blinded bins list",result
+    return result
+# done function
+
 # blind within an interval, i.e. the most common case of blinding
-def get_histo_blinded(histo,binRange=[40,170],debug=False):
+def get_histo_blinded_from_binRange(histo,binRange=[40,170],debug=False):
     h=histo.Clone()
     low_blind=binRange[0]
     high_blind=binRange[1]
@@ -1659,6 +1674,19 @@ def get_histo_blinded(histo,binRange=[40,170],debug=False):
     # done loop over bins
     getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
     return h
+# done function
+
+# blind from the list of bins, i.e. from the bins where S/B>threshold (typically 0.05)
+def get_histo_blinded_from_binList(histo,binList=[4,5,6],debug=False):
+   h=histo.Clone()
+   MaxEdgePlusOne=h.GetNbinsX()+2
+   for i in binList:
+       assert(0<=i<MaxEdgePlusOne)
+       h.SetBinContent(i,0.0)
+       h.SetBinError(i,0.0)
+   # done for loop over bins
+   getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+   return h  
 # done function
 
 def get_histo_smoothed(h,debug):
@@ -2397,13 +2425,15 @@ def plotMultiGraph(list_graphs,canvas_size,legend_position,factor_maximum,plot_o
 # besides info needed for overlayHistograms (histogram and legend) we need more info
 # if it is S, B or D, and if we want to scale it by some number (default 1)
 # then we hard code the way we want this plot to look like
-def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),debug=False):
+def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",blinding=["threshold",0.05],doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),debug=False):
     if debug:
         print "Start stackHistograms"
+    assert(blinding[0]=="range" or blinding[0]=="threshold")
+    print list_tuple_h1D[0][0].GetName()
 
     # create canvas
     c=TCanvas("c","c",950,700)
-    c.cd()
+
     p1=TPad("p2","p2",0.00,0.30,0.75,1.00) # top left (stacked plots)
     p2=TPad("p1","p1",0.00,0.00,0.75,0.30) # bottom left (ratio pad)
     p3=TPad("p3","p3",0.75,0.00,1.00,1.00) # right (legends) p3
@@ -2424,6 +2454,41 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     # p1 - top left (stacked plots)
     p1.cd()
 
+    if blinding[0]=="threshold":
+        # evaluate the list of bins that need to be blinded for data
+        # first sum all of S, B, D
+        dict_processType_histoSum={}
+        for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+            if debug:
+                print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
+            histoSF=histo.Clone(histo.GetName()+"_SF")
+            histoSF.Scale(SF)
+            if debug:
+                print "process",process,"integral",histo.Integral(),"SF",SF,"integral SF",histoSF.Integral()
+            # add to sum
+            if processType in dict_processType_histoSum.keys():
+                dict_processType_histoSum[processType].Add(histoSF)
+            else:
+                dict_processType_histoSum[processType]=histoSF
+            # done if
+        # done for loop over histograms
+        if debug:
+            for processType in dict_processType_histoSum.keys():
+                print "processType",processType,"integral",dict_processType_histoSum[processType].Integral()
+        # from S and B histograms find the bins that are to be blinded
+        list_binsBlinded=get_list_of_blinded_bins_from_signal_and_background_histograms(dict_processType_histoSum["S"],
+                                                                                        dict_processType_histoSum["B"],
+                                                                                        threshold=blinding[1],debug=debug)  
+        # use this list to blind not only the data, but also the S and B
+        # when we evaluate the chi2 between B and D, we should use the same bin range
+        dict_processType_histoSumBlinded={}
+        for processType in dict_processType_histoSum.keys():
+            dict_processType_histoSumBlinded[processType]=get_histo_blinded_from_binList(dict_processType_histoSum[processType],
+                                                                                         binList=list_binsBlinded,
+                                                                                         debug=debug)
+        # done for loop over processType
+    # done if blinding is of type threshold
+
     # first create and plot the stack (background and signal)
     stack=THStack(stackName,stackName)
     dict_process_histoStack={}
@@ -2438,6 +2503,8 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
             dict_process_histoStack[process].SetLineWidth(2)
             dict_process_histoStack[process].SetLineColor(color)
             dict_process_histoStack[process].SetFillColor(color)
+            if doAveragePerBinWidth:
+                dict_process_histoStack[process]=get_histo_averaged_per_bin_width(dict_process_histoStack[process],debug=debug)
             stack.Add(dict_process_histoStack[process])
         # done if
     # done for loop over histograms
@@ -2460,11 +2527,12 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
             dict_process_histoOverlayMC[process].SetLineWidth(2)
             dict_process_histoOverlayMC[process].SetFillStyle(0)
             dict_process_histoOverlayMC[process].SetLineColor(color)
+            if doAveragePerBinWidth:
+                dict_process_histoOverlayMC[process]=get_histo_averaged_per_bin_width(dict_process_histoOverlayMC[process],debug=debug)
             dict_process_histoOverlayMC[process].Draw("hist same")
         # done if
     # done for loop over histograms
-        
-    # then draw overlaid the data
+
     # if scale==0, it means we do not want them overlaid
     dict_process_histoOverlayData={}
     list_process_histoOverlayData=[]
@@ -2475,9 +2543,23 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
             list_process_histoOverlayData.append(process)
             dict_process_histoOverlayData[process]=histo.Clone(histo.GetName()+"_overlay")
             dict_process_histoOverlayData[process].Scale(SF)
+            if blinding[0]=="threshold":
+                dict_process_histoOverlayData[process]=get_histo_blinded_from_binList(dict_process_histoOverlayData[process],
+                                                                                      binList=list_binsBlinded,
+                                                                                      debug=debug)
+            elif blinding[0]=="range":
+                dict_process_histoOverlayData[process]=get_histo_blinded_from_binRange( dict_process_histoOverlayData[process],
+                                                                                        binRange=blinding[1],
+                                                                                        debug=debug)
+            else:
+                print "blinding[0]",blinding[0],"should be either threshold or range. Will ABORT!!!"
+                assert(False)
+            # done if
             dict_process_histoOverlayData[process].SetMarkerStyle(20)
             dict_process_histoOverlayData[process].SetLineWidth(2)
             dict_process_histoOverlayData[process].SetLineColor(color)
+            if doAveragePerBinWidth:
+                dict_process_histoOverlayData[process]=get_histo_averaged_per_bin_width(dict_process_histoOverlayData[process],debug=debug)
             dict_process_histoOverlayData[process].Draw("ep same")
         # done if
     # done for loop over histograms
@@ -2501,6 +2583,11 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     for extension in extensions.split(","):
         c.Print(outputFileName+"."+extension)
     # ended for over extensions
+
+    p1.Close()
+    p2.Close()
+    p3.Close()
+
     return None
 # done function
 
