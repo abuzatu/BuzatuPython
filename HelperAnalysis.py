@@ -1798,8 +1798,8 @@ class Analysis:
             # reduce category
             if "MVA" in self.stem:
                 # self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
-                #self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
-                self.set_list_category(["2tag2jet_150ptv_SR"]) 
+                self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
+                #self.set_list_category(["2tag2jet_150ptv_SR"]) 
             elif "CUT" in self.stem:
                 self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
                 # self.set_list_category(["2tag2jet_150_200ptv_SR"])
@@ -1854,20 +1854,20 @@ class Analysis:
             if self.verbose:
                 self.print_lists()
             doAll=True
-            if doAll and False:
+            if doAll and True:
                 self.create_histosRaw(option="reduced")
             # return
             # now we want to sum over processInitial for a given process
             self.set_list_process_info()
-            if doAll and False:
+            if doAll and True:
                 self.create_histosProcess()
             # return
             self.set_list_processMerged()
-            if doAll and False:
+            if doAll and True:
                 self.create_histosProcessMerged(doSF=True)
             # return
             self.set_list_processAnalysis()
-            if doAll and False:
+            if doAll and True:
                 if True:
                     self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
@@ -1888,7 +1888,7 @@ class Analysis:
                 # done if
             # done if
             # return
-            if True:
+            if doAll and True:
                 # self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3"]) # don't look yet, as not blinded
                 # self.set_list_variable(["MET"])
                 # self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
