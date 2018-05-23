@@ -1884,7 +1884,7 @@ class Analysis:
                 self.create_histosProcess()
             # return
             self.set_list_processMerged()
-            if self.do_later and self.do_create_histosProcessMerged:
+            if self.do_later or self.do_create_histosProcessMerged:
                 self.create_histosProcessMerged(doSF=True)
             # return
             self.set_list_processAnalysis()
