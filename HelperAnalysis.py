@@ -1677,7 +1677,7 @@ class Analysis:
                 # done loop over processMerged
                 outputFileName=self.folderPlots+"/stack_"+variable+"_"+category
                 # stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.25,0.88,0.88,72,0.037,0],debug=self.debug)
-                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",blinding=blinding,doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),debug=False)
+                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",blinding=blinding,doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.92,0.05),xAxisTitle=variable,debug=False)
                 print "outside stackHistograms"
             # done loop over category
         # done loop over variable
@@ -1828,6 +1828,7 @@ class Analysis:
             # self.list_variable=["mva","mBB"]
             # self.list_variable=["mBB","MET","pTB1"]
             # self.list_variable=["MET","pTB1","mBB","pTB2","EtaB1"]
+            # self.list_variable=["MET","SumPtJet","mBB"]
             # self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
             # self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
             if True:
@@ -1854,20 +1855,20 @@ class Analysis:
             if self.verbose:
                 self.print_lists()
             doAll=True
-            if doAll and True:
+            if doAll and False:
                 self.create_histosRaw(option="reduced")
             # return
             # now we want to sum over processInitial for a given process
             self.set_list_process_info()
-            if doAll and True:
+            if doAll and False:
                 self.create_histosProcess()
             # return
             self.set_list_processMerged()
-            if doAll and True:
+            if doAll and False:
                 self.create_histosProcessMerged(doSF=True)
             # return
             self.set_list_processAnalysis()
-            if doAll and True:
+            if doAll and False:
                 if True:
                     self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
                     self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
