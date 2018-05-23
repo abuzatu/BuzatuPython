@@ -76,7 +76,28 @@ class Analysis:
 
     def set_do_overlay_histosRaw_by_processInitial(self,do_overlay_histosRaw_by_processInitial):
         self.do_overlay_histosRaw_by_processInitial=do_overlay_histosRaw_by_processInitial
- 
+
+    def set_do_later(self,do_later):
+        self.do_later=do_later
+
+    def set_do_create_histosRaw(self,do_create_histosRaw):
+        self.do_create_histosRaw=do_create_histosRaw
+
+    def set_do_create_histosProcess(self,do_create_histosProcess):
+        self.do_create_histosProcess=do_create_histosProcess
+
+    def set_do_create_histosProcessMerged(self,do_create_histosProcessMerged):
+        self.do_create_histosProcessMerged=do_create_histosProcessMerged
+
+    def set_do_create_results(self,do_create_results):
+        self.do_create_results=do_create_results
+
+    def set_do_create_latex_table(self,do_create_latex_table):
+        self.do_create_latex_table=do_create_latex_table
+
+    def set_do_create_stacked_plots(self,do_create_stacked_plots):
+        self.do_create_stacked_plots=do_create_stacked_plots
+
     ### actions
 
     def create_folderProcessInitial(self):
@@ -1854,42 +1875,39 @@ class Analysis:
             # if self.debug:
             if self.verbose:
                 self.print_lists()
-            doAll=True
-            if doAll and True:
+            if self.do_later or self.do_create_histosRaw:
                 self.create_histosRaw(option="reduced")
             # return
             # now we want to sum over processInitial for a given process
             self.set_list_process_info()
-            if doAll and True:
+            if self.do_later or self.do_create_histosProcess:
                 self.create_histosProcess()
             # return
             self.set_list_processMerged()
-            if doAll and True:
+            if self.do_later and self.do_create_histosProcessMerged:
                 self.create_histosProcessMerged(doSF=True)
             # return
             self.set_list_processAnalysis()
-            if doAll and True:
+            if self.do_later or self.do_create_results:
+                self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
+                self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
                 if True:
-                    self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
-                    self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
-                    if True:
-                        self.create_results()
-                if True:
-                    self.read_results()
-                    self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
-                    self.list_processResult=self.list_processResult+["S/B","SigY_S_B"]
-                    # for bJetCorr in "Nominal,OneMu20GeV,OneMu15GeV,OneMu12GeV,OneMu10GeV,OneMu7GeV,OneMu6GeV,OneMu5GeV,OneMu4GeV,PtReco".split(","):
-                    # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
-                    # for var in "mBB,mva,MET".split(","):
-                    # for var in "mBBNominal".split(","):
-                    for var in list_variable:
-                        self.list_processResult=self.list_processResult+["SigH_S_B@"+var]                 
-                    self.create_yield_latex_table(doDocument=False)
-                    # self.create_overlaid_variable()
-                # done if
+                    self.create_results()
+            if self.do_later or self.do_create_latex_table:
+                self.read_results()
+                self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
+                self.list_processResult=self.list_processResult+["S/B","SigY_S_B"]
+                # for bJetCorr in "Nominal,OneMu20GeV,OneMu15GeV,OneMu12GeV,OneMu10GeV,OneMu7GeV,OneMu6GeV,OneMu5GeV,OneMu4GeV,PtReco".split(","):
+                # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
+                # for var in "mBB,mva,MET".split(","):
+                # for var in "mBBNominal".split(","):
+                for var in list_variable:
+                    self.list_processResult=self.list_processResult+["SigH_S_B@"+var]                 
+                self.create_yield_latex_table(doDocument=False)
+                # self.create_overlaid_variable()
             # done if
             # return
-            if doAll and True:
+            if self.do_later or self.do_create_stacked_plots:
                 # self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3"]) # don't look yet, as not blinded
                 # self.set_list_variable(["MET"])
                 # self.set_list_variable(["pTB1","pTB2","pTJ3","EtaB1","EtaB2","EtaJ3","mBB","mva"])
