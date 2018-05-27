@@ -2644,11 +2644,22 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     # add text at the top
     setupTextOnPlot(*text_option)
 
-    # add chi2 and KS using blinded histograms in both background and data; when we do not want blinding these histograms are not blinded in fact
+    # compute chi2 and KS using blinded histograms in both background and data; when we do not want blinding these histograms are not blinded in fact
     chi2,ndf,chi2_over_ndf=get_Chi2_of_two_histograms(dict_processType_histoSumBlinded["D"],dict_processType_histoSumBlinded["B"],debug=debug)
     KS=get_KS_of_two_histograms(dict_processType_histoSumBlinded["D"],dict_processType_histoSumBlinded["B"],debug=debug)
+    # compute significance from S and B using unblinded histograms, to add to the legend
+    sig_h=dict_processType_histoSum["S"].Clone()
+    bkg_h=dict_processType_histoSum["B"].Clone()
+    if debug:
+        getBinValues(sig_h)
+        getBinValues(bkg_h)
+    figureOfMerit="SignificanceSigmaB"
+    a=get_dict_figureOfMerit_histo(sig_h,bkg_h,list_figureOfMerit=[figureOfMerit],debug=debug)
+    h=a[figureOfMerit]
+    tupleResult=add_in_quadrature_bins_of_one_histo(h,IncludeUnderflowOverflowBins=False,debug=False)
+
     # create and draw the legend with the info
-    legendChi2=TLegend(0.51,0.75,0.88,0.93)
+    legendChi2=TLegend(0.51,0.65,0.88,0.94)
     legendChi2.SetBorderSize(0)
     legendChi2.SetFillStyle(0)
     legendChi2.SetTextSize(0.05)
@@ -2662,6 +2673,9 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     legendChi2.AddEntry("","KS Test: ","")
     legendChi2.AddEntry("","%.4f" % KS,"")
     legendChi2.AddEntry(""," ","")
+    legendChi2.AddEntry("","Sig:","")
+    legendChi2.AddEntry("","%.3f" % tupleResult[0],"")
+    legendChi2.AddEntry("","+/- %.3f" % tupleResult[1],"")
     legendChi2.Draw("same")
 
     # p2 - ratio
