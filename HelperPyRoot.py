@@ -2418,7 +2418,46 @@ def plotMultiGraph(list_graphs,canvas_size,legend_position,factor_maximum,plot_o
         c.Print(fileName+"."+extension)
     # ended for over extensions
     return None
-# ended function
+# done function
+
+# Kolmogorov-Smirnov test of two histograms
+def get_KS_of_two_histograms(h1,h2,debug=False):
+    KS=h1.KolmogorovTest(h2)
+    if debug:
+        print "h1",h1.GetName(),"h2",h2.GetName(),"KS",KS
+    return KS
+# done function
+
+def get_Chi2_of_two_histograms(h1,h2,debug=False):
+    chi2=0.0
+    ndf=0.0
+    for i in xrange(0,h1.GetNbinsX()+2):
+        content1=h1.GetBinContent(i)
+        error1  =h1.GetBinError(i)
+        content2=h2.GetBinContent(i)
+        error2  =h2.GetBinError(i)
+        diff_square=(content1-content2)*(content1-content2)
+        error_square=error1*error1+error2*error2
+        if content1>0 and error1>0 and content2>0 and error2>0:
+            chi2+=ratio(diff_square,error_square)
+            ndf+=1
+    # done loop over bins
+    chi2_over_ndf=ratio(chi2,ndf-1)
+    if debug:
+        print "h1",h1.GetName(),"h2",h2.GetName(),"chi2",chi2,"ndf",ndf,"chi2/(ndf-1)",chi2_over_ndf
+    return chi2,ndf,chi2_over_ndf
+# done function
+
+def get_Chi2_from_ROOT_of_two_histograms(h1,h2,debug=False):
+    chi2=array('d', [0])
+    ndf=array('i', [0])
+    igood=array('i', [0])
+    res=array('d', [0])
+    pvalue=h1.Chi2TestX(h2,chi2,ndf,igood,"WW",res)
+    if debug:
+        print "pvalue",pvalue,"chi2",chi2,"ndf",ndf,"igood",igood,"res",res
+    return pvalue,chi2,ndf
+# done function
 
 # make stacked plots
 # give list of tuple of histograms
@@ -2525,6 +2564,7 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
 
     # draw stack 
     stack.Draw("hist")
+    maximum=stack.GetMaximum()
     if doAveragePerBinWidth:
         titleY="Event yield density per bin width"
     else:
@@ -2551,6 +2591,7 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
             dict_process_histoOverlayMC[process].Scale(SF)
             dict_process_histoOverlayMC[process].Scale(scale)
             dict_process_histoOverlayMC[process].SetLineWidth(2)
+            # dict_process_histoOverlayMC[process].SetLineStyle(2) # to make the line dotted
             dict_process_histoOverlayMC[process].SetFillStyle(0)
             dict_process_histoOverlayMC[process].SetLineColor(color)
             if doAveragePerBinWidth:
@@ -2603,6 +2644,26 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     # add text at the top
     setupTextOnPlot(*text_option)
 
+    # add chi2 and KS using blinded histograms in both background and data; when we do not want blinding these histograms are not blinded in fact
+    chi2,ndf,chi2_over_ndf=get_Chi2_of_two_histograms(dict_processType_histoSumBlinded["D"],dict_processType_histoSumBlinded["B"],debug=debug)
+    KS=get_KS_of_two_histograms(dict_processType_histoSumBlinded["D"],dict_processType_histoSumBlinded["B"],debug=debug)
+    # create and draw the legend with the info
+    legendChi2=TLegend(0.51,0.75,0.88,0.93)
+    legendChi2.SetBorderSize(0)
+    legendChi2.SetFillStyle(0)
+    legendChi2.SetTextSize(0.05)
+    legendChi2.SetNColumns(3)
+    legendChi2.AddEntry("","#chi^{2}","")
+    legendChi2.AddEntry("","ndf","")
+    legendChi2.AddEntry("","#chi^{2}/(ndf-1)","")
+    legendChi2.AddEntry("","%.1f" % chi2,"")
+    legendChi2.AddEntry("","%.0f" % ndf,"")
+    legendChi2.AddEntry("","%.2f" % chi2_over_ndf,"")
+    legendChi2.AddEntry("","KS Test: ","")
+    legendChi2.AddEntry("","%.4f" % KS,"")
+    legendChi2.AddEntry(""," ","")
+    legendChi2.Draw("same")
+
     # p2 - ratio
     p2.cd()
 
@@ -2620,7 +2681,7 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     num.SetLineColor(1)
     num.SetYTitle("(Data-Bkg)/Bkg")
     num.SetXTitle(xAxisTitle)
-    num.GetXaxis().SetTitleSize(0.10)
+    num.GetXaxis().SetTitleSize(0.13)
     num.GetYaxis().SetTitleSize(0.10)
     num.GetYaxis().SetTitleOffset(0.4)
     num.GetXaxis().SetLabelSize(0.09)
