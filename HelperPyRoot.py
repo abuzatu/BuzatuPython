@@ -1569,7 +1569,7 @@ def get_histo_generic_binRange(histo,binRange="150,200,400",option="sum",debug=F
     return result
 # done function
 
-# teest the function from above
+# test the function from above
 def test_get_histo_generic_binRange(debug=True):
     h=TH1F("h","h",6,0,6)
     h.SetBinContent(0,2.0) # underflow
@@ -1586,6 +1586,107 @@ def test_get_histo_generic_binRange(debug=True):
     h=get_histo_generic_binRange(h,binRange=binRange,option="sum",debug=debug)
     getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
     plotHistogram(h,plot_option="HIST E",filePath=self.folderPlots,fileName="test2",extensions="pdf")
+# done function
+
+# group the bins so that they have same stats
+def get_automatic_binRange(h,NrBins=20,threshold=0.02,debug=True):
+    # move under/overflows in edge bins
+    h=get_histo_underflows_in_edge_bins(h,addUnderflow=True,addOverflow=True,debug=False)
+    Integral=h.Integral()
+    IntegralPerBin=ratio(Integral,NrBins)
+    if debug:
+        print "Integral",Integral,"IntegralPerBin",IntegralPerBin
+    # loop over the bins, but not the underflow and overflow
+    # find the first non zero bin
+    if debug:
+        print "Evaluate first non zero:"
+    for i in xrange(1,h.GetNbinsX()+1):
+        if debug:
+            print "i",i,"low",h.GetBinLowEdge(i),"high",h.GetBinLowEdge(i)+h.GetBinWidth(i),"content",h.GetBinContent(i),"error",h.GetBinError(i)
+        i_firstNonZero=i
+        if h.GetBinContent(i)!=0:
+            break
+    # done for loop
+    if debug:
+        print "i_firstNonZero",i_firstNonZero
+    # find last non zero bin
+    if debug:
+        print "Evaluate the last non zero:"
+    for i in reversed(xrange(1,h.GetNbinsX()+1)):
+        if debug:
+            print "i",i,"low",h.GetBinLowEdge(i),"high",h.GetBinLowEdge(i)+h.GetBinWidth(i),"content",h.GetBinContent(i),"error",h.GetBinError(i)
+        i_lastNonZero=i
+        if h.GetBinContent(i)!=0:
+            break
+    # done for loop
+    if debug:
+        print "i_lastNonZero",i_lastNonZero
+    # loop over the bins from first to last non zero bins
+    temp_sumIntegral=0.0
+    list_binInfo=[]
+    list_binEdges=[]
+    list_binEdges.append(h.GetBinLowEdge(i_firstNonZero))
+    string_binEdges=str(h.GetBinLowEdge(i_firstNonZero))
+    binEdgeLow=h.GetBinLowEdge(i_firstNonZero)
+    max_density=0.0
+    for i in xrange(i_firstNonZero,i_lastNonZero+1):
+        if debug:
+            print "i",i,"low",h.GetBinLowEdge(i),"high",h.GetBinLowEdge(i)+h.GetBinWidth(i),"content",h.GetBinContent(i),"error",h.GetBinError(i)
+        temp_sumIntegral+=h.GetBinContent(i)
+        if temp_sumIntegral+h.GetBinContent(i+1)>IntegralPerBin:
+            binEdgeHigh=h.GetBinLowEdge(i)+h.GetBinWidth(i)
+            list_binEdges.append(binEdgeHigh)
+            string_binEdges+=","+str(binEdgeHigh)
+            if debug:
+                print "last bin in this grouping i",i,"binEdgeHigh",binEdgeHigh
+            width=binEdgeHigh-binEdgeLow
+            density=ratio(temp_sumIntegral,width)
+            list_binInfo.append([binEdgeLow,binEdgeHigh,temp_sumIntegral,width,density])
+            if density>max_density:
+                max_density=density
+            # reset values
+            temp_sumIntegral=0.0
+            binEdgeLow=binEdgeHigh
+        # done if
+    # done loop over bins
+    # add the last values we have
+    binEdgeHigh=h.GetBinLowEdge(i)+h.GetBinWidth(i)
+    list_binEdges.append(binEdgeHigh)
+    width=binEdgeHigh-binEdgeLow
+    density=ratio(temp_sumIntegral,width)
+    list_binInfo.append([binEdgeLow,binEdgeHigh,temp_sumIntegral,width,density])
+    if debug:
+        print "list_binEdges",list_binEdges
+        print "max_density",max_density
+    max_density_to_use=threshold*max_density
+    if debug:
+        print "max_density_to_use",max_density_to_use
+    if debug:
+        print "list_binInfo:"
+        for binInfo in list_binInfo:
+            print "binInfo",binInfo
+
+    # remove the edge bins with values very small to the other bins
+    list_binInfo_D=[]
+    print "direct:","max_density_to_use",max_density_to_use
+    counter=0
+    for (binEdgeLow,binEdgeHigh,temp_sumIntegral,width,density) in list_binInfo:
+        if debug:
+            print "binEdgeLow",binEdgeLow,"binEdgeHigh",binEdgeHigh,"temp_sumIntegral",temp_sumIntegral,"width",width,"density",density
+        if density<max_density_to_use:
+            continue
+        last_good_binEdgeHigh=binEdgeHigh
+        counter+=1
+        if counter==1:
+            string_binEdge=str(binEdgeLow)
+        else:
+            string_binEdge+=","+str(binEdgeLow)
+    # done loop over loop
+    string_binEdge+=","+str(last_good_binEdgeHigh)
+    if debug:
+        print "string_binEdge",string_binEdge
+
+    return string_binEdge
 # done function
 
 # 
@@ -2493,7 +2594,6 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     # p1 - top left (stacked plots)
     p1.cd()
 
-    # evaluate the list of bins that need to be blinded for data
     # first sum all of S, B, D
     dict_processType_histoSum={}
     for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
@@ -2513,6 +2613,46 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     if debug:
         for processType in dict_processType_histoSum.keys():
             print "processType",processType,"integral",dict_processType_histoSum[processType].Integral()
+
+    # get the bin range from the background distribution
+    binRange=get_automatic_binRange(dict_processType_histoSum["B"],NrBins=16,threshold=0.02,debug=debug)
+    print "binRange",binRange
+
+    # rebin all the histograms with this new binning
+    list_tuple_h1D_rebinned=[]
+    for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+        if debug:
+            print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
+        # rebin
+        histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
+        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
+        list_tuple_h1D_rebinned.append((histo,process,(processType,color,SF,scale)))
+    # done for loop over histograms
+
+    # rewrite the inital list of tuple with the new one
+    list_tuple_h1D=list_tuple_h1D_rebinned
+
+    # recompute the sum of S, B, D
+    dict_processType_histoSum={}
+    for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+        if debug:
+            print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
+        histoSF=histo.Clone(histo.GetName()+"_SF")
+        histoSF.Scale(SF)
+        if debug:
+            print "process",process,"integral",histo.Integral(),"SF",SF,"integral SF",histoSF.Integral()
+        # add to sum
+        if processType in dict_processType_histoSum.keys():
+            dict_processType_histoSum[processType].Add(histoSF)
+        else:
+            dict_processType_histoSum[processType]=histoSF
+        # done if
+    # done for loop over histograms
+    if debug:
+        for processType in dict_processType_histoSum.keys():
+            print "processType",processType,"integral",dict_processType_histoSum[processType].Integral()
+
+    # evaluate the list of bins that need to be blinded for data
     # from S and B histograms find the bins that are to be blinded
     if blinding[0]=="threshold":
         list_binsBlinded=get_list_of_blinded_bins_from_signal_and_background_histograms(dict_processType_histoSum["S"],

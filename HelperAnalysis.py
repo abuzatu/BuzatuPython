@@ -420,19 +420,20 @@ class Analysis:
         debug_binRange=False
 
         # mBB
-        binRange_mBB=get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)
+        binRange_mBB=get_binRange(0,30,30,debug_binRange)+","+get_binRange(30,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)
         # mva EPS 2017 https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/SMVHbbPublication2017BkgModelling#BDT_Binning
         self.binRange_mva2J="-1,-0.91,-0.77,-0.542,-0.268,-0.05,0.094,0.194,0.278,0.358,0.424,0.48,0.53,0.584,0.656,1.0"
         self.binRange_mva3J="-1,-0.848,-0.676,-0.492,-0.3,-0.126,0.03,0.158,0.272,0.362,0.44,0.51,0.576,0.644,0.722,1.0"
         self.binRange_mBB=binRange_mBB
+        # self.binRange_pTB1=[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)
 
         self.dict_variable_info={
             "EtaB1":[get_binRange(-2.5,2.5,0.2,debug_binRange)],
             "EtaB2":[get_binRange(-2.5,2.5,0.2,debug_binRange)],
             "EtaJ3":[get_binRange(-4.5,-2.5,0.5,debug_binRange)+","+get_binRange(-2.5,2.5,0.2,debug_binRange)+","+get_binRange(2.5,4.5,0.5,debug_binRange)],
-            "PhiB1":[""],
-            "PhiB2":[""],
-            "PhiJ3":[""],
+            "PhiB1":[get_binRange(-3.15,3.15,0.0315*10,debug_binRange)],
+            "PhiB2":[get_binRange(-3.15,3.15,0.0315*10,debug_binRange)],
+            "PhiJ3":[get_binRange(-3.15,3.15,0.0315*10,debug_binRange)],
             "EtaFwdJets":[get_binRange(-4.5,4.5,0.1,debug_binRange)],
             "EtaSigJets":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
             # "MET":[get_binRange(150,400,10,debug_binRange)+","+get_binRange(400,700,100,debug_binRange)],
@@ -456,21 +457,22 @@ class Analysis:
             "eff_C":[get_binRange(0.0,1,0.05,debug_binRange)],
             "eff_L":[get_binRange(0.0,1,0.05,debug_binRange)],
             "eff_Data":[get_binRange(0.0,1,0.05,debug_binRange)],
-            "MindPhiMETJet":[get_binRange(0.0315*40,3.15,0.0315*2,debug_binRange)],
+            "MindPhiMETJet":[get_binRange(0.0315*0,3.15,0.0315*2,debug_binRange)],
             "NTags":[""],
             "Njets":[get_binRange(2,10,1,debug_binRange)],
             "njets":[get_binRange(2,10,1,debug_binRange)],
             "NFwdJets":[get_binRange(2,10,1,debug_binRange)],
             "NSigJets":[get_binRange(2,10,1,debug_binRange)],
             "SumPtJet":[get_binRange(120,400,10,debug_binRange)+","+get_binRange(400,600,20,debug_binRange)],
+            "HT":[get_binRange(250,600,10,debug_binRange)+","+get_binRange(600,100,20,debug_binRange)],
             "costheta":[get_binRange(0,1,0.05,debug_binRange)],
             "dEtaBB":[get_binRange(0,1.5,0.1,debug_binRange)+","+get_binRange(1.5,2.5,0.2,debug_binRange)+","+get_binRange(2.5,4.5,1,debug_binRange)],
-            "dPhiBB":[get_binRange(0,3.2-20*0.032,0.032*4,debug_binRange)],
+            "dPhiBB":[get_binRange(0,3.2,5*0.032,debug_binRange)],
             "dPhiMETMPT":[get_binRange(0,3.15-0.0315*48,0.0315,debug_binRange)],
-            "dPhiVBB":[get_binRange(3.2-10*0.032,3.2,0.032,debug_binRange)],
+            "dPhiVBB":[get_binRange(0,3.2,5*0.032,debug_binRange)],
             "dRB1J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "dRB2J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
-            "dRBB":[get_binRange(0.4,1.0,0.1,debug_binRange)+","+get_binRange(1.0,5,0.2,debug_binRange)],
+            "dRBB":[get_binRange(0.4,0.7,0.05,debug_binRange)+","+get_binRange(0.7,1.0,0.1,debug_binRange)+","+get_binRange(1.0,3.0,0.2,debug_binRange)+","+get_binRange(3.0,4.0,0.5,debug_binRange)+","+get_binRange(4.0,5.0,1.0,debug_binRange)],
             "mBB":[binRange_mBB],
             "mBBMVA":[binRange_mBB],
             "mBBNominal":[binRange_mBB],
@@ -516,8 +518,8 @@ class Analysis:
             "PtFwdJets":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
             "PtSigJets":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
             "pTBB":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,500,20,debug_binRange)],
-            "pTBBMETAsym":[get_binRange(-0.6,-0.2,0.1,debug_binRange)+","+get_binRange(-0.2,0.1,0.02,debug_binRange)+","+get_binRange(0.1,0.3,0.1,debug_binRange)],
-            "pTBBoverMET":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
+            "pTBBMETAsym":[get_binRange(-0.2,-0.1,0.05,debug_binRange)+","+get_binRange(-0.1,0.1,0.02,debug_binRange)+","+get_binRange(0.1,0.2,0.05,debug_binRange)],
+            "pTBBoverMET":[get_binRange(0.3,0.7,0.1,debug_binRange)+","+get_binRange(0.7,0.8,0.05,debug_binRange)+","+get_binRange(0.8,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.3,0.05,debug_binRange)],
             "METOverSqrtHT":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
             "METOverSqrtSumET":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
             "METRho":[""],
@@ -1638,6 +1640,48 @@ class Analysis:
             if variable in self.dict_variable_info.keys():
                 info=self.dict_variable_info[variable]
                 binRange=info[0]
+            elif "mBB" in variable and "mBBJ" not in variable:
+                binRange=self.dict_variable_info["mBB"][0]
+            elif "mBBJ" in variable:
+                binRange=self.dict_variable_info["mBBJ"][0]
+            elif "pTB1" in variable:
+                binRange=self.dict_variable_info["pTB1"][0]
+            elif "pTB2" in variable:
+                binRange=self.dict_variable_info["pTB2"][0]
+            elif "SumPtJet" in variable:
+                binRange=self.dict_variable_info["SumPtJet"][0]
+            elif "HT" in variable:
+                binRange=self.dict_variable_info["HT"][0]
+            elif "dRBB" in variable:
+                binRange=self.dict_variable_info["dRBB"][0]
+            elif "dEtaBB" in variable:
+                binRange=self.dict_variable_info["dEtaBB"][0]
+            elif "dPhiBB" in variable:
+                binRange=self.dict_variable_info["dPhiBB"][0]
+            elif "dPhiVBB" in variable:
+                binRange=self.dict_variable_info["dPhiVBB"][0]
+            elif "pTJ3" in variable:
+                binRange=self.dict_variable_info["pTJ3"][0]
+            elif "EtaB1" in variable:
+                binRange=self.dict_variable_info["EtaB1"][0]
+            elif "EtaB2" in variable:
+                binRange=self.dict_variable_info["EtaB2"][0]
+            elif "EtaJ3" in variable:
+                binRange=self.dict_variable_info["EtaJ3"][0]
+            elif "PhiB1" in variable:
+                binRange=self.dict_variable_info["PhiB1"][0]
+            elif "PhiB2" in variable:
+                binRange=self.dict_variable_info["PhiB2"][0]
+            elif "PhiJ3" in variable:
+                binRange=self.dict_variable_info["PhiJ3"][0]
+            elif "yBB" in variable:
+                binRange=self.dict_variable_info["yBB"][0]
+            elif "pTBBoverMET" in variable:
+                binRange=self.dict_variable_info["pTBBoverMET"][0]
+            elif "pTBBMETAsym" in variable:
+                binRange=self.dict_variable_info["pTBBMETAsym"][0]
+            elif "pTBB" in variable:
+                binRange=self.dict_variable_info["pTBB"][0]
             else:
                 binRange=""
             # done if
@@ -1681,14 +1725,14 @@ class Analysis:
                     # done if
                     # rebin, collect overflows, do average
                     debug=False
-                    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
-                    histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
-                    if "ptMuonInJet" in variable:
-                        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
-                    else:
-                        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
+                    #getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    #histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
+                    #if "ptMuonInJet" in variable:
+                    #    histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
+                    #else:
+                    #    histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
                     #histo=get_histo_averaged_per_bin_width(histo,debug=debug)
-                    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    #getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     # prepare histograms
                     list_info=self.dict_processMerged_stackInfo[processMerged]
                     #histo.SetLineColor(color)
@@ -1869,6 +1913,8 @@ class Analysis:
                 for variable in self.list_variable:
                     if variable in list_variable_ignore:
                         continue
+                    # if not "Nominal" in variable:
+                    #    continue
                     #if "mBB" in variable: # temp
                     #    continue
                     list_variable.append(variable)
