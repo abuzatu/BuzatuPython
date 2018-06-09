@@ -199,6 +199,16 @@ class Analysis:
             os.system(command)
     # done function
 
+    def hadd_tagFinal(self):
+        for processInitial in self.list_processInitial:
+            output=self.folderProcessInitial+"/"+processInitial+".root"
+            inputs=self.folderInput+"/hist-"+processInitial+"-*.root"
+            command="hadd -f "+output+" "+inputs
+            if self.debug:
+                print "command",command
+            os.system(command)
+    # done function  
+
     def evaluate_content_of_one_processInitial(self,processInitial,debug):
         if self.debug:
             print "Start evaluate_content_of_one_processInitial()"
@@ -374,6 +384,10 @@ class Analysis:
             print "histoNameRaw",histoNameRaw
         return histoNameRaw
     # done function
+
+    def set_fileNameHistosInput(self):
+        self.fileNameHistosInput=self.folderHistos+"/histosInput.root"
+    # done function  
 
     def set_fileNameHistosRaw(self):
         self.fileNameHistosRaw=self.folderHistos+"/histosRaw.root"
@@ -1814,6 +1828,65 @@ class Analysis:
         self.set_evaluated_list_category()
         self.set_evaluated_list_variable()
         self.set_evaluated_list_all()
+
+    def do_cp_second(self):
+        if self.debug:
+            print "Start do_cp_second()"
+        self.create_folderProcessInitial()
+        command="cp -r"
+        if self.name.endswith("_D"):
+            folder1=self.folderOutput.replace("_D","_D1")
+            folder2=self.folderOutput.replace("_D","_D2")
+        elif self.name.endswith("_T"):
+            folder1=self.folderOutput.replace("_T","_D1")
+            folder2=self.folderOutput.replace("_T","_T2")
+        else:
+            print "name",self.name,"does not end in _D or _T. Will ABORT!!!"
+            assert(False)
+        # done if
+        command+=" "+folder1+"/processInitial/*.root" 
+        command+=" "+folder2+"/processInitial/*.root"
+        command+=" "+self.folderProcessInitial+"/."
+        if self.debug or self.verbose:
+            print "command="+command
+        os.system(command)
+        if self.debug or self.verbose:
+            print "Done copied the .root file in the new processInitial"
+        # then evaluate the content of these files
+        if self.do_evaluate_list_processInitial:
+            self.evaluate_list_processInitial(option="processInitial")
+        self.set_evaluated_list_processInitial()
+        if self.do_evaluate_content_of_all_processInitial:
+            self.evaluate_content_of_all_processInitial()
+        self.set_evaluated_list_process()
+        self.set_evaluated_list_category()
+        self.set_evaluated_list_variable()
+        self.set_evaluated_list_all()
+    # done function
+
+    def do_hadd_second(self):
+        if self.debug:
+            print "Start do_hadd_second()"
+        self.create_folderHistos()
+        self.set_fileNameHistosInput()
+        command="hadd -f"
+        command+=" "+self.folderHistos+"/input.root"
+        if self.name.endswith("_D"):
+            folder1=self.folderOutput.replace("_D","_D1")
+            folder2=self.folderOutput.replace("_D","_D2")
+        elif self.name.endswith("_T"):
+            folder1=self.folderOutput.replace("_T","_D1")
+            folder2=self.folderOutput.replace("_T","_T2")
+        else:
+            print "name",self.name,"does not end in _D or _T. Will ABORT!!!"
+            assert(False)
+        # done if
+        command+=" "+folder1+"/processInitial/*.root"
+        command+=" "+folder2+"/processInitial/*.root"
+        if self.debug or self.verbose:
+            print "command="+command
+        os.system(command)
+    # done function
 
     def do_all(self):
         if self.debug:
