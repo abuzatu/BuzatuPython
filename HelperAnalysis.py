@@ -1792,6 +1792,29 @@ class Analysis:
        
     ### summary
 
+
+
+    def do_hadd_first(self):
+        if self.debug:
+            print "Start do_hadd_first()"
+        self.create_folderProcessInitial()
+        if self.do_evaluate_list_processInitial:
+            self.evaluate_list_processInitial(option="ReaderBatch")
+        self.set_evaluated_list_processInitial()
+        if self.do_hadd_processInitial:
+            self.hadd_each_processInitial()
+        # self.create_folderFitInput()
+        # dict_stem_analysis[stem].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
+        # re-evaluate from the folder output if you put by hand new folders, like data16B
+        if self.do_evaluate_list_processInitial:
+            self.evaluate_list_processInitial(option="processInitial")
+        if self.do_evaluate_content_of_all_processInitial:
+            self.evaluate_content_of_all_processInitial()
+        self.set_evaluated_list_process()
+        self.set_evaluated_list_category()
+        self.set_evaluated_list_variable()
+        self.set_evaluated_list_all()
+
     def do_all(self):
         if self.debug:
             print "Start do_all()"
@@ -1801,7 +1824,7 @@ class Analysis:
         self.set_evaluated_list_processInitial()
         if self.do_hadd_processInitial:
             self.hadd_each_processInitial()
-        self.create_folderFitInput()
+        # self.create_folderFitInput()
         # dict_stem_analysis[stem].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
         # re-evaluate from the folder output if you put by hand new folders, like data16B
         if self.do_evaluate_list_processInitial:
