@@ -463,16 +463,16 @@ class Analysis:
             "njets":[get_binRange(2,10,1,debug_binRange)],
             "NFwdJets":[get_binRange(2,10,1,debug_binRange)],
             "NSigJets":[get_binRange(2,10,1,debug_binRange)],
-            "SumPtJet":[get_binRange(120,400,10,debug_binRange)+","+get_binRange(400,600,20,debug_binRange)],
-            "HT":[get_binRange(250,600,10,debug_binRange)+","+get_binRange(600,100,20,debug_binRange)],
+            "SumPtJet":[get_binRange(120,400,10,debug_binRange)+","+get_binRange(400,600,50,debug_binRange)],
+            "HT":[get_binRange(240,560,20,debug_binRange)+","+get_binRange(560,600,20,debug_binRange)+","+get_binRange(600,1000,50,debug_binRange)],
             "costheta":[get_binRange(0,1,0.05,debug_binRange)],
             "dEtaBB":[get_binRange(0,1.5,0.1,debug_binRange)+","+get_binRange(1.5,2.5,0.2,debug_binRange)+","+get_binRange(2.5,4.5,1,debug_binRange)],
             "dPhiBB":[get_binRange(0,3.2,5*0.032,debug_binRange)],
             "dPhiMETMPT":[get_binRange(0,3.15-0.0315*48,0.0315,debug_binRange)],
-            "dPhiVBB":[get_binRange(0,3.2,5*0.032,debug_binRange)],
+            "dPhiVBB":[get_binRange(3.2-35*0.032,3.2-20*0.032,5*0.032,debug_binRange)+","+get_binRange(3.2-20*0.032,3.2-10*0.032,2*0.032,debug_binRange)+","+get_binRange(3.2-10*0.032,3.2-0*0.032,1*0.032,debug_binRange)],
             "dRB1J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "dRB2J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
-            "dRBB":[get_binRange(0.4,0.7,0.05,debug_binRange)+","+get_binRange(0.7,1.0,0.1,debug_binRange)+","+get_binRange(1.0,3.0,0.2,debug_binRange)+","+get_binRange(3.0,4.0,0.5,debug_binRange)+","+get_binRange(4.0,5.0,1.0,debug_binRange)],
+            "dRBB":[get_binRange(0.4,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.0,0.1,debug_binRange)+","+get_binRange(1.0,3.0,0.2,debug_binRange)+","+get_binRange(3.0,4.0,0.5,debug_binRange)+","+get_binRange(4.0,5.0,1.0,debug_binRange)],
             "mBB":[binRange_mBB],
             "mBBMVA":[binRange_mBB],
             "mBBNominal":[binRange_mBB],
@@ -494,12 +494,24 @@ class Analysis:
             "nrMuonInJetB1":[get_binRange(0,3,1,debug_binRange)],  
             "nrMuonInJetB2":[get_binRange(0,3,1,debug_binRange)],  
             "nrMuonInJetJ3":[get_binRange(0,3,1,debug_binRange)],  
+            "nrElectronInJetB1":[get_binRange(0,3,1,debug_binRange)],  
+            "nrElectronInJetB2":[get_binRange(0,3,1,debug_binRange)],  
+            "nrElectronInJetJ3":[get_binRange(0,3,1,debug_binRange)],  
             #"ptMuonInJetB1":["0,2,4,5,6,7,10,12,15,20,30,50,100"],  
             #"ptMuonInJetB2":["0,2,4,5,6,7,10,12,15,20,30,50,100"],  
             #"ptMuonInJetJ3":["0,2,4,5,6,7,10,12,15,20,30,50,100"],  
-            "ptMuonInJetB1":["2,5,7,10,12,15,20,30,50,100"],  
-            "ptMuonInJetB2":["2,5,7,10,12,15,20,30,50,100"],  
-            "ptMuonInJetJ3":["2,5,7,10,12,15,20,30,50,100"],  
+            "ptOneMuInJetB1":["1,2,3,4,7,10,12,15,20,30"],
+            "ptOneMuInJetB2":["1,2,3,4,7,10,12,15,20,30"],
+            "ptOneMuInJetJ3":["1,2,3,4,7,10,12,15,20,30"],
+            "dRMuonInJetB1":[get_binRange(0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.4,0.05,debug_binRange)],  
+            "dRMuonInJetB2":[get_binRange(0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.4,0.05,debug_binRange)],  
+            "dRMuonInJetJ3":[get_binRange(0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.4,0.05,debug_binRange)],
+            "PtRatioOneElectronInJetB1":[get_binRange(0.0,0.1,0.01,debug_binRange)],
+            "PtRatioOneElectronInJetB2":[get_binRange(0.0,0.1,0.01,debug_binRange)],
+            "PtRatioOneElectronInJetJ3":[get_binRange(0.0,0.1,0.01,debug_binRange)],
+            "PtRatioOneMuonInJetB1":[get_binRange(0.0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.2,0.02,debug_binRange)+","+get_binRange(0.2,1.0,0.05,debug_binRange)],
+            "PtRatioOneMuonInJetB2":[get_binRange(0.0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.2,0.02,debug_binRange)+","+get_binRange(0.2,1.0,0.05,debug_binRange)],
+            "PtRatioOneMuonInJetJ3":[get_binRange(0.0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.2,0.02,debug_binRange)+","+get_binRange(0.2,1.0,0.05,debug_binRange)],
             "mBBJ":[get_binRange(40,80,20,debug_binRange)+","+get_binRange(80,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)+","+get_binRange(500,700,50,debug_binRange)+","+get_binRange(700,1000,100,debug_binRange)],
             "maxdRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "mindRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
@@ -513,13 +525,13 @@ class Analysis:
             "mva":[self.binRange_mva2J],
             "mvadiboson":[get_binRange(-1,1,0.05,debug_binRange)],
             "nTaus":[get_binRange(0,3,1,debug_binRange)],
-            "pTB1":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
-            "pTB2":[get_binRange(0,140,10,debug_binRange)+","+get_binRange(140,200,20,debug_binRange)],
+            "pTB1":[get_binRange(0,240,10,debug_binRange)+","+get_binRange(240,300,20,debug_binRange)+","+get_binRange(300,400,50,debug_binRange)],
+            "pTB2":[get_binRange(0,140,10,debug_binRange)+","+get_binRange(140,160,20,debug_binRange)],
             "PtFwdJets":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
             "PtSigJets":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
-            "pTBB":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,500,20,debug_binRange)],
-            "pTBBMETAsym":[get_binRange(-0.2,-0.1,0.05,debug_binRange)+","+get_binRange(-0.1,0.1,0.02,debug_binRange)+","+get_binRange(0.1,0.2,0.05,debug_binRange)],
-            "pTBBoverMET":[get_binRange(0.3,0.7,0.1,debug_binRange)+","+get_binRange(0.7,0.8,0.05,debug_binRange)+","+get_binRange(0.8,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.3,0.05,debug_binRange)],
+            "pTBB":[get_binRange(40,80,20,debug_binRange)+","+get_binRange(80,300,10,debug_binRange)+","+get_binRange(300,400,50,debug_binRange)],
+            "pTBBMETAsym":[get_binRange(-0.6,-0.2,0.1,debug_binRange)+","+get_binRange(-0.2,-0.1,0.05,debug_binRange)+","+get_binRange(-0.1,0.1,0.02,debug_binRange)+","+get_binRange(0.1,0.2,0.05,debug_binRange)],
+            "pTBBoverMET":[get_binRange(0.0,0.7,0.1,debug_binRange)+","+get_binRange(0.7,0.8,0.05,debug_binRange)+","+get_binRange(0.8,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.3,0.05,debug_binRange)+","+get_binRange(1.3,1.7,0.1,debug_binRange)],
             "METOverSqrtHT":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
             "METOverSqrtSumET":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
             "METRho":[""],
@@ -1515,7 +1527,7 @@ class Analysis:
                     # rebin, collect overflows, do average
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
-                    if "ptMuonInJet" in variable:
+                    if "ptOneMuInJet" in variable or "dRMuonInJet" in variable or "PtRatioOneMuonInJet" in variable or "PtRatioOneElectronInJet" in variable:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
                     else:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
@@ -1609,7 +1621,7 @@ class Analysis:
                     debug=False
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
-                    if "ptMuonInJet" in variable:
+                    if "ptOneMuInJet" in variable or "dRMuonInJet" in variable or "PtRatioOneMuonInJet" in variable or "PtRatioOneElectronInJet" in variable:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
                     else:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
@@ -1640,10 +1652,14 @@ class Analysis:
             if variable in self.dict_variable_info.keys():
                 info=self.dict_variable_info[variable]
                 binRange=info[0]
-            elif "mBB" in variable and "mBBJ" not in variable:
-                binRange=self.dict_variable_info["mBB"][0]
             elif "mBBJ" in variable:
                 binRange=self.dict_variable_info["mBBJ"][0]
+                print "ADRIAN mBBJ"     
+                print "ADRIAN binRange",binRange
+            elif "mBB" in variable:
+                binRange=self.dict_variable_info["mBB"][0]
+                print "ADRIAN mBB"     
+                print "ADRIAN binRange",binRange
             elif "pTB1" in variable:
                 binRange=self.dict_variable_info["pTB1"][0]
             elif "pTB2" in variable:
@@ -1688,8 +1704,6 @@ class Analysis:
             for category in self.list_category:
                 if self.debug:
                     print "category",category
-                if "mBB" in variable:
-                    binRange=self.binRange_mBB
                 if variable=="mva":
                     if "2jet" in category:
                         binRange=self.binRange_mva2J
@@ -1725,14 +1739,16 @@ class Analysis:
                     # done if
                     # rebin, collect overflows, do average
                     debug=False
-                    #getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
-                    #histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
-                    #if "ptMuonInJet" in variable:
-                    #    histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
-                    #else:
-                    #    histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
+                    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
+                    if "ptOneMuInJet" in variable or "dRMuonInJet" in variable or "PtRatioOneMuonInJet" in variable or "PtRatioOneElectronInJet" in variable:
+                        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
+                    else:
+                        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
                     #histo=get_histo_averaged_per_bin_width(histo,debug=debug)
-                    #getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    if "TruthWZ" in variable and processMerged=="data":
+                        histo.Reset()
                     # prepare histograms
                     list_info=self.dict_processMerged_stackInfo[processMerged]
                     #histo.SetLineColor(color)
@@ -1913,9 +1929,22 @@ class Analysis:
                 for variable in self.list_variable:
                     if variable in list_variable_ignore:
                         continue
+                    #if not ("TruthWZ" in variable):
+                    #    continue
+                    # if not ("mBB" in variable or "mBBJ" in variable or "pTB1" in variable or "pTB2" in variable or "dPhiVBB" in variable or "HT" in variable):
+                    #    continue
+                    # if not ("OneMuVR0GeV_PtRecoR21InclusiveADNone" in variable or "OneMuVR0GeV_PtRecoR21SplitADNone" in variable or "OneMuVR0GeV_PtRecoR21InclusiveAorDNone" in variable or "OneMuVR0GeV_PtRecoR21SplitAorDNone" in variable):
+                    # if not ("OneMuVR0GeV_PtRecoR21SplitADNone" in variable or "OneMuVR4GeV_PtRecoR21SplitADNone" in variable or "OneMuVR7GeV_PtRecoR21SplitADNone" in variable or "OneMuVR10GeV_PtRecoR21SplitADNone" in variable):
+                    # if not ("OneMuVR0GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR0GeV_PtRecoR21SplitADBukinMedian" in variable or "OneMuVR4GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR4GeV_PtRecoR21SplitADBukinMedian" in variable or "OneMuVR7GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR7GeV_PtRecoR21SplitADBukinMedian" in variable or "OneMuVR10GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR10GeV_PtRecoR21SplitADBukinMedian" in variable or "Regression" in variable):
+                    if not ("mBB" in variable and "mBBJ" not in variable):
+                        continue
+                    # if not (variable.endswith("Nominal") or variable.endswith("OneMu") or variable.endswith("PtReco") or variable.endswith("OneMuVR0GeV") or variable.endswith("OneMuVR4GeV") or variable.endswith("OneMuVR7GeV") or variable.endswith("OneMuVR10GeV") or "OneMuInJet" in variable or "MuonInJet" in variable or "ElectronInJet" in variable):
+                    #if not (variable.endswith("Nominal")):
+                    # if not ("OneMuInJet" in variable or "MuonInJet" in variable or "ElectronInJet" in variable):
+                        #continue
                     # if not "Nominal" in variable:
                     #    continue
-                    #if "mBB" in variable: # temp
+                    # if "mBB" in variable: # temp
                     #    continue
                     list_variable.append(variable)
                 # done for loop

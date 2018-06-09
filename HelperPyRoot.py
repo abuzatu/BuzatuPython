@@ -1668,7 +1668,8 @@ def get_automatic_binRange(h,NrBins=20,threshold=0.02,debug=True):
 
     # remove the edge bins with values very small to the other bins
     list_binInfo_D=[]
-    print "direct:","max_density_to_use",max_density_to_use
+    if debug:
+        print "direct:","max_density_to_use",max_density_to_use
     counter=0
     for (binEdgeLow,binEdgeHigh,temp_sumIntegral,width,density) in list_binInfo:
         if debug:
@@ -2565,7 +2566,7 @@ def get_Chi2_from_ROOT_of_two_histograms(h1,h2,debug=False):
 # besides info needed for overlayHistograms (histogram and legend) we need more info
 # if it is S, B or D, and if we want to scale it by some number (default 1)
 # then we hard code the way we want this plot to look like
-def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",blinding=["threshold",0.05],doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),xAxisTitle="MET [GeV]",debug=False):
+def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",blinding=["threshold",0.05],doAutomaticBinning=False,doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),xAxisTitle="MET [GeV]",debug=False):
     if debug:
         print "Start stackHistograms"
     assert(blinding[0]=="range" or blinding[0]=="threshold")
@@ -2594,43 +2595,46 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     # p1 - top left (stacked plots)
     p1.cd()
 
-    # first sum all of S, B, D
-    dict_processType_histoSum={}
-    for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+    if doAutomaticBinning:
+        # first sum all of S, B, D
+        dict_processType_histoSum={}
+        for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+            if debug:
+                print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
+            histoSF=histo.Clone(histo.GetName()+"_SF")
+            histoSF.Scale(SF)
+            if debug:
+                print "process",process,"integral",histo.Integral(),"SF",SF,"integral SF",histoSF.Integral()
+            # add to sum
+            if processType in dict_processType_histoSum.keys():
+                dict_processType_histoSum[processType].Add(histoSF)
+            else:
+                dict_processType_histoSum[processType]=histoSF
+            # done if
+        # done for loop over histograms
         if debug:
-            print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
-        histoSF=histo.Clone(histo.GetName()+"_SF")
-        histoSF.Scale(SF)
+            for processType in dict_processType_histoSum.keys():
+                print "processType",processType,"integral",dict_processType_histoSum[processType].Integral()
+
+        # get the bin range from the background distribution
+        binRange=get_automatic_binRange(dict_processType_histoSum["B"],NrBins=16,threshold=0.02,debug=debug)
         if debug:
-            print "process",process,"integral",histo.Integral(),"SF",SF,"integral SF",histoSF.Integral()
-        # add to sum
-        if processType in dict_processType_histoSum.keys():
-            dict_processType_histoSum[processType].Add(histoSF)
-        else:
-            dict_processType_histoSum[processType]=histoSF
-        # done if
-    # done for loop over histograms
-    if debug:
-        for processType in dict_processType_histoSum.keys():
-            print "processType",processType,"integral",dict_processType_histoSum[processType].Integral()
+            print "binRange",binRange
 
-    # get the bin range from the background distribution
-    binRange=get_automatic_binRange(dict_processType_histoSum["B"],NrBins=16,threshold=0.02,debug=debug)
-    print "binRange",binRange
-
-    # rebin all the histograms with this new binning
-    list_tuple_h1D_rebinned=[]
-    for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
-        if debug:
-            print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
-        # rebin
-        histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
-        histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
-        list_tuple_h1D_rebinned.append((histo,process,(processType,color,SF,scale)))
-    # done for loop over histograms
-
-    # rewrite the inital list of tuple with the new one
-    list_tuple_h1D=list_tuple_h1D_rebinned
+        # rebin all the histograms with this new binning
+        list_tuple_h1D_rebinned=[]
+        for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+            if debug:
+                print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
+            # rebin
+            histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
+            histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
+            list_tuple_h1D_rebinned.append((histo,process,(processType,color,SF,scale)))
+        # done for loop over histograms
+            
+        # rewrite the inital list of tuple with the new one
+        list_tuple_h1D=list_tuple_h1D_rebinned
+    # done if doAutomaticBinning
 
     # recompute the sum of S, B, D
     dict_processType_histoSum={}
