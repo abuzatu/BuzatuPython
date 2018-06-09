@@ -391,7 +391,7 @@ class Analysis:
 
     def set_fileNameHistosRaw(self):
         # suffix=""
-        suffix="_"+self.list_category[0]
+        suffix="_"+self.list_category[0]+"_"+self.list_variable[0]
         self.fileNameHistosRaw=self.folderHistos+"/histosRaw"+suffix+".root"
     # done function
 
@@ -603,7 +603,7 @@ class Analysis:
 
     def set_fileNameHistosProcess(self):
         # suffix=""
-        suffix="_"+self.list_category[0]
+        suffix="_"+self.list_category[0]+"_"+self.list_variable[0]
         self.fileNameHistosProcess=self.folderHistos+"/histosProcess"+suffix+".root"
     # done function
 
@@ -1097,7 +1097,7 @@ class Analysis:
 
     def set_fileNameHistosProcessMerged(self):
         # suffix=""
-        suffix="_"+self.list_category[0]
+        suffix="_"+self.list_category[0]+"_"+self.list_variable[0]
         self.fileNameHistosProcessMerged=self.folderHistos+"/histosProcessMerged"+suffix+".root"
     # done function
 
@@ -1269,7 +1269,7 @@ class Analysis:
         if self.debug or self.verbose:
             print "Start create_results()"
         # suffix=""
-        suffix="_"+self.list_category[0]
+        suffix="_"+self.list_category[0]+"_"+self.list_variable[0]
         fileName=self.folderResults+"/results"+suffix+".txt"
         # create a new file
         f = open(fileName,'w')
@@ -2026,7 +2026,8 @@ class Analysis:
             # self.list_variable=["MET","SumPtJet","mBB"]
             # self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
             # self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
-            if self.do_later or True:
+            # if  self.do_later or True:
+            if self.do_later and False:
                 # only included at the pretag inclusive: on 0ptag2pjet or so
                 string_variable_ignore="EtaFwdJets,EtaSigJets,PtFwdJets,PtSigJets,NFwdJets,NSigJets,MV2c10_B,MV2c10_C,MV2c10_Data,MV2c10_L,btag_weight_B,btag_weight_C,btag_weight_Data,btag_weight_L,eff_B,eff_C,eff_L,njets"
                 string_variable_ignore+=",METSig_hard,RandomRunNumber,PileupReweight,PhiJ3,NTags,NJets,METVarT,METVarL_soft,METVarL_hard,METVarL,METSig_soft,METSig,METRho,METDirectional,METOverSqrtHT,METOverSqrtSumET,AverageMu,ActualMu,AverageMuScaled"
@@ -2079,12 +2080,12 @@ class Analysis:
                 self.create_histosProcessMerged(doSF=True)
             # return
             self.set_list_processAnalysis()
-            if self.do_later or self.do_create_results:
+            if False and (self.do_later or self.do_create_results):
                 self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
                 self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
                 if True:
                     self.create_results()
-            if self.do_later or self.do_create_latex_table:
+            if False and (self.do_later or self.do_create_latex_table):
                 self.read_results()
                 self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
                 self.list_processResult=self.list_processResult+["S/B","SigY_S_B"]
@@ -2092,7 +2093,8 @@ class Analysis:
                 # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
                 # for var in "mBB,mva,MET".split(","):
                 # for var in "mBBNominal".split(","):
-                for var in list_variable:
+                # for var in list_variable:
+                for var in []:
                     self.list_processResult=self.list_processResult+["SigH_S_B@"+var]                 
                 self.create_yield_latex_table(doDocument=False)
                 # self.create_overlaid_variable()
