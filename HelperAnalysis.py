@@ -390,7 +390,9 @@ class Analysis:
     # done function  
 
     def set_fileNameHistosRaw(self):
-        self.fileNameHistosRaw=self.folderHistos+"/histosRaw.root"
+        # suffix=""
+        suffix="_"+self.list_category[0]
+        self.fileNameHistosRaw=self.folderHistos+"/histosRaw"+suffix+".root"
     # done function
 
     def create_histosRaw(self,option):
@@ -600,7 +602,9 @@ class Analysis:
     # done function
 
     def set_fileNameHistosProcess(self):
-        self.fileNameHistosProcess=self.folderHistos+"/histosProcess.root"
+        # suffix=""
+        suffix="_"+self.list_category[0]
+        self.fileNameHistosProcess=self.folderHistos+"/histosProcess"+suffix+".root"
     # done function
 
     def create_histosProcess(self):
@@ -1092,7 +1096,9 @@ class Analysis:
             }
 
     def set_fileNameHistosProcessMerged(self):
-        self.fileNameHistosProcessMerged=self.folderHistos+"/histosProcessMerged.root"
+        # suffix=""
+        suffix="_"+self.list_category[0]
+        self.fileNameHistosProcessMerged=self.folderHistos+"/histosProcessMerged"+suffix+".root"
     # done function
 
     def create_histosProcessMerged(self,doSF=True):
@@ -1262,7 +1268,9 @@ class Analysis:
     def create_results(self):
         if self.debug or self.verbose:
             print "Start create_results()"
-        fileName=self.folderResults+"/results.txt"
+        # suffix=""
+        suffix="_"+self.list_category[0]
+        fileName=self.folderResults+"/results"+suffix+".txt"
         # create a new file
         f = open(fileName,'w')
         if self.debug:
@@ -1806,7 +1814,19 @@ class Analysis:
        
     ### summary
 
-
+    def do_evaluate_contents(self):
+        # then evaluate the content of these files                                                                                                                              
+        self.create_folderProcessInitial()
+        if self.do_evaluate_list_processInitial:
+            self.evaluate_list_processInitial(option="processInitial")
+        self.set_evaluated_list_processInitial()
+        if self.do_evaluate_content_of_all_processInitial:
+            self.evaluate_content_of_all_processInitial()
+        self.set_evaluated_list_process()
+        self.set_evaluated_list_category()
+        self.set_evaluated_list_variable()
+        self.set_evaluated_list_all()
+    # done function
 
     def do_hadd_first(self):
         if self.debug:
@@ -1820,14 +1840,8 @@ class Analysis:
         # self.create_folderFitInput()
         # dict_stem_analysis[stem].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
         # re-evaluate from the folder output if you put by hand new folders, like data16B
-        if self.do_evaluate_list_processInitial:
-            self.evaluate_list_processInitial(option="processInitial")
-        if self.do_evaluate_content_of_all_processInitial:
-            self.evaluate_content_of_all_processInitial()
-        self.set_evaluated_list_process()
-        self.set_evaluated_list_category()
-        self.set_evaluated_list_variable()
-        self.set_evaluated_list_all()
+        self.do_evaluate_contents()
+    # done function
 
     def do_cp_second(self):
         if self.debug:
@@ -1853,15 +1867,7 @@ class Analysis:
         if self.debug or self.verbose:
             print "Done copied the .root file in the new processInitial"
         # then evaluate the content of these files
-        if self.do_evaluate_list_processInitial:
-            self.evaluate_list_processInitial(option="processInitial")
-        self.set_evaluated_list_processInitial()
-        if self.do_evaluate_content_of_all_processInitial:
-            self.evaluate_content_of_all_processInitial()
-        self.set_evaluated_list_process()
-        self.set_evaluated_list_category()
-        self.set_evaluated_list_variable()
-        self.set_evaluated_list_all()
+        self.do_evaluate_contents()
     # done function
 
     def do_hadd_second(self):
@@ -1888,7 +1894,7 @@ class Analysis:
         os.system(command)
     # done function
 
-    def do_all(self):
+    def do_all_begining_deprecated(self):
         if self.debug:
             print "Start do_all()"
         self.create_folderProcessInitial()
@@ -1908,8 +1914,11 @@ class Analysis:
         self.set_evaluated_list_category()
         self.set_evaluated_list_variable()
         self.set_evaluated_list_all()
-        if self.hadd_all_processInitial_to_produce_fit_inputs:
-            self.hadd_all_processInitial_to_produce_fit_inputs()
+        #if self.hadd_all_processInitial_to_produce_fit_inputs:
+        #    self.hadd_all_processInitial_to_produce_fit_inputs()
+
+
+    def do_all(self):
         self.create_folderHistos()
         self.set_fileNameHistosRaw()
         self.set_fileNameHistosProcess()
@@ -1976,7 +1985,8 @@ class Analysis:
             #self.list_process=["ttbar"]
             #self.list_process=["data"]
             # reduce category
-            if self.do_later or True:
+            # if self.do_later or True:
+            if self.do_later and False:
                 if "MVA" in self.stem:
                     # self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
                     self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
@@ -2032,7 +2042,9 @@ class Analysis:
                     # if not ("OneMuVR0GeV_PtRecoR21InclusiveADNone" in variable or "OneMuVR0GeV_PtRecoR21SplitADNone" in variable or "OneMuVR0GeV_PtRecoR21InclusiveAorDNone" in variable or "OneMuVR0GeV_PtRecoR21SplitAorDNone" in variable):
                     # if not ("OneMuVR0GeV_PtRecoR21SplitADNone" in variable or "OneMuVR4GeV_PtRecoR21SplitADNone" in variable or "OneMuVR7GeV_PtRecoR21SplitADNone" in variable or "OneMuVR10GeV_PtRecoR21SplitADNone" in variable):
                     # if not ("OneMuVR0GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR0GeV_PtRecoR21SplitADBukinMedian" in variable or "OneMuVR4GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR4GeV_PtRecoR21SplitADBukinMedian" in variable or "OneMuVR7GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR7GeV_PtRecoR21SplitADBukinMedian" in variable or "OneMuVR10GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR10GeV_PtRecoR21SplitADBukinMedian" in variable or "Regression" in variable):
-                    if not ("mBB" in variable and "mBBJ" not in variable):
+                    #if not ("mBB" in variable and "mBBJ" not in variable):
+                    #   continue
+                    if not (variable=="mBB"):
                         continue
                     # if not (variable.endswith("Nominal") or variable.endswith("OneMu") or variable.endswith("PtReco") or variable.endswith("OneMuVR0GeV") or variable.endswith("OneMuVR4GeV") or variable.endswith("OneMuVR7GeV") or variable.endswith("OneMuVR10GeV") or "OneMuInJet" in variable or "MuonInJet" in variable or "ElectronInJet" in variable):
                     #if not (variable.endswith("Nominal")):
