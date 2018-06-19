@@ -2289,9 +2289,9 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
             ratio_h1D.SetMarkerColor(ratio_h1D.GetLineColor())  
             #ratio_h1D.Draw("E6 SAME") # stat errors on the ratios of systematics as curved shape
             #ratio_h1D.Draw("E1 SAME") # stat errors on the ratios of systematics as crosses
-            #ratio_h1D.Draw("HIST SAME") # no errors but it draws the line also horizontally when the bins have zero value at start and vertically for the first non zero bin
-            #ratio_h1D.Draw(plot_option_ratio+" SAME")
-            ratio_h1D.Draw("E1 SAME")
+            ratio_h1D.Draw("HIST SAME") # no errors but it draws the line also horizontally when the bins have zero value at start and vertically for the first non zero bin
+            ratio_h1D.Draw(plot_option_ratio+" SAME")
+            #ratio_h1D.Draw("E1 SAME")
             None
 
     # done loop over ratio histogram
@@ -4319,4 +4319,29 @@ def get_dict_figureOfMerit_histo(sig_h,bkg_h,list_figureOfMerit=["SignalOverBack
             getBinValues(histo,debug=debug)
     # 
     return dict_figureOfMerit_histo
+# done function
+
+def deltaPhi(phi1,phi2,debug=False):
+    absDPhi=abs(phi1-phi2)
+    if absDPhi<math.pi:
+        deltaPhi=absDPhi
+    else:
+        deltaPhi=2*math.pi-absDPhi
+    if debug:
+        print "phi1",phi1,"phi2",phi2,"absDPhi",absDPhi,"deltaPhi",deltaPhi
+    return deltaPhi
+# done function
+
+def deltaEta(eta1,eta2,debug=False):
+    deltaEta=abs(eta1-eta2)
+    if debug:
+        print "eta1",eta1,"eta2",eta2,"deltaEta",deltaEta
+    return deltaEta
+# done function
+
+def deltaR(deltaEta,deltaPhi,debug=False):
+    deltaR=math.sqrt(deltaEta*deltaEta+deltaPhi*deltaPhi)
+    if debug:
+        print "deltaEta",deltaEta,"deltaPhi",deltaPhi,"deltaR",deltaR
+    return deltaR
 # done function
