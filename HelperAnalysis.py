@@ -199,6 +199,16 @@ class Analysis:
             os.system(command)
     # done function
 
+    def hadd_tagFinal(self):
+        for processInitial in self.list_processInitial:
+            output=self.folderProcessInitial+"/"+processInitial+".root"
+            inputs=self.folderInput+"/hist-"+processInitial+"-*.root"
+            command="hadd -f "+output+" "+inputs
+            if self.debug:
+                print "command",command
+            os.system(command)
+    # done function  
+
     def evaluate_content_of_one_processInitial(self,processInitial,debug):
         if self.debug:
             print "Start evaluate_content_of_one_processInitial()"
@@ -375,8 +385,14 @@ class Analysis:
         return histoNameRaw
     # done function
 
+    def set_fileNameHistosInput(self):
+        self.fileNameHistosInput=self.folderHistos+"/histosInput.root"
+    # done function  
+
     def set_fileNameHistosRaw(self):
-        self.fileNameHistosRaw=self.folderHistos+"/histosRaw.root"
+        # suffix=""
+        suffix="_"+self.list_category[0]+"_"+self.list_variable[0]
+        self.fileNameHistosRaw=self.folderHistos+"/histosRaw"+suffix+".root"
     # done function
 
     def create_histosRaw(self,option):
@@ -420,18 +436,20 @@ class Analysis:
         debug_binRange=False
 
         # mBB
-        binRange_mBB=get_binRange(20,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)
+        binRange_mBB=get_binRange(0,30,30,debug_binRange)+","+get_binRange(30,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)
         # mva EPS 2017 https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/SMVHbbPublication2017BkgModelling#BDT_Binning
         self.binRange_mva2J="-1,-0.91,-0.77,-0.542,-0.268,-0.05,0.094,0.194,0.278,0.358,0.424,0.48,0.53,0.584,0.656,1.0"
         self.binRange_mva3J="-1,-0.848,-0.676,-0.492,-0.3,-0.126,0.03,0.158,0.272,0.362,0.44,0.51,0.576,0.644,0.722,1.0"
+        self.binRange_mBB=binRange_mBB
+        # self.binRange_pTB1=[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)
 
         self.dict_variable_info={
             "EtaB1":[get_binRange(-2.5,2.5,0.2,debug_binRange)],
             "EtaB2":[get_binRange(-2.5,2.5,0.2,debug_binRange)],
             "EtaJ3":[get_binRange(-4.5,-2.5,0.5,debug_binRange)+","+get_binRange(-2.5,2.5,0.2,debug_binRange)+","+get_binRange(2.5,4.5,0.5,debug_binRange)],
-            "PhiB1":[""],
-            "PhiB2":[""],
-            "PhiJ3":[""],
+            "PhiB1":[get_binRange(-3.15,3.15,0.0315*10,debug_binRange)],
+            "PhiB2":[get_binRange(-3.15,3.15,0.0315*10,debug_binRange)],
+            "PhiJ3":[get_binRange(-3.15,3.15,0.0315*10,debug_binRange)],
             "EtaFwdJets":[get_binRange(-4.5,4.5,0.1,debug_binRange)],
             "EtaSigJets":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
             # "MET":[get_binRange(150,400,10,debug_binRange)+","+get_binRange(400,700,100,debug_binRange)],
@@ -455,21 +473,22 @@ class Analysis:
             "eff_C":[get_binRange(0.0,1,0.05,debug_binRange)],
             "eff_L":[get_binRange(0.0,1,0.05,debug_binRange)],
             "eff_Data":[get_binRange(0.0,1,0.05,debug_binRange)],
-            "MindPhiMETJet":[get_binRange(0.0315*40,3.15,0.0315*2,debug_binRange)],
+            "MindPhiMETJet":[get_binRange(0.0315*0,3.15,0.0315*2,debug_binRange)],
             "NTags":[""],
             "Njets":[get_binRange(2,10,1,debug_binRange)],
             "njets":[get_binRange(2,10,1,debug_binRange)],
             "NFwdJets":[get_binRange(2,10,1,debug_binRange)],
             "NSigJets":[get_binRange(2,10,1,debug_binRange)],
-            "SumPtJet":[get_binRange(120,400,10,debug_binRange)+","+get_binRange(400,600,20,debug_binRange)],
+            "SumPtJet":[get_binRange(120,400,10,debug_binRange)+","+get_binRange(400,600,50,debug_binRange)],
+            "HT":[get_binRange(240,560,20,debug_binRange)+","+get_binRange(560,600,20,debug_binRange)+","+get_binRange(600,1000,50,debug_binRange)],
             "costheta":[get_binRange(0,1,0.05,debug_binRange)],
             "dEtaBB":[get_binRange(0,1.5,0.1,debug_binRange)+","+get_binRange(1.5,2.5,0.2,debug_binRange)+","+get_binRange(2.5,4.5,1,debug_binRange)],
-            "dPhiBB":[get_binRange(0,3.2-20*0.032,0.032*4,debug_binRange)],
+            "dPhiBB":[get_binRange(0,3.2,5*0.032,debug_binRange)],
             "dPhiMETMPT":[get_binRange(0,3.15-0.0315*48,0.0315,debug_binRange)],
-            "dPhiVBB":[get_binRange(3.2-10*0.032,3.2,0.032,debug_binRange)],
+            "dPhiVBB":[get_binRange(3.2-35*0.032,3.2-20*0.032,5*0.032,debug_binRange)+","+get_binRange(3.2-20*0.032,3.2-10*0.032,2*0.032,debug_binRange)+","+get_binRange(3.2-10*0.032,3.2-0*0.032,1*0.032,debug_binRange)],
             "dRB1J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "dRB2J3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
-            "dRBB":[get_binRange(0.4,1.0,0.1,debug_binRange)+","+get_binRange(1.0,5,0.2,debug_binRange)],
+            "dRBB":[get_binRange(0.4,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.0,0.1,debug_binRange)+","+get_binRange(1.0,3.0,0.2,debug_binRange)+","+get_binRange(3.0,4.0,0.5,debug_binRange)+","+get_binRange(4.0,5.0,1.0,debug_binRange)],
             "mBB":[binRange_mBB],
             "mBBMVA":[binRange_mBB],
             "mBBNominal":[binRange_mBB],
@@ -491,32 +510,44 @@ class Analysis:
             "nrMuonInJetB1":[get_binRange(0,3,1,debug_binRange)],  
             "nrMuonInJetB2":[get_binRange(0,3,1,debug_binRange)],  
             "nrMuonInJetJ3":[get_binRange(0,3,1,debug_binRange)],  
+            "nrElectronInJetB1":[get_binRange(0,3,1,debug_binRange)],  
+            "nrElectronInJetB2":[get_binRange(0,3,1,debug_binRange)],  
+            "nrElectronInJetJ3":[get_binRange(0,3,1,debug_binRange)],  
             #"ptMuonInJetB1":["0,2,4,5,6,7,10,12,15,20,30,50,100"],  
             #"ptMuonInJetB2":["0,2,4,5,6,7,10,12,15,20,30,50,100"],  
             #"ptMuonInJetJ3":["0,2,4,5,6,7,10,12,15,20,30,50,100"],  
-            "ptMuonInJetB1":["2,5,7,10,12,15,20,30,50,100"],  
-            "ptMuonInJetB2":["2,5,7,10,12,15,20,30,50,100"],  
-            "ptMuonInJetJ3":["2,5,7,10,12,15,20,30,50,100"],  
+            "ptOneMuInJetB1":["1,2,3,4,7,10,12,15,20,30"],
+            "ptOneMuInJetB2":["1,2,3,4,7,10,12,15,20,30"],
+            "ptOneMuInJetJ3":["1,2,3,4,7,10,12,15,20,30"],
+            "dRMuonInJetB1":[get_binRange(0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.4,0.05,debug_binRange)],  
+            "dRMuonInJetB2":[get_binRange(0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.4,0.05,debug_binRange)],  
+            "dRMuonInJetJ3":[get_binRange(0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.4,0.05,debug_binRange)],
+            "PtRatioOneElectronInJetB1":[get_binRange(0.0,0.1,0.01,debug_binRange)],
+            "PtRatioOneElectronInJetB2":[get_binRange(0.0,0.1,0.01,debug_binRange)],
+            "PtRatioOneElectronInJetJ3":[get_binRange(0.0,0.1,0.01,debug_binRange)],
+            "PtRatioOneMuonInJetB1":[get_binRange(0.0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.2,0.02,debug_binRange)+","+get_binRange(0.2,1.0,0.05,debug_binRange)],
+            "PtRatioOneMuonInJetB2":[get_binRange(0.0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.2,0.02,debug_binRange)+","+get_binRange(0.2,1.0,0.05,debug_binRange)],
+            "PtRatioOneMuonInJetJ3":[get_binRange(0.0,0.1,0.01,debug_binRange)+","+get_binRange(0.1,0.2,0.02,debug_binRange)+","+get_binRange(0.2,1.0,0.05,debug_binRange)],
             "mBBJ":[get_binRange(40,80,20,debug_binRange)+","+get_binRange(80,160,10,debug_binRange)+","+get_binRange(160,300,20,debug_binRange)+","+get_binRange(300,500,40,debug_binRange)+","+get_binRange(500,700,50,debug_binRange)+","+get_binRange(700,1000,100,debug_binRange)],
             "maxdRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "mindRBJ3":[get_binRange(0.4,3.4,0.1,debug_binRange)+","+get_binRange(3.4,5,0.2,debug_binRange)],
             "AverageMu":[get_binRange(0,100,2,debug_binRange)],
-            "AverageMuScaled":[get_binRange(6,44,2,debug_binRange)],
-            "ActualMu":[get_binRange(0,100,1,debug_binRange)],
-            "ActualMuScaled":[get_binRange(0,100,1,debug_binRange)],
+            "AverageMuScaled":[get_binRange(0,100,2,debug_binRange)],
+            "ActualMu":[get_binRange(0,100,2,debug_binRange)],
+            "ActualMuScaled":[get_binRange(0,100,2,debug_binRange)],
             "PileupReweight":[""],
             "RandomRunNumber":[""],
             # "mva":[get_binRange(-1,1,0.05,debug_binRange)],
             "mva":[self.binRange_mva2J],
             "mvadiboson":[get_binRange(-1,1,0.05,debug_binRange)],
             "nTaus":[get_binRange(0,3,1,debug_binRange)],
-            "pTB1":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
-            "pTB2":[get_binRange(0,140,10,debug_binRange)+","+get_binRange(140,200,20,debug_binRange)],
+            "pTB1":[get_binRange(0,240,10,debug_binRange)+","+get_binRange(240,300,20,debug_binRange)+","+get_binRange(300,400,50,debug_binRange)],
+            "pTB2":[get_binRange(0,140,10,debug_binRange)+","+get_binRange(140,160,20,debug_binRange)],
             "PtFwdJets":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
             "PtSigJets":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,20,debug_binRange)+","+get_binRange(400,500,50,debug_binRange)],
-            "pTBB":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,500,20,debug_binRange)],
-            "pTBBMETAsym":[get_binRange(-0.6,-0.2,0.1,debug_binRange)+","+get_binRange(-0.2,0.1,0.02,debug_binRange)+","+get_binRange(0.1,0.3,0.1,debug_binRange)],
-            "pTBBoverMET":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
+            "pTBB":[get_binRange(40,80,20,debug_binRange)+","+get_binRange(80,300,10,debug_binRange)+","+get_binRange(300,400,50,debug_binRange)],
+            "pTBBMETAsym":[get_binRange(-0.6,-0.2,0.1,debug_binRange)+","+get_binRange(-0.2,-0.1,0.05,debug_binRange)+","+get_binRange(-0.1,0.1,0.02,debug_binRange)+","+get_binRange(0.1,0.2,0.05,debug_binRange)],
+            "pTBBoverMET":[get_binRange(0.0,0.7,0.1,debug_binRange)+","+get_binRange(0.7,0.8,0.05,debug_binRange)+","+get_binRange(0.8,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.3,0.05,debug_binRange)+","+get_binRange(1.3,1.7,0.1,debug_binRange)],
             "METOverSqrtHT":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
             "METOverSqrtSumET":[get_binRange(0.2,0.7,0.1,debug_binRange)+","+get_binRange(0.7,1.2,0.02,debug_binRange)+","+get_binRange(1.2,1.6,0.1,debug_binRange)],
             "METRho":[""],
@@ -571,7 +602,9 @@ class Analysis:
     # done function
 
     def set_fileNameHistosProcess(self):
-        self.fileNameHistosProcess=self.folderHistos+"/histosProcess.root"
+        # suffix=""
+        suffix="_"+self.list_category[0]+"_"+self.list_variable[0]
+        self.fileNameHistosProcess=self.folderHistos+"/histosProcess"+suffix+".root"
     # done function
 
     def create_histosProcess(self):
@@ -1018,8 +1051,8 @@ class Analysis:
             "ttX"       :["B",ROOT.kOrange-7,1.0,0],
             "ttbar"     :["B",ROOT.kOrange,1.0,0],
             "otherHiggs":["B",ROOT.kGray+1,1.0,0],
-            "diboson"   :["B",ROOT.kGray,1.0,2],
-            "VHbb"      :["S",ROOT.kRed,1.0,2],
+            "diboson"   :["B",ROOT.kGray,1.0,3],
+            "VHbb"      :["S",ROOT.kRed,1.0,3],
             "data"      :["D",ROOT.kBlack,1.0,1],
             }
         #
@@ -1063,7 +1096,9 @@ class Analysis:
             }
 
     def set_fileNameHistosProcessMerged(self):
-        self.fileNameHistosProcessMerged=self.folderHistos+"/histosProcessMerged.root"
+        # suffix=""
+        suffix="_"+self.list_category[0]+"_"+self.list_variable[0]
+        self.fileNameHistosProcessMerged=self.folderHistos+"/histosProcessMerged"+suffix+".root"
     # done function
 
     def create_histosProcessMerged(self,doSF=True):
@@ -1233,7 +1268,9 @@ class Analysis:
     def create_results(self):
         if self.debug or self.verbose:
             print "Start create_results()"
-        fileName=self.folderResults+"/results.txt"
+        # suffix=""
+        suffix="_"+self.list_category[0]+"_"+self.list_variable[0]
+        fileName=self.folderResults+"/results"+suffix+".txt"
         # create a new file
         f = open(fileName,'w')
         if self.debug:
@@ -1512,7 +1549,7 @@ class Analysis:
                     # rebin, collect overflows, do average
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
-                    if "ptMuonInJet" in variable:
+                    if "ptOneMuInJet" in variable or "dRMuonInJet" in variable or "PtRatioOneMuonInJet" in variable or "PtRatioOneElectronInJet" in variable:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
                     else:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
@@ -1606,7 +1643,7 @@ class Analysis:
                     debug=False
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
-                    if "ptMuonInJet" in variable:
+                    if "ptOneMuInJet" in variable or "dRMuonInJet" in variable or "PtRatioOneMuonInJet" in variable or "PtRatioOneElectronInJet" in variable:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
                     else:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
@@ -1637,6 +1674,52 @@ class Analysis:
             if variable in self.dict_variable_info.keys():
                 info=self.dict_variable_info[variable]
                 binRange=info[0]
+            elif "mBBJ" in variable:
+                binRange=self.dict_variable_info["mBBJ"][0]
+                print "ADRIAN mBBJ"     
+                print "ADRIAN binRange",binRange
+            elif "mBB" in variable:
+                binRange=self.dict_variable_info["mBB"][0]
+                print "ADRIAN mBB"     
+                print "ADRIAN binRange",binRange
+            elif "pTB1" in variable:
+                binRange=self.dict_variable_info["pTB1"][0]
+            elif "pTB2" in variable:
+                binRange=self.dict_variable_info["pTB2"][0]
+            elif "SumPtJet" in variable:
+                binRange=self.dict_variable_info["SumPtJet"][0]
+            elif "HT" in variable:
+                binRange=self.dict_variable_info["HT"][0]
+            elif "dRBB" in variable:
+                binRange=self.dict_variable_info["dRBB"][0]
+            elif "dEtaBB" in variable:
+                binRange=self.dict_variable_info["dEtaBB"][0]
+            elif "dPhiBB" in variable:
+                binRange=self.dict_variable_info["dPhiBB"][0]
+            elif "dPhiVBB" in variable:
+                binRange=self.dict_variable_info["dPhiVBB"][0]
+            elif "pTJ3" in variable:
+                binRange=self.dict_variable_info["pTJ3"][0]
+            elif "EtaB1" in variable:
+                binRange=self.dict_variable_info["EtaB1"][0]
+            elif "EtaB2" in variable:
+                binRange=self.dict_variable_info["EtaB2"][0]
+            elif "EtaJ3" in variable:
+                binRange=self.dict_variable_info["EtaJ3"][0]
+            elif "PhiB1" in variable:
+                binRange=self.dict_variable_info["PhiB1"][0]
+            elif "PhiB2" in variable:
+                binRange=self.dict_variable_info["PhiB2"][0]
+            elif "PhiJ3" in variable:
+                binRange=self.dict_variable_info["PhiJ3"][0]
+            elif "yBB" in variable:
+                binRange=self.dict_variable_info["yBB"][0]
+            elif "pTBBoverMET" in variable:
+                binRange=self.dict_variable_info["pTBBoverMET"][0]
+            elif "pTBBMETAsym" in variable:
+                binRange=self.dict_variable_info["pTBBMETAsym"][0]
+            elif "pTBB" in variable:
+                binRange=self.dict_variable_info["pTBB"][0]
             else:
                 binRange=""
             # done if
@@ -1680,12 +1763,14 @@ class Analysis:
                     debug=False
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
                     histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
-                    if "ptMuonInJet" in variable:
+                    if "ptOneMuInJet" in variable or "dRMuonInJet" in variable or "PtRatioOneMuonInJet" in variable or "PtRatioOneElectronInJet" in variable:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=False,addOverflow=True,debug=False)
                     else:
                         histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
                     #histo=get_histo_averaged_per_bin_width(histo,debug=debug)
                     getBinValues(histo,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
+                    if "TruthWZ" in variable and processMerged=="data":
+                        histo.Reset()
                     # prepare histograms
                     list_info=self.dict_processMerged_stackInfo[processMerged]
                     #histo.SetLineColor(color)
@@ -1696,9 +1781,9 @@ class Analysis:
                     #    print "histo",histo,"processMerged",processMerged,"processType",processType,"SF",SF
                     list_tuple_h1D.append((histo,processMerged,list_info))
                 # done loop over processMerged
-                outputFileName=self.folderPlots+"/stack_"+variable+"_"+category
+                outputFileName=self.folderPlots+"/stack_"+variable.replace("_","")+"_"+category
                 # stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.25,0.88,0.88,72,0.037,0],debug=self.debug)
-                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",blinding=blinding,doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.92,0.05),xAxisTitle=variable,debug=False)
+                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",blinding=blinding,doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{"+self.name+"}?#bf{"+category+"}",0.04,13,0.15,0.92,0.05),xAxisTitle=variable,debug=False)
                 print "outside stackHistograms"
             # done loop over category
         # done loop over variable
@@ -1729,7 +1814,87 @@ class Analysis:
        
     ### summary
 
-    def do_all(self):
+    def do_evaluate_contents(self):
+        # then evaluate the content of these files                                                                                                                              
+        self.create_folderProcessInitial()
+        if self.do_evaluate_list_processInitial:
+            self.evaluate_list_processInitial(option="processInitial")
+        self.set_evaluated_list_processInitial()
+        if self.do_evaluate_content_of_all_processInitial:
+            self.evaluate_content_of_all_processInitial()
+        self.set_evaluated_list_process()
+        self.set_evaluated_list_category()
+        self.set_evaluated_list_variable()
+        self.set_evaluated_list_all()
+    # done function
+
+    def do_hadd_first(self):
+        if self.debug:
+            print "Start do_hadd_first()"
+        self.create_folderProcessInitial()
+        if self.do_evaluate_list_processInitial:
+            self.evaluate_list_processInitial(option="ReaderBatch")
+        self.set_evaluated_list_processInitial()
+        if self.do_hadd_processInitial:
+            self.hadd_each_processInitial()
+        # self.create_folderFitInput()
+        # dict_stem_analysis[stem].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
+        # re-evaluate from the folder output if you put by hand new folders, like data16B
+        self.do_evaluate_contents()
+    # done function
+
+    def do_cp_second(self):
+        if self.debug:
+            print "Start do_cp_second()"
+        self.create_folderProcessInitial()
+        command="cp -r"
+        if self.name.endswith("_D"):
+            folder1=self.folderOutput.replace("_D","_D1")
+            folder2=self.folderOutput.replace("_D","_D2")
+        elif self.name.endswith("_T"):
+            folder1=self.folderOutput.replace("_T","_D1")
+            folder2=self.folderOutput.replace("_T","_T2")
+        else:
+            print "name",self.name,"does not end in _D or _T. Will ABORT!!!"
+            assert(False)
+        # done if
+        command+=" "+folder1+"/processInitial/*.root" 
+        command+=" "+folder2+"/processInitial/*.root"
+        command+=" "+self.folderProcessInitial+"/."
+        if self.debug or self.verbose:
+            print "command="+command
+        os.system(command)
+        if self.debug or self.verbose:
+            print "Done copied the .root file in the new processInitial"
+        # then evaluate the content of these files
+        self.do_evaluate_contents()
+    # done function
+
+    def do_hadd_second(self):
+        if self.debug:
+            print "Start do_hadd_second()"
+        self.create_folderHistos()
+        self.set_fileNameHistosInput()
+        command="hadd -f"
+        command+=" "+self.folderHistos+"/input.root"
+        if self.name.endswith("_D"):
+            folder1=self.folderOutput.replace("_D","_D1")
+            folder2=self.folderOutput.replace("_D","_D2")
+        elif self.name.endswith("_T"):
+            folder1=self.folderOutput.replace("_T","_D1")
+            folder2=self.folderOutput.replace("_T","_T2")
+        else:
+            print "name",self.name,"does not end in _D or _T. Will ABORT!!!"
+            assert(False)
+        # done if
+        command+=" "+folder1+"/processInitial/*.root"
+        command+=" "+folder2+"/processInitial/*.root"
+        if self.debug or self.verbose:
+            print "command="+command
+        os.system(command)
+    # done function
+
+    def do_all_begining_deprecated(self):
         if self.debug:
             print "Start do_all()"
         self.create_folderProcessInitial()
@@ -1738,7 +1903,7 @@ class Analysis:
         self.set_evaluated_list_processInitial()
         if self.do_hadd_processInitial:
             self.hadd_each_processInitial()
-        self.create_folderFitInput()
+        # self.create_folderFitInput()
         # dict_stem_analysis[stem].set_do_hadd_all_processInitial_to_produce_fit_inputs(True)
         # re-evaluate from the folder output if you put by hand new folders, like data16B
         if self.do_evaluate_list_processInitial:
@@ -1749,8 +1914,11 @@ class Analysis:
         self.set_evaluated_list_category()
         self.set_evaluated_list_variable()
         self.set_evaluated_list_all()
-        if self.hadd_all_processInitial_to_produce_fit_inputs:
-            self.hadd_all_processInitial_to_produce_fit_inputs()
+        #if self.hadd_all_processInitial_to_produce_fit_inputs:
+        #    self.hadd_all_processInitial_to_produce_fit_inputs()
+
+
+    def do_all(self):
         self.create_folderHistos()
         self.set_fileNameHistosRaw()
         self.set_fileNameHistosProcess()
@@ -1817,16 +1985,21 @@ class Analysis:
             #self.list_process=["ttbar"]
             #self.list_process=["data"]
             # reduce category
-            if "MVA" in self.stem:
-                # self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
-                self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
-                #self.set_list_category(["2tag2jet_150ptv_SR"]) 
-            elif "CUT" in self.stem:
-                self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
-                # self.set_list_category(["2tag2jet_150_200ptv_SR"])
-            else:
-                print "Neither MVA, nor CUT are not found in stem",self.stem,". Will ABORT!!!"
-                assert(False)
+            # if self.do_later or True:
+            if self.do_later and False:
+                if "MVA" in self.stem:
+                    # self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR","2tag4jet_150ptv_SR","2tag5pjet_150ptv_SR"])
+                    self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"])
+                    # self.set_list_category(["2tag2jet_150ptv_SR"]) 
+                    None
+                elif "CUT" in self.stem:
+                    self.set_list_category(["2tag2jet_150_200ptv_SR","2tag2jet_200ptv_SR","2tag3jet_150_200ptv_SR","2tag3jet_200ptv_SR"])
+                    # self.set_list_category(["2tag2jet_150_200ptv_SR"])
+                    None
+                else:
+                    print "Neither MVA, nor CUT are not found in stem",self.stem,". Will ABORT!!!"
+                    assert(False)
+                # done if
             # done if
             # self.set_list_category(["2tag2jet_150ptv_SR","2tag3jet_150ptv_SR"]) 
             # self.set_list_category(["2tag2jet_150ptv_SR"]) 
@@ -1848,20 +2021,39 @@ class Analysis:
             # self.list_variable=["mva"]
             # self.list_variable=["mva","mBB"]
             # self.list_variable=["mBB","MET","pTB1"]
+            # self.list_variable=["mBBRegression"]
             # self.list_variable=["MET","pTB1","mBB","pTB2","EtaB1"]
             # self.list_variable=["MET","SumPtJet","mBB"]
             # self.set_list_variable(["mBBNominal","mBBOneMu","mBBOneMu4GeV","mBBOneMu5GeV","mBBOneMu6GeV","mBBOneMu7GeV","mBBOneMu10GeV","mBBOneMu12GeV","mBBOneMu15GeV","mBBOneMu20GeV","mBBPtReco","mBB"])
             # self.set_list_variable(["njets","MV2c10_Data","btag_weight_Data","PtSigJets","EtaSigJets","NSigJets","PtFwdJets","EtaFwdJets","NFwdJets",])
-            if True:
+            # if  self.do_later or True:
+            if self.do_later and False:
                 # only included at the pretag inclusive: on 0ptag2pjet or so
                 string_variable_ignore="EtaFwdJets,EtaSigJets,PtFwdJets,PtSigJets,NFwdJets,NSigJets,MV2c10_B,MV2c10_C,MV2c10_Data,MV2c10_L,btag_weight_B,btag_weight_C,btag_weight_Data,btag_weight_L,eff_B,eff_C,eff_L,njets"
-                string_variable_ignore+=",METSig_hard,RandomRunNumber,PileupReweight,PhiJ3,NTags,NJets,METVarT,METVarL_soft,METVarL_hard,METVarL,METSig_soft,METSig,METRho,METDirectional,METOverSqrtHT,METOverSqrtSumET,AverageMu,ActualMu,ActualMuScaled"
+                string_variable_ignore+=",METSig_hard,RandomRunNumber,PileupReweight,PhiJ3,NTags,NJets,METVarT,METVarL_soft,METVarL_hard,METVarL,METSig_soft,METSig,METRho,METDirectional,METOverSqrtHT,METOverSqrtSumET,AverageMu,ActualMu,AverageMuScaled"
                 list_variable_ignore=string_variable_ignore.split(",")
                 list_variable=[]
                 for variable in self.list_variable:
                     if variable in list_variable_ignore:
                         continue
-                    #if "mBB" in variable: # temp
+                    #if not ("TruthWZ" in variable):
+                    #    continue
+                    # if not ("mBB" in variable or "mBBJ" in variable or "pTB1" in variable or "pTB2" in variable or "dPhiVBB" in variable or "HT" in variable):
+                    #    continue
+                    # if not ("OneMuVR0GeV_PtRecoR21InclusiveADNone" in variable or "OneMuVR0GeV_PtRecoR21SplitADNone" in variable or "OneMuVR0GeV_PtRecoR21InclusiveAorDNone" in variable or "OneMuVR0GeV_PtRecoR21SplitAorDNone" in variable):
+                    # if not ("OneMuVR0GeV_PtRecoR21SplitADNone" in variable or "OneMuVR4GeV_PtRecoR21SplitADNone" in variable or "OneMuVR7GeV_PtRecoR21SplitADNone" in variable or "OneMuVR10GeV_PtRecoR21SplitADNone" in variable):
+                    # if not ("OneMuVR0GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR0GeV_PtRecoR21SplitADBukinMedian" in variable or "OneMuVR4GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR4GeV_PtRecoR21SplitADBukinMedian" in variable or "OneMuVR7GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR7GeV_PtRecoR21SplitADBukinMedian" in variable or "OneMuVR10GeV_PtRecoR21SplitADBukin" in variable or "OneMuVR10GeV_PtRecoR21SplitADBukinMedian" in variable or "Regression" in variable):
+                    #if not ("mBB" in variable and "mBBJ" not in variable):
+                    #   continue
+                    if not (variable=="mBB"):
+                        continue
+                    # if not (variable.endswith("Nominal") or variable.endswith("OneMu") or variable.endswith("PtReco") or variable.endswith("OneMuVR0GeV") or variable.endswith("OneMuVR4GeV") or variable.endswith("OneMuVR7GeV") or variable.endswith("OneMuVR10GeV") or "OneMuInJet" in variable or "MuonInJet" in variable or "ElectronInJet" in variable):
+                    #if not (variable.endswith("Nominal")):
+                    # if not ("OneMuInJet" in variable or "MuonInJet" in variable or "ElectronInJet" in variable):
+                        #continue
+                    # if not "Nominal" in variable:
+                    #    continue
+                    # if "mBB" in variable: # temp
                     #    continue
                     list_variable.append(variable)
                 # done for loop
@@ -1884,16 +2076,16 @@ class Analysis:
                 self.create_histosProcess()
             # return
             self.set_list_processMerged()
-            if self.do_later and self.do_create_histosProcessMerged:
+            if self.do_later or self.do_create_histosProcessMerged:
                 self.create_histosProcessMerged(doSF=True)
             # return
             self.set_list_processAnalysis()
-            if self.do_later or self.do_create_results:
+            if False and (self.do_later or self.do_create_results):
                 self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
                 self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
                 if True:
                     self.create_results()
-            if self.do_later or self.do_create_latex_table:
+            if False and (self.do_later or self.do_create_latex_table):
                 self.read_results()
                 self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
                 self.list_processResult=self.list_processResult+["S/B","SigY_S_B"]
@@ -1901,7 +2093,8 @@ class Analysis:
                 # for bJetCorr in "Nominal,OneMu,PtReco".split(","):
                 # for var in "mBB,mva,MET".split(","):
                 # for var in "mBBNominal".split(","):
-                for var in list_variable:
+                # for var in list_variable:
+                for var in []:
                     self.list_processResult=self.list_processResult+["SigH_S_B@"+var]                 
                 self.create_yield_latex_table(doDocument=False)
                 # self.create_overlaid_variable()

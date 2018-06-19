@@ -1569,7 +1569,7 @@ def get_histo_generic_binRange(histo,binRange="150,200,400",option="sum",debug=F
     return result
 # done function
 
-# teest the function from above
+# test the function from above
 def test_get_histo_generic_binRange(debug=True):
     h=TH1F("h","h",6,0,6)
     h.SetBinContent(0,2.0) # underflow
@@ -1586,6 +1586,108 @@ def test_get_histo_generic_binRange(debug=True):
     h=get_histo_generic_binRange(h,binRange=binRange,option="sum",debug=debug)
     getBinValues(h,significantDigits=2,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=debug)
     plotHistogram(h,plot_option="HIST E",filePath=self.folderPlots,fileName="test2",extensions="pdf")
+# done function
+
+# group the bins so that they have same stats
+def get_automatic_binRange(h,NrBins=20,threshold=0.02,debug=True):
+    # move under/overflows in edge bins
+    h=get_histo_underflows_in_edge_bins(h,addUnderflow=True,addOverflow=True,debug=False)
+    Integral=h.Integral()
+    IntegralPerBin=ratio(Integral,NrBins)
+    if debug:
+        print "Integral",Integral,"IntegralPerBin",IntegralPerBin
+    # loop over the bins, but not the underflow and overflow
+    # find the first non zero bin
+    if debug:
+        print "Evaluate first non zero:"
+    for i in xrange(1,h.GetNbinsX()+1):
+        if debug:
+            print "i",i,"low",h.GetBinLowEdge(i),"high",h.GetBinLowEdge(i)+h.GetBinWidth(i),"content",h.GetBinContent(i),"error",h.GetBinError(i)
+        i_firstNonZero=i
+        if h.GetBinContent(i)!=0:
+            break
+    # done for loop
+    if debug:
+        print "i_firstNonZero",i_firstNonZero
+    # find last non zero bin
+    if debug:
+        print "Evaluate the last non zero:"
+    for i in reversed(xrange(1,h.GetNbinsX()+1)):
+        if debug:
+            print "i",i,"low",h.GetBinLowEdge(i),"high",h.GetBinLowEdge(i)+h.GetBinWidth(i),"content",h.GetBinContent(i),"error",h.GetBinError(i)
+        i_lastNonZero=i
+        if h.GetBinContent(i)!=0:
+            break
+    # done for loop
+    if debug:
+        print "i_lastNonZero",i_lastNonZero
+    # loop over the bins from first to last non zero bins
+    temp_sumIntegral=0.0
+    list_binInfo=[]
+    list_binEdges=[]
+    list_binEdges.append(h.GetBinLowEdge(i_firstNonZero))
+    string_binEdges=str(h.GetBinLowEdge(i_firstNonZero))
+    binEdgeLow=h.GetBinLowEdge(i_firstNonZero)
+    max_density=0.0
+    for i in xrange(i_firstNonZero,i_lastNonZero+1):
+        if debug:
+            print "i",i,"low",h.GetBinLowEdge(i),"high",h.GetBinLowEdge(i)+h.GetBinWidth(i),"content",h.GetBinContent(i),"error",h.GetBinError(i)
+        temp_sumIntegral+=h.GetBinContent(i)
+        if temp_sumIntegral+h.GetBinContent(i+1)>IntegralPerBin:
+            binEdgeHigh=h.GetBinLowEdge(i)+h.GetBinWidth(i)
+            list_binEdges.append(binEdgeHigh)
+            string_binEdges+=","+str(binEdgeHigh)
+            if debug:
+                print "last bin in this grouping i",i,"binEdgeHigh",binEdgeHigh
+            width=binEdgeHigh-binEdgeLow
+            density=ratio(temp_sumIntegral,width)
+            list_binInfo.append([binEdgeLow,binEdgeHigh,temp_sumIntegral,width,density])
+            if density>max_density:
+                max_density=density
+            # reset values
+            temp_sumIntegral=0.0
+            binEdgeLow=binEdgeHigh
+        # done if
+    # done loop over bins
+    # add the last values we have
+    binEdgeHigh=h.GetBinLowEdge(i)+h.GetBinWidth(i)
+    list_binEdges.append(binEdgeHigh)
+    width=binEdgeHigh-binEdgeLow
+    density=ratio(temp_sumIntegral,width)
+    list_binInfo.append([binEdgeLow,binEdgeHigh,temp_sumIntegral,width,density])
+    if debug:
+        print "list_binEdges",list_binEdges
+        print "max_density",max_density
+    max_density_to_use=threshold*max_density
+    if debug:
+        print "max_density_to_use",max_density_to_use
+    if debug:
+        print "list_binInfo:"
+        for binInfo in list_binInfo:
+            print "binInfo",binInfo
+
+    # remove the edge bins with values very small to the other bins
+    list_binInfo_D=[]
+    if debug:
+        print "direct:","max_density_to_use",max_density_to_use
+    counter=0
+    for (binEdgeLow,binEdgeHigh,temp_sumIntegral,width,density) in list_binInfo:
+        if debug:
+            print "binEdgeLow",binEdgeLow,"binEdgeHigh",binEdgeHigh,"temp_sumIntegral",temp_sumIntegral,"width",width,"density",density
+        if density<max_density_to_use:
+            continue
+        last_good_binEdgeHigh=binEdgeHigh
+        counter+=1
+        if counter==1:
+            string_binEdge=str(binEdgeLow)
+        else:
+            string_binEdge+=","+str(binEdgeLow)
+    # done loop over loop
+    string_binEdge+=","+str(last_good_binEdgeHigh)
+    if debug:
+        print "string_binEdge",string_binEdge
+
+    return string_binEdge
 # done function
 
 # 
@@ -2418,14 +2520,53 @@ def plotMultiGraph(list_graphs,canvas_size,legend_position,factor_maximum,plot_o
         c.Print(fileName+"."+extension)
     # ended for over extensions
     return None
-# ended function
+# done function
+
+# Kolmogorov-Smirnov test of two histograms
+def get_KS_of_two_histograms(h1,h2,debug=False):
+    KS=h1.KolmogorovTest(h2)
+    if debug:
+        print "h1",h1.GetName(),"h2",h2.GetName(),"KS",KS
+    return KS
+# done function
+
+def get_Chi2_of_two_histograms(h1,h2,debug=False):
+    chi2=0.0
+    ndf=0.0
+    for i in xrange(0,h1.GetNbinsX()+2):
+        content1=h1.GetBinContent(i)
+        error1  =h1.GetBinError(i)
+        content2=h2.GetBinContent(i)
+        error2  =h2.GetBinError(i)
+        diff_square=(content1-content2)*(content1-content2)
+        error_square=error1*error1+error2*error2
+        if content1>0 and error1>0 and content2>0 and error2>0:
+            chi2+=ratio(diff_square,error_square)
+            ndf+=1
+    # done loop over bins
+    chi2_over_ndf=ratio(chi2,ndf-1)
+    if debug:
+        print "h1",h1.GetName(),"h2",h2.GetName(),"chi2",chi2,"ndf",ndf,"chi2/(ndf-1)",chi2_over_ndf
+    return chi2,ndf,chi2_over_ndf
+# done function
+
+def get_Chi2_from_ROOT_of_two_histograms(h1,h2,debug=False):
+    chi2=array('d', [0])
+    ndf=array('i', [0])
+    igood=array('i', [0])
+    res=array('d', [0])
+    pvalue=h1.Chi2TestX(h2,chi2,ndf,igood,"WW",res)
+    if debug:
+        print "pvalue",pvalue,"chi2",chi2,"ndf",ndf,"igood",igood,"res",res
+    return pvalue,chi2,ndf
+# done function
 
 # make stacked plots
 # give list of tuple of histograms
 # besides info needed for overlayHistograms (histogram and legend) we need more info
 # if it is S, B or D, and if we want to scale it by some number (default 1)
 # then we hard code the way we want this plot to look like
-def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",blinding=["threshold",0.05],doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),xAxisTitle="MET [GeV]",debug=False):
+def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",extensions="pdf",blinding=["threshold",0.05],doAutomaticBinning=False,doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}",0.04,13,0.15,0.88,0.05),xAxisTitle="MET [GeV]",debug=False):
     if debug:
         print "Start stackHistograms"
     assert(blinding[0]=="range" or blinding[0]=="threshold")
@@ -2454,8 +2595,48 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     # p1 - top left (stacked plots)
     p1.cd()
 
-    # evaluate the list of bins that need to be blinded for data
-    # first sum all of S, B, D
+    if doAutomaticBinning:
+        # first sum all of S, B, D
+        dict_processType_histoSum={}
+        for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+            if debug:
+                print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
+            histoSF=histo.Clone(histo.GetName()+"_SF")
+            histoSF.Scale(SF)
+            if debug:
+                print "process",process,"integral",histo.Integral(),"SF",SF,"integral SF",histoSF.Integral()
+            # add to sum
+            if processType in dict_processType_histoSum.keys():
+                dict_processType_histoSum[processType].Add(histoSF)
+            else:
+                dict_processType_histoSum[processType]=histoSF
+            # done if
+        # done for loop over histograms
+        if debug:
+            for processType in dict_processType_histoSum.keys():
+                print "processType",processType,"integral",dict_processType_histoSum[processType].Integral()
+
+        # get the bin range from the background distribution
+        binRange=get_automatic_binRange(dict_processType_histoSum["B"],NrBins=16,threshold=0.02,debug=debug)
+        if debug:
+            print "binRange",binRange
+
+        # rebin all the histograms with this new binning
+        list_tuple_h1D_rebinned=[]
+        for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
+            if debug:
+                print "histo",histo,"process",process,"processType",processType,"color",color,"SF",SF,"scale",scale
+            # rebin
+            histo=get_histo_generic_binRange(histo,binRange=binRange,option="sum",debug=debug)
+            histo=get_histo_underflows_in_edge_bins(histo,addUnderflow=True, addOverflow=True,debug=False)
+            list_tuple_h1D_rebinned.append((histo,process,(processType,color,SF,scale)))
+        # done for loop over histograms
+            
+        # rewrite the inital list of tuple with the new one
+        list_tuple_h1D=list_tuple_h1D_rebinned
+    # done if doAutomaticBinning
+
+    # recompute the sum of S, B, D
     dict_processType_histoSum={}
     for (histo,process,(processType,color,SF,scale)) in list_tuple_h1D:
         if debug:
@@ -2474,6 +2655,8 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     if debug:
         for processType in dict_processType_histoSum.keys():
             print "processType",processType,"integral",dict_processType_histoSum[processType].Integral()
+
+    # evaluate the list of bins that need to be blinded for data
     # from S and B histograms find the bins that are to be blinded
     if blinding[0]=="threshold":
         list_binsBlinded=get_list_of_blinded_bins_from_signal_and_background_histograms(dict_processType_histoSum["S"],
@@ -2525,6 +2708,7 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
 
     # draw stack 
     stack.Draw("hist")
+    maximum=stack.GetMaximum()
     if doAveragePerBinWidth:
         titleY="Event yield density per bin width"
     else:
@@ -2551,6 +2735,7 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
             dict_process_histoOverlayMC[process].Scale(SF)
             dict_process_histoOverlayMC[process].Scale(scale)
             dict_process_histoOverlayMC[process].SetLineWidth(2)
+            # dict_process_histoOverlayMC[process].SetLineStyle(2) # to make the line dotted
             dict_process_histoOverlayMC[process].SetFillStyle(0)
             dict_process_histoOverlayMC[process].SetLineColor(color)
             if doAveragePerBinWidth:
@@ -2603,6 +2788,40 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     # add text at the top
     setupTextOnPlot(*text_option)
 
+    # compute chi2 and KS using blinded histograms in both background and data; when we do not want blinding these histograms are not blinded in fact
+    chi2,ndf,chi2_over_ndf=get_Chi2_of_two_histograms(dict_processType_histoSumBlinded["D"],dict_processType_histoSumBlinded["B"],debug=debug)
+    KS=get_KS_of_two_histograms(dict_processType_histoSumBlinded["D"],dict_processType_histoSumBlinded["B"],debug=debug)
+    # compute significance from S and B using unblinded histograms, to add to the legend
+    sig_h=dict_processType_histoSum["S"].Clone()
+    bkg_h=dict_processType_histoSum["B"].Clone()
+    if debug:
+        getBinValues(sig_h)
+        getBinValues(bkg_h)
+    figureOfMerit="SignificanceSigmaB"
+    a=get_dict_figureOfMerit_histo(sig_h,bkg_h,list_figureOfMerit=[figureOfMerit],debug=debug)
+    h=a[figureOfMerit]
+    tupleResult=add_in_quadrature_bins_of_one_histo(h,IncludeUnderflowOverflowBins=False,debug=False)
+
+    # create and draw the legend with the info
+    legendChi2=TLegend(0.51,0.65,0.88,0.94)
+    legendChi2.SetBorderSize(0)
+    legendChi2.SetFillStyle(0)
+    legendChi2.SetTextSize(0.05)
+    legendChi2.SetNColumns(3)
+    legendChi2.AddEntry("","#chi^{2}","")
+    legendChi2.AddEntry("","ndf","")
+    legendChi2.AddEntry("","#chi^{2}/(ndf-1)","")
+    legendChi2.AddEntry("","%.1f" % chi2,"")
+    legendChi2.AddEntry("","%.0f" % ndf,"")
+    legendChi2.AddEntry("","%.2f" % chi2_over_ndf,"")
+    legendChi2.AddEntry("","KS Test: ","")
+    legendChi2.AddEntry("","%.4f" % KS,"")
+    legendChi2.AddEntry(""," ","")
+    legendChi2.AddEntry("","Sig:","")
+    legendChi2.AddEntry("","%.3f" % tupleResult[0],"")
+    legendChi2.AddEntry("","+/- %.3f" % tupleResult[1],"")
+    legendChi2.Draw("same")
+
     # p2 - ratio
     p2.cd()
 
@@ -2620,7 +2839,7 @@ def stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName="stack",
     num.SetLineColor(1)
     num.SetYTitle("(Data-Bkg)/Bkg")
     num.SetXTitle(xAxisTitle)
-    num.GetXaxis().SetTitleSize(0.10)
+    num.GetXaxis().SetTitleSize(0.13)
     num.GetYaxis().SetTitleSize(0.10)
     num.GetYaxis().SetTitleOffset(0.4)
     num.GetXaxis().SetLabelSize(0.09)
