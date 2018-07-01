@@ -615,15 +615,23 @@ def retrieveObject(fileName="",objectType="histo",objectPath="",objectName="",na
     if not file.IsOpen():
         print "File",fileName,"does not exist, so will abort"
         assert(False)
-    #if debug:
-    #    file.ls()
-    gDirectory.cd(objectPath)
     if False:
-        print "objectPath",objectPath
-        print "gDirectory.ls()"
-        gDirectory.ls()
-        print "objectName",objectName
-    object=gDirectory.Get(objectName)
+        file.ls()
+    if False:
+        # the old way, slow when reading from a path inside the file
+        gDirectory.cd(objectPath)
+        if False:
+            print "objectPath",objectPath
+            print "gDirectory.ls()"
+            gDirectory.ls()
+            print "objectName",objectName
+        object=gDirectory.Get(objectName)
+    else:
+        # the new way, faster when reading from a path inside the file
+        if objectPath=="":
+            object=gDirectory.Get(objectName)
+        else:
+            object=gDirectory.Get(objectPath+"/"+objectName)
     if debug:
         print "object",object,"type(object)",type(object)
     if object==None:
@@ -1456,10 +1464,12 @@ def remove_duplicates_from_generic_binRange(binRange="150,200,400",debug=False):
 # so can get rid of this
 # the option "average" is deprecated, now rebin with sum, then move overflows to edge bins, and then average out
 def get_histo_generic_binRange(histo,binRange="150,200,400",option="sum",debug=False):
+    if debug:
+        print "Start get_histo_generic_binRange()"
     if option!="sum" and option!="average2":
         print "option",option,"not known. Choose sum, average2. Will ABORT!!!"
         assert(False)
-    h=histo.Clone()
+    h=histo.Clone(histo.GetName()+"_rebin")
     if binRange=="":
         # then do nothing, return as it was
         # it makes easier to use the same generic function and for some histograms to not actually rebin
@@ -1725,7 +1735,7 @@ def get_histo_averaged_per_bin_width(histo,debug=False):
     # and the overflow to the last bin
     # and then average here
     # and then plot (overlay) the histograms
-    h=histo.Clone()
+    h=histo.Clone(histo.GetName()+"_AvgBins")
     for i in xrange(1,h.GetNbinsX()+1):
         value=h.GetBinContent(i)
         error=h.GetBinError(i)
