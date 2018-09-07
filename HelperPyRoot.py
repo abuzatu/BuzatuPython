@@ -1438,6 +1438,8 @@ def remove_duplicates_from_generic_binRange(binRange="150,200,400",debug=False):
     # in that case, skip one of them, as it gives incorrectly a bin of zero range
     if debug:
         print "input binRange",binRange
+    if binRange=="":
+        return ""
     binRangeOutput=""
     previousEdge=""
     list_repeatedEdge=[]
