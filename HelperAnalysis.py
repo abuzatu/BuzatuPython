@@ -250,18 +250,33 @@ class Analysis:
                 print "processInitial",processInitial
             list_histoName=self.evaluate_content_of_one_processInitial(processInitial,False)
             for histoName in list_histoName:
+                if self.debug:
+                    print "histoName",histoName
                 # e.g. ttbar_3ptag5pjet_150ptv_SR_yBB
                 list_histoNameElement=histoName.split("_")
+                if self.debug:
+                    print "list_histoNameElement",list_histoNameElement
+
                 #if "ttbar_dilep" in histoName or "stopWt_dilep" in histoName or "ggH125_bb" in histoName or "ggH125_inc" in histoName or "VBFH125_inc" in histoName or "ttbar_spin" in histoName:
                 #    process=list_histoNameElement[0]+"_"+list_histoNameElement[1] # e.g. "ttbar_dilep or stopWt_dilep
                 #    category=list_histoNameElement[2]+"_"+list_histoNameElement[3]+"_"+list_histoNameElement[4] # next three elements, eg. 3ptag5pjet_150ptv_SR
                 #else:
                 # only one word to define the process, e.g. ttbar or ttbarDilep
                 process=list_histoNameElement[0] # first element e.g. ttbar
-                if "150_200ptv" in histoName:
-                    category=list_histoNameElement[1]+"_"+list_histoNameElement[2]+"_"+list_histoNameElement[3]+"_"+list_histoNameElement[4] # next three elements, eg. 3ptag5pjet_150_200ptv_SR
-                else:
+                index=None
+                for i,s in enumerate(list_histoNameElement):
+                    if self.debug:
+                        print "i,s",i,s
+                    if "ptv" in s:
+                        index=i
+                if self.debug:
+                    print "index of element that contains ptv",index
+                if index==None:
+                    print "list_histoNameElement",list_histoNameElement
+                if "jet" in list_histoNameElement[index-1]:
                     category=list_histoNameElement[1]+"_"+list_histoNameElement[2]+"_"+list_histoNameElement[3] # next three elements, eg. 3ptag5pjet_150ptv_SR or 3ptag5pjet_200ptv_SR
+                else:
+                    category=list_histoNameElement[1]+"_"+list_histoNameElement[2]+"_"+list_histoNameElement[3]+"_"+list_histoNameElement[4] # next three elements, eg. 3ptag5pjet_150_200ptv_SR
                 # done if
                 variable=histoName.replace(process+"_"+category+"_","") # the rest, tricky as sometimes the name has an _ in it
                 if self.debug:
@@ -384,6 +399,13 @@ class Analysis:
         histoNameInitial=variable+"_"+category+"_"+process
         if self.debug:
             print "histoNameInitial",histoNameInitial
+        return histoNameInitial
+    # done function
+
+    def get_histoNameProcess_new(self,variable,category,process):
+        histoNameInitial=process+"_"+category+"_"+variable
+        if self.debug:
+            print "histoNameInitial_new",histoNameInitial
         return histoNameInitial
     # done function
 
@@ -1106,6 +1128,44 @@ class Analysis:
             "D"        :[["data"]],
             }
 
+    def set_list_processMerged_new(self):
+        if self.debug:
+            print "Start set_list_processMerged()"
+
+        self.list_process.remove('W')
+        self.list_process.remove('Z')
+
+        # those stored in .root
+        self.list_processMerged=self.list_process+[
+            "VHbb",
+            # "VHcc",
+            "otherHiggs",
+            "diboson",
+            "Whf",
+            "Zhf",
+            "stop",
+            "ttX",
+            "S",
+            "B",
+            "D",
+            # "BplusS",
+            ]
+
+        self.dict_processMerged_info={
+            "VHbb"     :[["qqZvvH125","qqWlvH125","ggZvvH125","qqZllH125","ggZllH125"]],
+            "VHcc"     :[["qqZvvH125cc","qqWlvH125cc","ggZvvH125cc","qqZllH125cc","ggZllH125cc"]],
+            "otherHiggs" :[["qqZvvH125cc","qqWlvH125cc","ggZvvH125cc","qqZllH125cc","ggZllH125cc","qqWincH4l","qqZincH4l","ggH125Inc","VBFH125Inc","bbH125","ttH"]],
+            "diboson"  :[["WW","WZ","ZZ","ggWW","ggZZ"]],
+            "Whf"      :[["Wbb","Wbc","Wbl","Wcc"]],
+            "Zhf"      :[["Zbb","Zbc","Zbl","Zcc"]],
+            "stop"     :[["stops","stopt","stopWt","stoptZq"]],
+            "ttX"     :[["ttV","ttbarWW","ttt","4topSM"]],
+            "S"        :[["qqZvvH125","qqWlvH125","ggZvvH125","qqZllH125","ggZllH125"]],
+            "B"        :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttbarWW","ttt","4topSM","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","qqZvvH125cc","qqWlvH125cc","ggZvvH125cc","qqZllH125cc","ggZllH125cc","qqWincH4l","qqZincH4l","ggH125Inc","VBFH125Inc","bbH125","ttH"]],
+            "BplusS"      :[["Wbb","Wbc","Wbl","Wcc","Wcl","Wl","Zbb","Zbc","Zbl","Zcc","Zcl","Zl","ttbar","ttV","ttbarWW","ttt","4topSM","stops","stopt","stopWt","stoptZq","WW","WZ","ZZ","ggWW","ggZZ","qqZvvH125cc","qqWlvH125cc","ggZvvH125cc","qqZllH125cc","ggZllH125cc","qqWincH4l","qqZincH4l","ggH125Inc","VBFH125Inc","bbH125","ttH","qqZvvH125","qqWlvH125","ggZvvH125","qqZllH125","ggZllH125"]],
+            "D"        :[["data"]],
+            }
+
     def set_fileNameHistosProcessMerged(self):
         # suffix=""
         suffix="_"+self.list_category[0]+"_"+self.list_variable[0]
@@ -1175,6 +1235,88 @@ class Analysis:
                     # done for loop over process that need to be summed to get processMerged
                     if self.debug:
                         print "counter",counter
+                    # store the histogram
+                    outputFile=TFile(self.fileNameHistosProcessMerged,"UPDATE")
+                    histoProcessMerged.SetDirectory(outputFile)
+                    histoProcessMerged.Write()
+                    outputFile.Close()
+                # done for loop over process
+            # done for loop over category
+        # done for loop over variable
+    # done function
+
+    def create_histosProcessMerged_new(self,doSF=True):
+        if self.debug or self.verbose:
+            print "Start create_histosProcessMerged()"
+        # now we want to sum over process for a given processMerged
+        outputFile=TFile(self.fileNameHistosProcessMerged,"RECREATE")
+        outputFile.Close()
+        for variable in self.list_variable:
+            for category in self.list_category:
+                if self.verbose:
+                    print "variable",variable,"category",category
+                if "2jet" in category:
+                    cat="2"
+                elif "3jet" in category:
+                    cat="3"
+                elif "4jet" in category:
+                    cat="4"
+                elif "5pjet" in category:
+                    cat="5p"
+                else:
+                    cat="none"   
+                if self.debug:
+                    print "cat",cat
+                for processMerged in self.list_processMerged:
+                    counter=0
+                    if self.debug:
+                        print " %-10s %-10s %-10s" % (variable,category,processMerged)
+                    if processMerged not in self.dict_processMerged_info.keys():
+                        if self.debug:
+                            print "processMerged",processMerged,"is not in  self.dict_processMerged_info"
+                        list_process=[processMerged]
+                    else:
+                        if self.debug:
+                            print "processMerged",processMerged,"is not in  self.dict_processMerged_info"
+                        list_process=self.dict_processMerged_info[processMerged][0]
+                    if self.debug:
+                        print "processMerged",processMerged,"list_process",list_process
+                    for process in list_process:
+                        if self.debug:
+                            print "%-10s %-10s %-10s %-10s" % (variable,category,processMerged,process)
+                        #inputFileName=self.fileNameHistosProcess
+                        inputFileName=self.folderProcessInitial+"/all.root"
+                        histoNameProcess      =self.get_histoNameProcess_new(variable,category,process)
+                        histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
+                        histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcess,name=histoNameProcessMerged,returnDummyIfNotFound=True,debug=self.debug)
+                        if histo=="dummy":
+                            continue
+                        counter+=1
+                        if doSF:
+                            if self.debug:
+                                print "process",self.dict_process_info[process][1]
+                                print "cat",cat
+                            SF=self.dict_process_info[process][1][cat]
+                        else:
+                            SF=1.0
+                        if self.debug:
+                            print "Scale histo with SF",SF,"type(SF)",type(SF)
+                        histo.Scale(SF)
+                        if counter==1:
+                            histoProcessMerged=histo
+                        else:
+                            histoProcessMerged.Add(histo)
+                    # done for loop over process that need to be summed to get processMerged
+                    if self.debug:
+                        print "counter",counter
+                    if counter==0:
+                        if self.debug:
+                            print "No histogram in this category, so set a dummy histogram, taken from ttbar and then reset"
+                        process="ttbar"
+                        histoNameProcess      =self.get_histoNameProcess_new(variable,category,process)
+                        histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcess,name=histoNameProcessMerged,returnDummyIfNotFound=False,debug=self.debug)
+                        histoProcessMerged=histo
+                        histoProcessMerged.Reset()
                     # store the histogram
                     outputFile=TFile(self.fileNameHistosProcessMerged,"UPDATE")
                     histoProcessMerged.SetDirectory(outputFile)
@@ -1800,7 +1942,6 @@ class Analysis:
         # done loop over variable
     # done function
 
-
     ### print
 
     def print_list_category(self):
@@ -2134,8 +2275,26 @@ class Analysis:
         # self.set_list_processInitial(["ZeeL_v221"])
         # self.evaluate_content_of_one_processInitial("WHlv125J_MINLO","False")
         # self.print_all()
+    # done function
+
+    def do_all_new(self):
+        self.create_folderProcessInitial()
+        self.set_dict_variable_info()
+        self.set_list_processMerged_new()
+        self.create_folderHistos()
+        self.set_fileNameHistosProcessMerged()
+        print self.fileNameHistosProcessMerged
+        if True:
+            self.create_histosProcessMerged_new(doSF=False)
+        if True:
+            self.create_folderPlots()
+            self.list_color=[1,4,2,8,ROOT.kOrange]
+            self.create_stacked_plots()
+    # done function
 
     ### done methods
+
+
 
 # done class
 
