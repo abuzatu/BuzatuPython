@@ -108,6 +108,17 @@ class Analysis:
         os.system(command)
     # done function
 
+    def do_hadd_all(self):
+        self.create_folderProcessInitial()
+        former_folderProcessInitial=self.folderProcessInitial
+        self.folderOutput=self.folderOutput.replace("_1","_2")
+        self.create_folderProcessInitial()
+        command="hadd -f "+self.folderProcessInitial+"/all.root "+former_folderProcessInitial+"/*.root"
+        if self.debug:
+            print "command="+command
+        os.system(command)
+    # done function
+
     def create_folderFitInput(self):
         self.folderFitInput=self.folderOutput+"/fitInput"
         command="mkdir -p "+self.folderFitInput
@@ -1851,11 +1862,17 @@ class Analysis:
         if self.name.endswith("_D"):
             folder1=self.folderOutput.replace("_D","_D1")
             folder2=self.folderOutput.replace("_D","_D2")
+            print "Copying D1 and D2 into D."
         elif self.name.endswith("_T"):
-            folder1=self.folderOutput.replace("_T","_D1")
+            folder1=self.folderOutput.replace("_T","_T1")
             folder2=self.folderOutput.replace("_T","_T2")
+            print "Copying T1 and T2 into T."
+        elif self.name.endswith("_TD"):
+            folder1=self.folderOutput.replace("_TD","_D1")
+            folder2=self.folderOutput.replace("_TD","_T2")
+            print "Copying D1 and T2 into TD."
         else:
-            print "name",self.name,"does not end in _D or _T. Will ABORT!!!"
+            print "name",self.name,"does not end in _D or _T, or TD. Will ABORT!!!"
             assert(False)
         # done if
         command+=" "+folder1+"/processInitial/*.root" 
