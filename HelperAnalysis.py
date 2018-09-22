@@ -30,6 +30,11 @@ class Analysis:
 
     def set_stem(self,stem):
         self.stem=stem
+        # e.g. 0L_31-15_a_MVA_TD
+        (self.channel,self.vtag,self.period,self.analysis,self.btag)=stem.split("_")
+        if True:
+            print "stem",stem,"(channel,vtag,period,analysis,btag)",(self.channel,self.vtag,self.period,self.analysis,self.btag)
+        
 
     def set_debug(self,debug):
         self.debug=debug
@@ -1281,6 +1286,31 @@ class Analysis:
                         list_process=self.dict_processMerged_info[processMerged][0]
                     if self.debug:
                         print "processMerged",processMerged,"list_process",list_process
+                    # from ICHEP2018 we get the SF as ratio of post-fit to pre-fit 
+                    # and in fit enters directly the processMerged
+                    # i.e. Zhf, not Zbb, Zbc, Zbl, Zcc
+                    # i.e. Whf, not Wbb, Wbc, Wbl, Wcc
+                    # i.e. stop, not stops, stopt, stopWt
+                    if doSF:
+                        categorySF=self.dict_analysis_channel_category_categorySF[self.analysis+"_"+self.channel+"_"+category]
+                        if self.debug:
+                            print "categorySF",categorySF
+                        if categorySF+"_"+processMerged in self.dict_categorySF_processMerged_SF:
+                            SF_Tuple=self.dict_categorySF_processMerged_SF[categorySF+"_"+processMerged]
+                        else:
+                            SF_Tuple=(1.0,0.0)
+                        # done if
+                    else:
+                        SF_Tuple=(1.0,0.0)
+                    # done if
+                    SF=SF_Tuple[0]
+                    if self.debug:
+                        print "Scale histo processMerged",processMerged,"with SF",SF,"type(SF)",type(SF)
+                    # now we have the SF for this processMerged
+                    # now we multiply this SF to each process that forms processMerged
+                    # so that after the SF if you add the corresponding process you get the corresponding processMerged
+                    # that gives you the freedom to use the individual process, or the total processMerged
+                    # in plots, sensitivities, etc
                     for process in list_process:
                         if self.debug:
                             print "%-10s %-10s %-10s %-10s" % (variable,category,processMerged,process)
@@ -1293,15 +1323,8 @@ class Analysis:
                             continue
                         counter+=1
                         if doSF:
-                            if self.debug:
-                                print "process",self.dict_process_info[process][1]
-                                print "cat",cat
-                            SF=self.dict_process_info[process][1][cat]
-                        else:
-                            SF=1.0
-                        if self.debug:
-                            print "Scale histo with SF",SF,"type(SF)",type(SF)
-                        histo.Scale(SF)
+                            histo.Scale(SF)
+                        # done if doSFAtProcessLevelOldWay
                         if counter==1:
                             histoProcessMerged=histo
                         else:
@@ -1317,6 +1340,8 @@ class Analysis:
                         histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcess,name=histoNameProcessMerged,returnDummyIfNotFound=False,debug=self.debug)
                         histoProcessMerged=histo
                         histoProcessMerged.Reset()
+                    # done if
+                    # now we have the histogram histoProcesMerged done
                     # store the histogram
                     outputFile=TFile(self.fileNameHistosProcessMerged,"UPDATE")
                     histoProcessMerged.SetDirectory(outputFile)
@@ -1877,8 +1902,8 @@ class Analysis:
                 binRange=""
             # done if
             for category in self.list_category:
-                if self.debug:
-                    print "category",category
+                if True or self.debug:
+                    print "category",category,"stem",self.stem,"channel",self.channel
                 if variable=="mva":
                     if "2jet" in category:
                         binRange=self.binRange_mva2J
@@ -2277,6 +2302,131 @@ class Analysis:
         # self.print_all()
     # done function
 
+    def set_dict_categorySF_processMerged_SF(self):
+        inputFileName="./info/ICHEP2018/"+self.analysis+".txt"
+        if True or self.debug:
+            print "inputFileName",inputFileName
+        self.dict_categorySF_processMerged_SF={}
+        with open(inputFileName,'r') as f:
+            for line in f:
+                line=line.rstrip()
+                if line=="":
+                    continue
+                if "-lepton" in line:
+                    continue
+                if "b-tag" in line:
+                    continue
+                if "S/B" in line:
+                    continue
+                if "S/sqrt(S+B)" in line:
+                    continue
+                if "blih" in line:
+                    continue
+                if self.debug:
+                    print "line",line
+                if "Region" in line:
+                    assert(len(line.split())==1)
+                    categorySF=line
+                    continue
+                if self.debug:
+                    print "categorySF",categorySF,"line",line
+                list_lineElement=line.split()
+                processMerged=list_lineElement[0]
+                if processMerged=="data":
+                    SF=(1.0,0.0)
+                else:
+                    SF=(float(list_lineElement[1]),float(list_lineElement[2]))
+                if self.debug:
+                    print "categorySF",categorySF,"processMerged",processMerged,"SF",SF
+                self.dict_categorySF_processMerged_SF[categorySF+"_"+processMerged]=SF
+            # done loop over lines
+        # close file
+        if self.debug:
+            for categorySF_processMerged in sorted(self.dict_categorySF_processMerged_SF.keys()):
+                print "categorySF_processMerged",categorySF_processMerged,self.dict_categorySF_processMerged_SF[categorySF_processMerged]
+        # done if
+        # nothing to return as already set
+    # done function
+
+    def set_dict_analysis_channel_category_categorySF(self):
+        self.dict_analysis_channel_category_categorySF={
+            # #############
+            # ### MVA #####
+            # #############
+
+            # 0L 150-inf SR
+            "MVA_0L_2tag2jet_150ptv_SR":"Region_BMin150_Y4033_DSR_T2_L0_distmva_J2",
+            "MVA_0L_2tag3jet_150ptv_SR":"Region_BMin150_Y4033_DSR_T2_L0_distmva_J3",
+            # 1L 150-info SR
+            "MVA_1L_2tag2jet_150ptv_WhfSR":"Region_BMin150_Y4033_DWhfSR_T2_L1_distmva_J2",
+            "MVA_1L_2tag3pjet_150ptv_WhfSR":"Region_BMin150_Y4033_DWhfSR_T2_L1_distmva_J3",
+            # 1L 150-inf CR
+            "MVA_1L_2tag2jet_150ptv_WhfCR":"Region_BMin150_Y4033_DWhfCR_T2_L1_distmva_J2",
+            "MVA_1L_2tag3pjet_150ptv_WhfCR":"Region_BMin150_Y4033_DWhfCR_T2_L1_distmva_J3",
+            # 2L 150-inf SR
+            "MVA_2L_2tag2jet_150ptv_SR":"Region_BMin150_Y4033_DSR_T2_L2_distmva_J2",
+            "MVA_2L_2tag3pjet_150ptv_SR":"Region_BMin150_incJet1_Y4033_DSR_T2_L2_distmva_J3",
+            # 2L 150-inf CR (topemucr)
+            "MVA_2L_2tag2jet_150ptv_topemucr":"Region_BMin150_Y4033_Dtopemucr_T2_L2_distmBBMVA_J2",
+            "MVA_2L_2tag3pjet_150ptv_topemucr":"Region_BMin150_incJet1_Y4033_Dtopemucr_T2_L2_distmBBMVA_J3",
+            # 2L 75-150 SR
+            "MVA_2L_2tag2jet_75_150ptv_SR":"Region_BMax150_BMin75_Y4033_DSR_T2_L2_distmva_J2",
+            "MVA_2L_2tag3pjet_75_150ptv_SR":"Region_BMax150_BMin75_incJet1_Y4033_DSR_T2_L2_distmva_J3",
+            # 2L 75-150 CR (topemucr)
+            "MVA_2L_2tag2jet_75_150ptv_topemucr":"Region_BMax150_BMin75_Y4033_Dtopemucr_T2_L2_distmBBMVA_J2",
+            "MVA_2L_2tag3pjet_75_150ptv_topemucr":"Region_BMax150_BMin75_incJet1_Y4033_Dtopemucr_T2_L2_distmBBMVA_J3",
+
+            # #############
+            # ### CUT #####
+            # #############
+
+            # 0L 200-inf SR
+            "CUT_0L_2tag2jet_200ptv_SR":"Region_BMin200_Y4033_DSR_T2_L0_distmBB_J2",
+            "CUT_0L_2tag3jet_200ptv_SR":"Region_BMin200_Y4033_DSR_T2_L0_distmBB_J3",
+            # 0L 150-200 SR
+            "CUT_0L_2tag2jet_150_200ptv_SR":"Region_BMax200_BMin150_Y4033_DSR_T2_L0_distmBB_J2",
+            "CUT_0L_2tag3jet_150_200ptv_SR":"Region_BMax200_BMin150_Y4033_DSR_T2_L0_distmBB_J3",
+            # 1L
+            # in 1L CUT SR and CR are merged into SR at SplitInputs
+            # but our inputs produced from Reader give SR and CR
+            # so point both to the SR from the txt file
+            # 1L 200-inf SR
+            "CUT_1L_2tag2jet_200ptv_WhfSR":"Region_BMin200_Y4033_DWhfSR_T2_L1_distmBB_J2",
+            "CUT_1L_2tag3pjet_200ptv_WhfSR":"Region_BMin200_Y4033_DWhfSR_T2_L1_distmBB_J3",
+            # 1L 200-inf CR
+            "CUT_1L_2tag2jet_200ptv_WhfCR":"Region_BMin200_Y4033_DWhfSR_T2_L1_distmBB_J2", # note CR <- SR
+            "CUT_1L_2tag3pjet_200ptv_WhfCR":"Region_BMin200_Y4033_DWhfSR_T2_L1_distmBB_J3", # note CR <- SR
+            # 1L 150-200 SR
+            "CUT_1L_2tag2jet_150_200ptv_WhfSR":"Region_BMax200_BMin150_Y4033_DWhfSR_T2_L1_distmBB_J2",
+            "CUT_1L_2tag3pjet_150_200ptv_WhfSR":"Region_BMax200_BMin150_Y4033_DWhfSR_T2_L1_distmBB_J3",
+            # 1L 150-200 CR
+            "CUT_1L_2tag2jet_150_200ptv_WhfCR":"Region_BMax200_BMin150_Y4033_DWhfSR_T2_L1_distmBB_J2", # note CR <- SR
+            "CUT_1L_2tag3pjet_150_200ptv_WhfCR":"Region_BMax200_BMin150_Y4033_DWhfSR_T2_L1_distmBB_J3", # note CR <- SR
+            # 2L
+            # in 2L CUT the topemu CR 150_200ptv and 200ptv is merged into 150ptv at SplitInputs
+            # 2L 200-inf SR
+            "CUT_2L_2tag2jet_200ptv_SR":"Region_BMin200_Y4033_DSR_T2_L2_distmBB_J2",
+            "CUT_2L_2tag3pjet_200ptv_SR":"Region_BMin200_incJet1_Y4033_DSR_T2_L2_distmBB_J3",
+            # 2L 200-inf CR (topemucr)
+            "CUT_2L_2tag2jet_200ptv_topemucr":"Region_BMin150_Y4033_Dtopemucr_T2_L2_distmBB_J2", # 200 <- 150
+            "CUT_2L_2tag3pjet_200ptv_topemucr":"Region_BMin150_incJet1_Y4033_Dtopemucr_T2_L2_distmBB_J3", # 200 <- 150
+            # 2L 150-200 SR 
+            "CUT_2L_2tag2jet_150_200ptv_SR":"Region_BMax200_BMin150_Y4033_DSR_T2_L2_distmBB_J2",
+            "CUT_2L_2tag3pjet_150_200ptv_SR":"Region_BMax200_BMin150_incJet1_Y4033_DSR_T2_L2_distmBB_J3",
+            # 2L 150-200 CR (topemucr)
+            "CUT_2L_2tag2jet_150_200ptv_topemucr":"Region_BMin150_Y4033_Dtopemucr_T2_L2_distmBB_J2", # 150_200 <- 150
+            "CUT_2L_2tag3pjet_150_200ptv_topemucr":"Region_BMin150_incJet1_Y4033_Dtopemucr_T2_L2_distmBB_J3", # 150_200 <- 150
+            # 2L 075-150 SR
+            "CUT_2L_2tag2jet_75_150ptv_SR":"Region_BMax150_BMin75_Y4033_DSR_T2_L2_distmBB_J2",
+            "CUT_2L_2tag3pjet_75_150ptv_SR":"Region_BMax150_BMin75_incJet1_Y4033_DSR_T2_L2_distmBB_J3",
+            # 2L 075-150 CR (topemucr)
+            "CUT_2L_2tag2jet_75_150ptv_topemucr":"Region_BMax150_BMin75_Y4033_Dtopemucr_T2_L2_distmBB_J2",
+            "CUT_2L_2tag3pjet_75_150ptv_topemucr":"Region_BMax150_BMin75_incJet1_Y4033_Dtopemucr_T2_L2_distmBB_J3",
+            
+            
+            }
+    # done function
+
     def do_all_new(self):
         self.create_folderProcessInitial()
         self.set_dict_variable_info()
@@ -2285,7 +2435,10 @@ class Analysis:
         self.set_fileNameHistosProcessMerged()
         print self.fileNameHistosProcessMerged
         if True:
-            self.create_histosProcessMerged_new(doSF=False)
+            self.set_dict_analysis_channel_category_categorySF()
+            self.set_dict_categorySF_processMerged_SF()
+        if True:
+            self.create_histosProcessMerged_new(doSF=True)
         if True:
             self.create_folderPlots()
             self.list_color=[1,4,2,8,ROOT.kOrange]
