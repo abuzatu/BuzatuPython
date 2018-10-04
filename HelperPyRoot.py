@@ -869,7 +869,7 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
     if doValidationPlot:
         ROOT.gStyle.SetOptFit(1011)
         c=TCanvas("c","c",800,600)
-        h.Draw()
+        h.Draw("HIST")
     #SetOwnership(h,0)
     if debug:
         print "****************** Start getBinvalues in fit ************"
