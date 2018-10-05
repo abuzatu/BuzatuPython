@@ -1,11 +1,10 @@
 #!/usr/bin/python
 
 import sys
-#import time
-from functools import wraps
-from time import time
-import itertools
+from decorators import timing
+from itertools import permutations
 from collections import Counter
+
 
 total = len(sys.argv)
 # number of arguments plus 1
@@ -33,7 +32,7 @@ debug=False
 verbose=False
 list_pair=[
     ("aab","bba"),
-    ("qwerty","wqeyrt"),
+    # ("qwerty","wqeyrt"),
     # ("abgtyqwerty","tywqeyrtagb"),
     # ("abgtaabgaja","tywqeyrtagb"),
     # ("abgtaabgaja","aabgajbatag"),
@@ -46,22 +45,10 @@ list_algo=[
     "1", # 12 characters is already at maximum time of 15 minutes, !n, so 13 characters are 15 min times 13, so about 3 hours, so un-scalable
 ]
 
-#################################################################
-################### Functions ###################################
-#################################################################
 
-def timing(f):
-    # create a decorator as a wrapper so that before the function call we get the time
-    # after the function call we get the new time, so compute the elapsed time, and print it
-    # also print out the result if the permutation is possible or not and the two words
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        start = time()
-        result = f(*args, **kwargs)
-        end = time()
-        print 'Permutation possible {} in elapsed time: {} for {} vs {}'.format(int(result), end-start,args[0],args[1])
-        return result
-    return wrapper
+#################################################################
+################### Regular Functions ###########################
+#################################################################
 
 @timing
 def checkPermutationsAlgo1(left,right):
@@ -73,7 +60,7 @@ def checkPermutationsAlgo1(left,right):
     # we trust the permutation algorithm from Python 
     # that the permutations are computed in the most efficient way
     # in terms of memory and CPU
-    iterator_permutations_left=itertools.permutations(left)
+    iterator_permutations_left=permutations(left)
     for iterator in  iterator_permutations_left:
         if debug:
             print "iterator",iterator
