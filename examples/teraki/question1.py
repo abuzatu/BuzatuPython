@@ -95,7 +95,7 @@ def checkPermutationsAlgo2(left,right):
     if debug:
         print "counter_left",counter_left
         print "counter_right",counter_right
-
+    # done if
     # loop over the unique elements of each counter, and check if the element exists in the other counter
     # if not, return False
     # if yes, then compare the count numbers; if not the same, return False
@@ -113,7 +113,6 @@ def checkPermutationsAlgo2(left,right):
     # we can return True
     return True
 # done function
-
 
 def checkPermutationsPair(pair):
     if verbose:
@@ -149,8 +148,6 @@ def checkPermutationsPair(pair):
 for pair in list_pair:
     checkPermutationsPair(pair)
 # done loop over pair
-
-# done for loop over pairs
 
 #################################################################
 ################### Finished ####################################
