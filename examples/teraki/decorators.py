@@ -33,11 +33,10 @@ def debugging(f):
         args_repr=[repr(a) for a in args]
         kwargs_repr=["{k}={v!r}" for k, v in kwargs.items()]
         signature=",".join(args_repr + kwargs_repr)
-        print("Start function {}({}).".format(f.__name__,signature))
+        print "Start function {}({}).".format(f.__name__,signature)
         result=f(*args, **kwargs)
-        print("End   function {}({}). Returned {}.".format(f.__name__,signature,result))
+        print "End   function {}({}). Returned {}.".format(f.__name__,signature,result)
         return result
     # done inner function
     return wrapper_debug
 # done function
-

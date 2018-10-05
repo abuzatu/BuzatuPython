@@ -31,11 +31,10 @@ debug=False
 verbose=False
 list_pair=[
     ("aab","bba"),
-    # ("qwerty","wqeyrt"),
-    # ("abgtyqwerty","tywqeyrtagb"),
-    # ("abgtaabgaja","tywqeyrtagb"),
-    # ("abgtaabgaja","aabgajbatag"),
-    # ("abgtaabgaja","aabgajbatag"),
+    ("qwerty","wqeyrt"),
+    ("abgtyqwerty","tywqeyrtagb"),
+    ("abgtaabgaja","aabgajbatag"),
+    ("abgtaabgaja","tywqeyrtagb"),
     # ("abgtaabgajaiuyty","aabgajbatagtyyui"),
 ]
 
