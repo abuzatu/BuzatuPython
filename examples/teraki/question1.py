@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
 import sys
-from decorators import timing
+from decorators import *
 from itertools import permutations
 from collections import Counter
-
 
 total = len(sys.argv)
 # number of arguments plus 1
@@ -45,12 +44,12 @@ list_algo=[
     "1", # 12 characters is already at maximum time of 15 minutes, !n, so 13 characters are 15 min times 13, so about 3 hours, so un-scalable
 ]
 
-
 #################################################################
 ################### Regular Functions ###########################
 #################################################################
 
 @timing
+# @debugging
 def checkPermutationsAlgo1(left,right):
     # the simplest solution, brute force, the most inneficient, would be to
     # start with left and compute all the permutations possible
@@ -80,6 +79,7 @@ def checkPermutationsAlgo1(left,right):
 # done function
 
 @timing
+# @debugging
 def checkPermutationsAlgo2(left,right):
     # Algo1 has the disadvantage that one needs to calculate all the permutations first
     # which grows with factorial of N, the number of letters in the words
@@ -114,6 +114,7 @@ def checkPermutationsAlgo2(left,right):
     # we can return True
     return True
 # done function
+
 
 def checkPermutationsPair(pair):
     if verbose:
