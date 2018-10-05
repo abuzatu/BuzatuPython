@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 import sys
-import itertools
 import time
+import itertools
+from collections import Counter
 
 total = len(sys.argv)
 # number of arguments plus 1
@@ -27,36 +28,30 @@ if total!=1:
 #################################################################
 
 debug=False
-verbose=False
+verbose=True
 list_pair=[
     # ("aab","bba"),
     # ("qwerty","wqeyrt"),
     # ("camel","tiger"),
     # ("cat","lion"),
     # ("abgty","tyagb"),
-    ("abgtyqwerty","tywqeyrtagb"),
+    # ("aab","aba"),
+    # ("abgtyqwerty","tywqeyrtagb"),
+    ("abgtaabgaja","tywqeyrtagb"),
+    ("abgtaabgaja","aabgajbatag"),
+    
+]
+
+list_algo=[
+    "1",
+    "2",
 ]
 
 #################################################################
 ################### Functions ###################################
 #################################################################
 
-def checkPermutations(pair):
-    if debug:
-        print "Start checkPermutations with pair",pair
-    (left,right)=pair
-    # if the two strings do not have the same name, they can not be one permutation of the other
-    # so return False
-    if len(left)!=len(right):
-        if verbose or debug:
-            print "The two strings have different lengths, so they can not be permutations of the other. Return False."
-        return False
-    else:
-        if verbose or debug:
-            print "The two strings have the same length, so we can proceed."
-        length=len(left)
-    # done if
-
+def checkPermutationsAlgo1(left,right):
     # the simplest solution, brute force, the most inneficient, would be to
     # start with left and compute all the permutations possible
     # for each check if right is equal to one of the computed permutations
@@ -84,16 +79,72 @@ def checkPermutations(pair):
     return False
 # done function
 
+def checkPermutationsAlgo2(left,right):
+    # Algo1 has the disadvantage that one needs to calculate all the permutations first
+    # Especially when they have a lot of duplications, we can do better
+    # by counting the number of times each letter is in each word
+    # if the two counts are equal, that is what it means that they are a permutation of each other
+    counter_left=Counter(left)
+    counter_right=Counter(right)
+    # loop over the unique elements of each counter, and check if the element exists in the other counter
+    # if not, return False
+    # if yes, then compare the count numbers; if not the same, return False
+    # if yes, continue
+
+    for letter in counter_left:
+        count_left=counter_left[letter]
+        count_right=counter_right[letter]
+        if debug:
+            print "letter",letter,"count_left",count_left,"count_right",count_right
+        if count_left != count_right:
+            return False
+    # done loop over all letters
+    # if still here, we got all the letters matched to the same count
+    # we can return True
+    return True
+# done function
+
+def checkPermutationsPair(pair):
+    if verbose:
+        print "Start checkPermutations with pair",pair
+    (left,right)=pair
+    # if the two strings do not have the same name, they can not be one permutation of the other
+    # so return False
+    if len(left)!=len(right):
+        if verbose or debug:
+            print "The two strings have different lengths,",len(left),len(right),"so they can not be permutations of the other. Return False."
+        return False
+    else:
+        if verbose or debug:
+            print "The two strings have the same length, so we can proceed."
+        length=len(left)
+    # done if
+
+    for algo in list_algo:
+        start_time = time.time()
+        if algo=="1":
+            existPermutation=checkPermutationsAlgo1(left,right)
+        elif algo=="2":
+            existPermutation=checkPermutationsAlgo2(left,right)
+        else:
+            print "algo",algo,"not found. Choose 1 or 2. Will ABORT!!!"
+            assert(False)
+        # done if
+        duration_seconds=time.time() - start_time
+        string_time="--- %s seconds ---" % (duration_seconds)
+        print "existPermutation is",int(existPermutation),"duration",string_time,"for pair",pair
+    # done loop over algo
+
+# done function
+
 #################################################################
 ################### Run #########################################
 #################################################################
 
 for pair in list_pair:
-    start_time = time.time()
-    existPermutation=checkPermutations(pair)
-    duration_seconds=time.time() - start_time
-    string_time="--- %s seconds ---" % (duration_seconds)
-    print "existPermutation is",int(existPermutation),"duration",string_time,"for pair",pair
+    checkPermutationsPair(pair)
+# done loop over pair
+
 # done for loop over pairs
 
 #################################################################
