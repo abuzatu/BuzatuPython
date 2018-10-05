@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
 import sys
-import time
+#import time
+from functools import wraps
+from time import time
 import itertools
 from collections import Counter
 
@@ -30,17 +32,13 @@ if total!=1:
 debug=False
 verbose=False
 list_pair=[
-    # ("aab","bba"),
-    # ("qwerty","wqeyrt"),
-    # ("camel","tiger"),
-    # ("cat","lion"),
-    # ("abgty","tyagb"),
-    # ("aab","aba"),
+    ("aab","bba"),
+    ("qwerty","wqeyrt"),
     # ("abgtyqwerty","tywqeyrtagb"),
-    ("abgtaabgaja","tywqeyrtagb"),
-    ("abgtaabgaja","aabgajbatag"),
-    ("abgtaabgaja","aabgajbatag"),
-    ("abgtaabgajaiuyty","aabgajbatagtyyui"),
+    # ("abgtaabgaja","tywqeyrtagb"),
+    # ("abgtaabgaja","aabgajbatag"),
+    # ("abgtaabgaja","aabgajbatag"),
+    # ("abgtaabgajaiuyty","aabgajbatagtyyui"),
 ]
 
 list_algo=[
@@ -52,6 +50,20 @@ list_algo=[
 ################### Functions ###################################
 #################################################################
 
+def timing(f):
+    # create a decorator as a wrapper so that before the function call we get the time
+    # after the function call we get the new time, so compute the elapsed time, and print it
+    # also print out the result if the permutation is possible or not and the two words
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        start = time()
+        result = f(*args, **kwargs)
+        end = time()
+        print 'Permutation possible {} in elapsed time: {} for {} vs {}'.format(int(result), end-start,args[0],args[1])
+        return result
+    return wrapper
+
+@timing
 def checkPermutationsAlgo1(left,right):
     # the simplest solution, brute force, the most inneficient, would be to
     # start with left and compute all the permutations possible
@@ -80,6 +92,7 @@ def checkPermutationsAlgo1(left,right):
     return False
 # done function
 
+@timing
 def checkPermutationsAlgo2(left,right):
     # Algo1 has the disadvantage that one needs to calculate all the permutations first
     # which grows with factorial of N, the number of letters in the words
@@ -131,7 +144,6 @@ def checkPermutationsPair(pair):
         length=len(left)
     # done if
     for algo in list_algo:
-        start_time = time.time()
         if algo=="1":
             existPermutation=checkPermutationsAlgo1(left,right)
         elif algo=="2":
@@ -140,9 +152,6 @@ def checkPermutationsPair(pair):
             print "algo",algo,"not found. Choose 1 or 2. Will ABORT!!!"
             assert(False)
         # done if
-        duration_seconds=time.time() - start_time
-        string_time="--- %s seconds ---" % (duration_seconds)
-        print "existPermutation is",int(existPermutation),"duration",string_time,"for pair",pair
     # done loop over algo
 # done function
 
