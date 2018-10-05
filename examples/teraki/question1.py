@@ -28,7 +28,7 @@ if total!=1:
 #################################################################
 
 debug=False
-verbose=True
+verbose=False
 list_pair=[
     # ("aab","bba"),
     # ("qwerty","wqeyrt"),
@@ -39,12 +39,13 @@ list_pair=[
     # ("abgtyqwerty","tywqeyrtagb"),
     ("abgtaabgaja","tywqeyrtagb"),
     ("abgtaabgaja","aabgajbatag"),
-    
+    ("abgtaabgaja","aabgajbatag"),
+    ("abgtaabgajaiuyty","aabgajbatagtyyui"),
 ]
 
 list_algo=[
-    "1",
-    "2",
+    "2", # recommended
+    "1", # 12 characters is already at maximum time of 15 minutes, !n, so 13 characters are 15 min times 13, so about 3 hours, so un-scalable
 ]
 
 #################################################################
@@ -54,8 +55,8 @@ list_algo=[
 def checkPermutationsAlgo1(left,right):
     # the simplest solution, brute force, the most inneficient, would be to
     # start with left and compute all the permutations possible
-    # for each check if right is equal to one of the computed permutations
-    # at the first match, return true, else continue to the next permutation
+    # for each computed permutation check if equal with the right
+    # if matched, return true, else continue to the next permutation
     #
     # we trust the permutation algorithm from Python 
     # that the permutations are computed in the most efficient way
@@ -81,16 +82,26 @@ def checkPermutationsAlgo1(left,right):
 
 def checkPermutationsAlgo2(left,right):
     # Algo1 has the disadvantage that one needs to calculate all the permutations first
-    # Especially when they have a lot of duplications, we can do better
-    # by counting the number of times each letter is in each word
-    # if the two counts are equal, that is what it means that they are a permutation of each other
+    # which grows with factorial of N, the number of letters in the words
+    # Algo1 can not end until the exact match is found
+    # In Algo2 we change the approach: the run can end as soon as we know a permutation is not possible
+    # We use the fact that a permutation can happen if each letter from left is present to the right
+    # and (very importantly!) with the same number of counts
+    # then we check each letter from the left word and if it is not present, or is present but has another count 
+    # in the word to the right, it means there is no permutation, so return false
+    # we can code our own functions, but we can use Python's tools that are optmised in terms of memory and CPU
+    # 
     counter_left=Counter(left)
     counter_right=Counter(right)
+    if debug:
+        print "counter_left",counter_left
+        print "counter_right",counter_right
+
     # loop over the unique elements of each counter, and check if the element exists in the other counter
     # if not, return False
     # if yes, then compare the count numbers; if not the same, return False
     # if yes, continue
-
+    # if reached outside the loop, it means it is all identical counts, so return true
     for letter in counter_left:
         count_left=counter_left[letter]
         count_right=counter_right[letter]
@@ -119,7 +130,6 @@ def checkPermutationsPair(pair):
             print "The two strings have the same length, so we can proceed."
         length=len(left)
     # done if
-
     for algo in list_algo:
         start_time = time.time()
         if algo=="1":
@@ -134,7 +144,6 @@ def checkPermutationsPair(pair):
         string_time="--- %s seconds ---" % (duration_seconds)
         print "existPermutation is",int(existPermutation),"duration",string_time,"for pair",pair
     # done loop over algo
-
 # done function
 
 #################################################################
