@@ -33,65 +33,104 @@ if total!=1:
 # The length of the path is defined simply as the total number of moves.
 
 #################################################################
-################### My additions#################################
+################### My additions ################################
 #################################################################
 
 # My additions: 
-# define the value of 2 the square with the current position
-# and with the value of 3 the square with the past positions
+# Fill with with 2 the good (shortest) path.
+# Fill with 9 the squares from the path explored to not be good.
 # The solutions are equivalent if we go from one corner to the other or vice versa
 # So let's choose a convention from top left (0,0) -> bottom right (7,7)
+# When board given, first check it obbeys the rules of the program
 
 #################################################################
 ################### My strategy #################################
 #################################################################
-
-# Let's imagine the destinations is surrounded by forbidden squares (1).
-# If we start from the first position we can compute a lot of paths
-# But all of them are blocked in the end and we will have to return -1
-# But we should also return -1 as fast as possible, with minimum CPU calculations
-# This suggests it makes sense to start from the destination
-# Now let's imagine the starting point is surrounded by forbidden squares (1)
-# Then to find the result fast we should start from the first position.
-# So maybe it does not matter where we start from
-
-# No need to store the entire history of the travel in the form
-# of a list of boards, since we choose to update 
-# the previous position from 2 to 3
-# following by eye the 3 values shows us the path so far
-# one path would be final either when it can not proceed further
-# so a value of 2 surrounded by either values of 1 or 3
-# but allowing for some squares to still have a value of 0
-# or when the value of 2 is at position of bottom right (N-1,N-1).
 
 # Brute force would be to calculate all the possible paths
 # and if any compare them by length and pick the shortest
 
 # But we want to find the result in the shortest amount of operations
 # so we should not use brute force, but find a smarter shortcut
+# We use a recursive function with a backtracking option.
+# From every square, explore the four possible moves in a pre-defined order
+# check for each if it is allowed (not forbidden, not out of the box, 
+# and not one where we were there already and it was not good)
+# if it is good, keep going and explore in the same order the possiblities
+# hence recursiveness
+# if road gets blocked, backtrack once, if all options blocked, backtrack again
 
 #################################################################
 ################### Configurations ##############################
 #################################################################
 
-debug=True
+debug=False
 verbose=False
 
-N=3
+N=8
 NN=N*N
-list_state=[0,1,2,3]
 
 list_boardName=[
-    "1",
+    "boardA",
+    "boardB",
+    "boardC",
+    "boardD",
+    "boardE",
 ]
 
-dict_boardName_boardInitialState={
-    "1":np.array([
-            [ 2, 0, 0],
-            [ 0, 1, 1],    
-            [ 0, 0, 0],
+dict_boardName_board={
+    "boardA":np.array([
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
             ]),
-    }
+    "boardB":np.array([
+            [0,1,0,0,0,0,0,0],
+            [0,0,0,1,0,0,0,0],
+            [0,0,0,0,1,0,0,0],
+            [0,0,0,0,0,1,1,1],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            ]),
+    "boardC":np.array([
+            [0,0,1,0,1,0,0,0],
+            [0,0,1,0,1,0,0,0],
+            [0,0,0,0,1,0,0,0],
+            [1,1,1,0,1,0,0,0],
+            [0,0,0,0,1,0,0,0],
+            [1,0,1,1,1,0,0,0],
+            [0,0,0,0,1,0,0,0],
+            [0,0,1,0,0,0,0,0],
+            ]),
+    "boardD":np.array([
+            [0,0,1,0,0,0,1,0],
+            [0,0,0,0,1,0,0,0],
+            [0,0,0,0,1,0,0,1],
+            [1,1,1,1,1,0,0,0],
+            [0,0,0,0,0,0,0,1],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,1,1,1],
+            [0,0,0,0,0,0,0,0],
+            ]),
+    "boardE":np.array([
+            [0,0,1,0,0,0,1,0],
+            [0,0,0,0,1,0,0,0],
+            [0,0,0,0,1,0,0,1],
+            [1,1,1,1,1,0,0,0],
+            [0,0,0,0,0,0,0,1],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,1,1,1],
+            [0,0,0,0,0,1,0,0],
+            ]),
+   }
+
 
 #################################################################
 ################### Regular Functions ###########################
@@ -105,127 +144,127 @@ def getBoardImage(board):
             if j!=0:
                 result+=" "
             result+=str(board[i][j])
-        result+="\n"
+        if i!=N-1:
+            result+="\n"
     return result
 # done function
 
-def drawBoard(board):
-    print "board"
+def drawBoard(title,board):
+    print title
     print getBoardImage(board)
 # done function
 
-@debugging
-def checkCorrectnessBoard(board,S):
+# @debugging
+def checkCorrectnessBoard(board):
     '''Check that:
-    Board is the current state of the board at the current step S
-    Initially S=0, and we must check the rules of the problem
-    o top left corner is available (0) and piece is on the bottom right square (2)
-    o bottom right corner is available (0) and the piece is on the top left quare (2)
+    o top left corner and bottom right corners are available (0)
     o all other squares are either available (0) or unvailable (1)
-    For all other Steps S>0, past steps are marked as 3.
     '''
-    if S<0:
-        print "The number of steps S",S,"can no be negative. We will ABORT!!!"
-        assert(False)
-    elif S==0:
-        if board[(0,0)]!=2:
-            print "You did not place the piece at first in the top left corner at (0,0), with value 2. So board not correct."
-            return False
-    else:
-        if board[(0,0)]!=3:
-            print "The top left corner at (0,0), is a past position, so it should have a value of 3. So board not correct."
-            return False
+    if board[(0,0)]!=0:
+        print "The starting point corner of top left (0,0), should be available with a value of 0. So board not correct."
+        return False
     if board[(N-1,N-1)]!=0:
         print "The destination corner of bottom right (N-1,N-1), should be available with a value of 0. So board not correct."
         return False
     # done if
-    dict_state_count={state: 0 for state in list_state}
     for i in xrange(N):
         for j in xrange(N):
             position=(i,j)
             state=board[position]
             if debug:
                 print "position","state",position,state
-            if not (state==0 or state==1 or state==2 or state==3):
+            if not (state==0 or state==1):
                 if debug:
-                    print "i={} j={} state={} not good, as it must be 0, 1, 2, 3. So board not correct.".format(position[0],position[1],state)
+                    print "i={} j={} state={} not good, as it must be 0, or 1. So board not correct.".format(position[0],position[1],state)
                 return False
-            # done if
-            if state not in dict_state_count:
-                dict_state_count[state]=1
-            else:
-                dict_state_count[state]+=1
             # done if
         # done loop over j
     # done loop over i
-    # the piece should be in exactly one place
-    if dict_state_count[2]>1:
-        print "The piece is is more than one place, count of state 2 is more than 1. So board not correct."
-        return False
-    if dict_state_count[3]!=S:
-        print "The count of past positions is different than the number of steps. So board not correct."
-        return False
-    # we could check that the forbidden places are same as before, but since we insure that in our update move we leave it out for now
-    # as that would involve a lot of checks that would consume CPU
-    if sum(dict_state_count.values())!=NN:
-        print "The total count of values should be constant with the number of squares, i.e. N*N"
-        return False
-    # done if
-    # if here, it means the board is initialized correctly, so return True
     return True
 # done function
 
-@debugging
-def findAllowedMovesForOneSquare(i,j,board):
-    list_tuple=[]
-    # in principal the potential moves are done
-    # horizontally and vertically by one unit
+# @debugging
+def isSquareAllowed(board,i,j):
     # skip the potential new position if 
-    # - it is the same position we started from
     # - it is not on the board
     # - it is in a forbidden square
-    for i_current in i-1,0,i+1:
-        if i_current<0 or i_current>N-1:
-            # the horizontal (i) coordinate is outside of the board
-            continue
-        for j_current in j-1,0,j+1:
-            if j_current<0 or j_current>N-1:
-                # the vertical (j) coordinate is outside of the board
-                continue
-            if i_current==i and j_current==i:
-                # is the same position we started from
-                continue
-            if board[i_current][j_current]==1:
-                # it is a position not allowed on the board
-                continue
-            if board[i_current][j_current]==3:
-                # it is a position where the piece was already
-                # we want the shortest path
-                # if going somewhere only to return
-                # it means the path would not be the shortest possible
-                # so declare that move not allowed
-                continue
-            if debug:
-                print "These are selected as good potential moves: i_current","j_current",i_current,j_current
-            list_tuple.append((i_current,j_current))
-        # done for loop over j_current
-    # done for loop over i_current
-    return list_tuple
+    if i<0 or i>N-1:
+        # the horizontal (i) coordinate is outside of the board
+        return False
+    if j<0 or j>N-1:
+        # the vertical (j) coordinate is outside of the board
+        return False
+    if board[i][j]==1:
+        # it is a position not allowed on the board
+        return False
+    if board[i][j]>=2:
+        # we already went here enough times, so avoid it, as you go in a loop
+        return False
+    # if here, the square is allowed
+    return True
 # done function
 
-@debugging
-def solve(boardName):
-    boardInitialState=dict_boardName_boardInitialState[boardName]
+# @debugging
+def solveRecursive(board,i,j,):
     if debug:
-        print "boardInitialState"
-    drawBoard(boardInitialState)
-    correct=checkCorrectnessBoard(boardInitialState,0)
+        drawBoard("Temp",board)
+    if i==N-1 and j==N-1:
+        # we reached the destination
+        board[i][j]=2
+        return True
+    # done if
+    if isSquareAllowed(board,i,j)==True:
+        # go to that square
+        board[i][j]=2
+        # then try to go to neibourghs in all four directions
+        # since in most situations a path towards right/down
+        # is the most probable, with returns to left and up 
+        # needed only if those paths are closed
+        # we choose the order: right, down, up, left
+        # if one finds the right path, then continues
+        # from that square also with the same order of trials
+        # hence a recursive function
+        # check right
+        if solveRecursive(board,i,j+1)==True:
+            return True
+        # check down
+        if solveRecursive(board,i+1,j)==True:
+            return True
+        # check left
+        if solveRecursive(board,i,j-1)==True:
+            return True
+        # check up
+        if solveRecursive(board,i-1,j)==True:
+            return True
+        # if none of these (but one should work, so we should choose three that are not from the direction we come from)
+        # then we need to come back, to back track, so it is a backtracking algorithm
+        # so consider we did not come here
+        board[i][j]=9
+        return False
+    # done if square is allowed
+    return False
+    # done if square is allowed
+# done function
+
+# @debugging
+def solve(boardName):
+    board=dict_boardName_board[boardName]
+    correct=checkCorrectnessBoard(board)
     if correct==False:
-        print "boardName",boardName,"with state",boardInitialState,"is not correct, please ammend it by reading the rules at the top of this file. Skipping this board."
+        print "boardName",boardName,"is not correct, please amend it by reading the rules at the top of this file. Skipping this board."
         return None
     # done if
-    drawBoard(boardInitialState)
-    findAllowedMovesForOneSquare(0,0,boardInitialState)
+    print ""
+    print "boardName="+boardName
+    drawBoard("Initial board, with 1 for forbidden and 0 where we never went.",board)
+    if solveRecursive(board,0,0)==False:
+        # path does not exist, return False, or -1 as we are asked
+        print "No solution exists, so return -1."
+        return -1 
+    # print solution
+    drawBoard("Solution board with path shown in 2, and 9 where we went and was not good.",board)
+    # it worked fine return 0
+    return 0
 # done function
 
 #################################################################
