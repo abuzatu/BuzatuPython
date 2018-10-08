@@ -32,11 +32,43 @@ if total!=1:
 # (x, y) -> (x, y-1)
 # The length of the path is defined simply as the total number of moves.
 
+#################################################################
+################### My additions#################################
+#################################################################
+
 # My additions: 
 # define the value of 2 the square with the current position
 # and with the value of 3 the square with the past positions
 # The solutions are equivalent if we go from one corner to the other or vice versa
 # So let's choose a convention from top left (0,0) -> bottom right (7,7)
+
+#################################################################
+################### My strategy #################################
+#################################################################
+
+# Let's imagine the destinations is surrounded by forbidden squares (1).
+# If we start from the first position we can compute a lot of paths
+# But all of them are blocked in the end and we will have to return -1
+# But we should also return -1 as fast as possible, with minimum CPU calculations
+# This suggests it makes sense to start from the destination
+# Now let's imagine the starting point is surrounded by forbidden squares (1)
+# Then to find the result fast we should start from the first position.
+# So maybe it does not matter where we start from
+
+# No need to store the entire history of the travel in the form
+# of a list of boards, since we choose to update 
+# the previous position from 2 to 3
+# following by eye the 3 values shows us the path so far
+# one path would be final either when it can not proceed further
+# so a value of 2 surrounded by either values of 1 or 3
+# but allowing for some squares to still have a value of 0
+# or when the value of 2 is at position of bottom right (N-1,N-1).
+
+# Brute force would be to calculate all the possible paths
+# and if any compare them by length and pick the shortest
+
+# But we want to find the result in the shortest amount of operations
+# so we should not use brute force, but find a smarter shortcut
 
 #################################################################
 ################### Configurations ##############################
