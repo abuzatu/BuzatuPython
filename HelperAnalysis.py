@@ -35,7 +35,6 @@ class Analysis:
         if True:
             print "stem",stem,"(channel,vtag,period,analysis,btag)",(self.channel,self.vtag,self.period,self.analysis,self.btag)
         
-
     def set_debug(self,debug):
         self.debug=debug
 
