@@ -392,6 +392,8 @@ def addTree(fileName,fileOpen,treeName,list_variables,debug):
 # option A:
 # option B:
 # option C: just the object name 
+# this assumes all the histograms are at the same path
+# for a more generic code, see the function below, where the histograms do not have to be at the same path
 def listObjects(inputFileName,directoryPath="",searchClass="",list_searchName=["",""],doOption="A",doShowIntegral=False,outputFileName="a.log",debug=False):
     if debug:
         print "Start .ls of root inputFile ",inputFileName
@@ -440,6 +442,59 @@ def listObjects(inputFileName,directoryPath="",searchClass="",list_searchName=["
         print "End .ls of root inputFile ",inputFileName
     return list_text
 # ended function
+
+# function number 1 needed to find recursively and with back tracking all the histograms and profile in a ROOT folder structure of directories
+def isObjectAllowed(inputFileName,thisFile,path,debug=False):
+    # object is allowed if it has a non zero list of sub-folders inside
+    if debug:
+        print "path",path
+    gDirectory.cd(path)
+    keyList = gDirectory.GetListOfKeys()
+    list_folder=[]
+    list_hist=[]
+    for key in keyList:
+        newPath = path + "/" +key.GetName()
+        if debug:
+            print "newPath",newPath, "trying to get object at this path"
+        obj = thisFile.Get(newPath)
+        if obj:
+            if obj.IsFolder()==True:
+                list_folder.append(newPath)
+            if obj and obj.InheritsFrom("TH1") or obj.InheritsFrom("TH2") or obj.InheritsFrom("TProfile") or obj.InheritsFrom("TProfile2D"):
+                if True:
+                    print "tosave","file",inputFileName+",","path",newPath+",","type",type(obj)
+            # done check if is folder
+        else:
+            if debug:
+                print "obj does not exist at path",newPath
+        # done if check if object exists    
+    # done loop over all the keys inside
+    allowed=len(list_folder)>0
+    return allowed,list_folder
+# done
+
+# example how to use the two functions above 
+# to find recursively and with back tracking all the histograms and profile in a ROOT folder structure of directories
+# thisFile = TFile(inputFileName,"READ")
+# solveRecursive(inputFileName,thisFile,initPath)
+# thisFile.Close()
+
+# function number 2 needed to find recursively and with back tracking all the histograms and profile in a ROOT folder structure of directories
+def solveRecursive(inputFileName,thisFile,path,debug=False):
+    if debug:
+        print "Start solveRecursive","inputFileName",inputFileName,"thisFile",thisFile,"path",path
+    allowed,list_folder=isObjectAllowed(inputFileName,thisFile,path)
+    if allowed==True:
+        for folder in list_folder:
+            if solveRecursive(inputFileName,thisFile,folder)==True:
+                return True
+        # if here we need to back track
+        return False
+    else:
+        if debug:
+            print "path not allowed",path
+        return False
+# done function
 
 # remove object from file
 # ex: removeObject("root1.root","tree1",";*",False)
