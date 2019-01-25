@@ -1523,7 +1523,9 @@ class Analysis:
         if self.debug or self.verbose:
             print "Start read_results()"
         self.dict_variable_category_processResult_tupleResult={}
-        for line in open(self.folderResults+"/results.txt", 'r'):
+        suffix="_"+self.list_category[0]+"_"+self.list_variable[0]
+        fileName=self.folderResults+"/results"+suffix+".txt"
+        for line in open(fileName, 'r'):
             line=line.rstrip()
             if self.debug:
                 print "line",line
@@ -1658,6 +1660,7 @@ class Analysis:
             f.write(text)
             f.write('\\hline \n')
             # add one processResult one at a time
+            print "ADRIAN ",self.list_processResult
             for processResult in self.list_processResult:
                 # info=self.dict_processMerged_info[processMergedType]
                 # doAddLineAfter=bool(info[1])
@@ -1688,6 +1691,146 @@ class Analysis:
             f.write('\\end{frame}\n')
             f.write('\\end{document}\n')
             f.close()
+        # done loop over variable
+    # done function
+
+    def create_yield_latex_table_compare(self,ref,doDocument=True,debug=False):
+        if debug:
+            print "Start create_yield_latex_table_compare()"
+        # the ratios will be made to the first element on the left
+        list_stem=[ref.stem,self.stem]
+        if debug:
+            print "list_stem",list_stem
+        dict_stem_analysis={
+            ref.stem:ref,
+            self.stem:self,
+            }
+        for variable in self.list_variable:
+            if debug:
+                print "variable",variable
+            for category in self.list_category:
+                if debug:
+                    print "category",category
+                # we create the latex table
+                fileName=self.folderYields+"/table_comparison_"+variable+"_"+category+".tex"
+                # create a new file
+                f = open(fileName,'w')
+                print "doDocument",doDocument
+                if doDocument:
+                    f.write('\\documentclass{beamer}\n')
+                    f.write('\\usepackage{tabularx}\n')
+                    f.write('\\usepackage{adjustbox}\n')
+                    f.write('\\usepackage{pdflscape}\n')
+                    f.write('\\begin{document}\n')
+                # done if
+                text='\\begin{frame}{Cat: \\texttt{\\detokenize{'+category+'}}; Var: \\texttt{\\detokenize{'+variable+'}};'
+                #text+=' \\\\ Comp: \\texttt{\\detokenize{'+comparison+'}}; Stem:'
+                #for i,stem in enumerate(list_stem):
+                #    if i>0:
+                #        text+=' vs'  
+                #    text+=' {\\color{black}\\texttt{\\detokenize{'+dict_stem_analysis[stem].stem+'}}}'
+                text+='.}'
+                f.write(text+'\n')
+                # continue
+                # f.write('\\begin{center}\n')
+                f.write('\\begin{landscape} \n')
+                text='\\adjustbox{max height=\\dimexpr\\textheight-'
+                if doDocument:
+                    text+='7.0'
+                else:
+                    text+='8.5'
+                text+='cm\\relax,max width=\\textwidth}'
+                f.write(text+'\n')
+                f.write('{\n')
+                text="\\begin{tabular}{|l"
+                for stem in list_stem:
+                    text+="|l"
+                text+="|l|l|}"
+                f.write(text+'\n')
+                f.write('\\hline \n')
+                f.write('\\hline \n')
+                text="Process vs Stem"
+                for stem in list_stem:
+                    text+=" & \\texttt{\\detokenize{"+stem+"}}"
+                for i,stem in enumerate(list_stem):
+                    if i==0:
+                        continue
+                    #text+=" & \\texttt{\\detokenize{Ratio "+stem.split("_")[-1]+" to "+list_stem[0].split("_")[-1]+"}}"
+                    text+=" & Ratio right to left"
+                    #text+=" & Ratio of relative error"
+                text+=" \\\\"
+                f.write(text+'\n')
+                f.write('\\hline \n')
+                # add one processResult one at a time
+                for processResult in self.list_processResult:
+                    # info=self.dict_processMerged_info[processMergedType]
+                    # doAddLineAfter=bool(info[1])
+                    if processResult=="qqZincH4l" or processResult=="dijet" or processResult=="data" or processResult=="VHbb":
+                        doAddLineAfter=True
+                    else:
+                        doAddLineAfter=False
+                    #if self.debug:
+                    #    print processMergedType,info[1],type(info[1]),doAddLineAfter,type(doAddLineAfter)
+                    if "@" in processResult:
+                        list_processResult=processResult.split("@")
+                        processResult=list_processResult[0]
+                        currentVariable=list_processResult[1]
+                        text="\\texttt{\\detokenize{"+processResult+" "+currentVariable+"}}"
+                    else:
+                        # regular processResult
+                        currentVariable=variable
+                        text="\\texttt{\\detokenize{"+processResult+"}}"
+                        nrDigits="2"
+                    # done if
+                    tupleResultDenom=ref.dict_variable_category_processResult_tupleResult[currentVariable+"_"+category+"_"+processResult]
+                    # a is the first one, so the reference
+                    # done loop over stem
+                    for stem in list_stem:
+                        if False:
+                            print "stem",stem
+                        ana=dict_stem_analysis[stem]
+                        tupleResult=ana.dict_variable_category_processResult_tupleResult[currentVariable+"_"+category+"_"+processResult]
+                        if tupleResult[0]>0.01:
+                            if "@" in processResult:
+                                text+=" & {\\color{orange}%.2f$\pm$%.2f}" % tupleResult
+                            else:
+                                text+=" & {\\color{orange}%.3f$\pm$%.3f}" % tupleResult
+                        else:
+                            text+=" & {\\color{orange}%.4f$\pm$%.4f}" % tupleResult
+                    # done loop over stem
+                    # add the ratio
+                    for i,stem in enumerate(list_stem):
+                        if i==0:
+                            continue
+                        ana=dict_stem_analysis[stem]
+                        tupleResultNumer=ana.dict_variable_category_processResult_tupleResult[currentVariable+"_"+category+"_"+processResult]
+                        # tupleResultNumer=tupleResult # from ana, the last one, which is also the second one
+                        tupleResultRatio=ratioTuple(tupleResultNumer,tupleResultDenom,debug=False) # a is the first one, ana is the last one
+                        text+=" & {\\color{orange}%.3f$\pm$%.3f}" % tupleResultRatio
+                    # done if
+                    # add the ratio of relative errors
+                    #relativeErrorDenom=ratio(tupleResultDenom[1],tupleResultDenom[0])
+                    #relativeErrorNumer=ratio(tupleResultNumer[1],tupleResultNumer[0])
+                    #relativeErrorRatio=ratio(relativeErrorNumer,relativeErrorDenom)
+                    #text+=" & {\\color{orange}%.3f}" % relativeErrorRatio
+                    # 
+                    text+=" \\\\ \n"
+                    f.write(text)
+                    if doAddLineAfter:
+                        f.write('\\hline \n')
+                # done for loop over processResult
+                f.write('\\hline \n')
+                f.write('\\end{tabular}\n')
+                f.write('}\n')
+                f.write('\\end{landscape} \n')
+                # f.write('\\end{center}\n')
+                f.write('\\end{frame}\n')
+                if doDocument:
+                    f.write('\\end{document}\n')
+                f.close()
+                # compile to make pdf
+                # os.system("pdflatex "+fileName)
+            # done loop over category
         # done loop over variable
     # done function
 
@@ -2424,8 +2567,6 @@ class Analysis:
             # 2L 075-150 CR (topemucr)
             "CUT_2L_2tag2jet_75_150ptv_topemucr":"Region_BMax150_BMin75_Y4033_Dtopemucr_T2_L2_distmBB_J2",
             "CUT_2L_2tag3pjet_75_150ptv_topemucr":"Region_BMax150_BMin75_incJet1_Y4033_Dtopemucr_T2_L2_distmBB_J3",
-            
-            
             }
     # done function
 
@@ -2445,11 +2586,33 @@ class Analysis:
             self.create_folderPlots()
             self.list_color=[1,4,2,8,ROOT.kOrange]
             self.create_stacked_plots()
+        self.create_folderResults()
+        self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
+        self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
+        if True:
+            self.create_results()
+        if True:
+            self.create_folderYields()
+            self.read_results()
+            # self.create_yield_latex_table(doDocument=True)
+            self.create_yield_latex_table2()
+            if self.debug:
+                print self.vtag
+            # vtag_ref="32-07"
+            vtag_ref="31-10"
+            if self.debug:
+                print "ADRIAN self",self.stem,self.folderResults
+            ref=copy.copy(self)
+            ref.stem=ref.stem.replace(self.vtag,vtag_ref)
+            ref.folderResults=ref.folderResults.replace(self.vtag,vtag_ref)
+            if self.debug:
+                print "ADRIAN self",self.stem,self.folderResults
+                print "ADRIAN","ref",ref.stem,ref.folderResults
+            ref.read_results()
+            self.create_yield_latex_table_compare(ref,doDocument=False,debug=True)
     # done function
-
     ### done methods
 
 
 
 # done class
-
