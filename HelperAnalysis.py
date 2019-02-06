@@ -163,6 +163,9 @@ class Analysis:
             if ".root" not in fileName:
                 print "skipping non *.root file fileName",fileName
                 continue
+            # condor on lxplus produces driver.root in the fetch folder
+            if fileName=="driver.root":
+                continue
             if option=="ReaderBatch":
                 # e.g. hist-data17-3.root
                 list_fileNameElement=fileName.split("-")
