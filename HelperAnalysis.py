@@ -490,7 +490,9 @@ class Analysis:
             "EtaFwdJets":[get_binRange(-4.5,4.5,0.1,debug_binRange)],
             "EtaSigJets":[get_binRange(-2.5,2.5,0.1,debug_binRange)],
             # "MET":[get_binRange(150,400,10,debug_binRange)+","+get_binRange(400,700,100,debug_binRange)],
-            "MET":[get_binRange(150,400,10,debug_binRange)],
+            "MET":[get_binRange(0,400,10,debug_binRange)],
+            "pTV":[get_binRange(150,400,10,debug_binRange)+","+get_binRange(400,600,50,debug_binRange)],
+            #"MET":[get_binRange(150,400,10,debug_binRange)],
             "MET_Track":[get_binRange(0,300,10,debug_binRange)+","+get_binRange(300,400,100,debug_binRange)],
             "MEff":[get_binRange(280,500,10,debug_binRange)+","+get_binRange(500,1000,20,debug_binRange)],
             "MEff3":[get_binRange(280,500,10,debug_binRange)+","+get_binRange(500,1000,20,debug_binRange)],
@@ -1136,8 +1138,10 @@ class Analysis:
         if self.debug:
             print "Start set_list_processMerged()"
 
-        self.list_process.remove('W')
-        self.list_process.remove('Z')
+        if 'W' in self.list_process:
+            self.list_process.remove('W')
+        if 'Z' in self.list_process:   
+            self.list_process.remove('Z')
 
         # those stored in .root
         self.list_processMerged=self.list_process+[
@@ -1300,6 +1304,7 @@ class Analysis:
                             SF_Tuple=(1.0,0.0)
                         # done if
                     else:
+                        print "ADRIAN no SF"
                         SF_Tuple=(1.0,0.0)
                     # done if
                     SF=SF_Tuple[0]
@@ -1333,8 +1338,10 @@ class Analysis:
                         print "counter",counter
                     if counter==0:
                         if self.debug:
-                            print "No histogram in this category, so set a dummy histogram, taken from ttbar and then reset"
-                        process="ttbar"
+                            print "No histogram in this category, so set a dummy histogram, taken from the first process in the list that exists, and then reset"
+                        if self.debug:
+                            print "self.list_process", self.list_process
+                        process=self.list_process[0]
                         histoNameProcess      =self.get_histoNameProcess_new(variable,category,process)
                         histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcess,name=histoNameProcessMerged,returnDummyIfNotFound=False,debug=self.debug)
                         histoProcessMerged=histo
@@ -2501,10 +2508,10 @@ class Analysis:
             "MVA_0L_2tag3jet_150ptv_SR":"Region_BMin150_Y4033_DSR_T2_L0_distmva_J3",
             # 1L 150-info SR
             "MVA_1L_2tag2jet_150ptv_WhfSR":"Region_BMin150_Y4033_DWhfSR_T2_L1_distmva_J2",
-            "MVA_1L_2tag3pjet_150ptv_WhfSR":"Region_BMin150_Y4033_DWhfSR_T2_L1_distmva_J3",
+            "MVA_1L_2tag3jet_150ptv_WhfSR":"Region_BMin150_Y4033_DWhfSR_T2_L1_distmva_J3",
             # 1L 150-inf CR
             "MVA_1L_2tag2jet_150ptv_WhfCR":"Region_BMin150_Y4033_DWhfCR_T2_L1_distmva_J2",
-            "MVA_1L_2tag3pjet_150ptv_WhfCR":"Region_BMin150_Y4033_DWhfCR_T2_L1_distmva_J3",
+            "MVA_1L_2tag3jet_150ptv_WhfCR":"Region_BMin150_Y4033_DWhfCR_T2_L1_distmva_J3",
             # 2L 150-inf SR
             "MVA_2L_2tag2jet_150ptv_SR":"Region_BMin150_Y4033_DSR_T2_L2_distmva_J2",
             "MVA_2L_2tag3pjet_150ptv_SR":"Region_BMin150_incJet1_Y4033_DSR_T2_L2_distmva_J3",
@@ -2534,16 +2541,16 @@ class Analysis:
             # so point both to the SR from the txt file
             # 1L 200-inf SR
             "CUT_1L_2tag2jet_200ptv_WhfSR":"Region_BMin200_Y4033_DWhfSR_T2_L1_distmBB_J2",
-            "CUT_1L_2tag3pjet_200ptv_WhfSR":"Region_BMin200_Y4033_DWhfSR_T2_L1_distmBB_J3",
+            "CUT_1L_2tag3jet_200ptv_WhfSR":"Region_BMin200_Y4033_DWhfSR_T2_L1_distmBB_J3",
             # 1L 200-inf CR
             "CUT_1L_2tag2jet_200ptv_WhfCR":"Region_BMin200_Y4033_DWhfSR_T2_L1_distmBB_J2", # note CR <- SR
-            "CUT_1L_2tag3pjet_200ptv_WhfCR":"Region_BMin200_Y4033_DWhfSR_T2_L1_distmBB_J3", # note CR <- SR
+            "CUT_1L_2tag3jet_200ptv_WhfCR":"Region_BMin200_Y4033_DWhfSR_T2_L1_distmBB_J3", # note CR <- SR
             # 1L 150-200 SR
             "CUT_1L_2tag2jet_150_200ptv_WhfSR":"Region_BMax200_BMin150_Y4033_DWhfSR_T2_L1_distmBB_J2",
             "CUT_1L_2tag3pjet_150_200ptv_WhfSR":"Region_BMax200_BMin150_Y4033_DWhfSR_T2_L1_distmBB_J3",
             # 1L 150-200 CR
             "CUT_1L_2tag2jet_150_200ptv_WhfCR":"Region_BMax200_BMin150_Y4033_DWhfSR_T2_L1_distmBB_J2", # note CR <- SR
-            "CUT_1L_2tag3pjet_150_200ptv_WhfCR":"Region_BMax200_BMin150_Y4033_DWhfSR_T2_L1_distmBB_J3", # note CR <- SR
+            "CUT_1L_2tag3jet_150_200ptv_WhfCR":"Region_BMax200_BMin150_Y4033_DWhfSR_T2_L1_distmBB_J3", # note CR <- SR
             # 2L
             # in 2L CUT the topemu CR 150_200ptv and 200ptv is merged into 150ptv at SplitInputs
             # 2L 200-inf SR
@@ -2584,6 +2591,8 @@ class Analysis:
             self.list_color=[1,4,2,8,ROOT.kOrange]
             self.create_stacked_plots()
         self.create_folderResults()
+        # self.list_processResult=["WZ","ZZ","ggZZ"]
+        # self.list_processMerged=["WZ","ZZ","ggZZ"]
         self.list_processResult=["VHbb","otherHiggs","diboson","Whf","Wcl","Wl","Zhf","Zcl","Zl","ttbar","ttX","stop","S","B","data"]
         self.list_processResult=self.list_processResult+["S/B","SigY_S_B","SigH_S_B"]
         if True:
@@ -2593,10 +2602,11 @@ class Analysis:
             self.read_results()
             # self.create_yield_latex_table(doDocument=True)
             self.create_yield_latex_table2()
+        if False:
             if self.debug:
                 print self.vtag
             # vtag_ref="32-07"
-            vtag_ref="31-10"
+            vtag_ref="32_07"
             if self.debug:
                 print "ADRIAN self",self.stem,self.folderResults
             ref=copy.copy(self)
