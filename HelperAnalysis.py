@@ -2071,12 +2071,18 @@ class Analysis:
                         print "processMerged",processMerged
                     histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
                     histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
-                    if "mBB" in variable and variable!="mBBJ":
-                        blinding=["range",[80,140]]
-                    elif variable=="mva" or variable=="mvadiboson":
-                        blinding=["range",[0.3,1.0]]
-                    else:
-                        blinding=["threshold",0.05]
+                    if "2tag2jet" in self.category:
+                        if "mBB" in variable and variable!="mBBJ":
+                            if self.period=="a" or self.period=="d" or self.period=="ad":
+                                blinding=["range",[100,140]] # unblind the diboson peak
+                            else:
+                                blinding=["range",[80,140]] # keep also the diboson peak blinded
+                            # done if
+                        elif variable=="mva" or variable=="mvadiboson":
+                            blinding=["range",[0.3,1.0]]
+                        else:
+                            blinding=["threshold",0.05]
+                        # done if
                     # done if
 
                     # blind the data
@@ -2113,7 +2119,7 @@ class Analysis:
                 # done loop over processMerged
                 outputFileName=self.folderPlots+"/stack_"+variable.replace("_","")+"_"+category
                 # stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; "+self.name+"}?#bf{"+variable+"}?#bf{"+category+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.72,0.25,0.88,0.88,72,0.037,0],debug=self.debug)
-                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="pdf",blinding=blinding,doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{"+self.name+"}?#bf{"+category+"}",0.04,13,0.15,0.92,0.05),xAxisTitle=variable,debug=False)
+                stackHistograms(list_tuple_h1D,stackName="stackName",outputFileName=outputFileName,extensions="png,pdf",blinding=blinding,doAveragePerBinWidth=True,text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV}?#bf{"+self.name+"}?#bf{"+category+"}",0.04,13,0.15,0.92,0.05),xAxisTitle=variable,debug=False)
                 print "outside stackHistograms"
             # done loop over category
         # done loop over variable
