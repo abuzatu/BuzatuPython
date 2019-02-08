@@ -2071,7 +2071,8 @@ class Analysis:
                         print "processMerged",processMerged
                     histoNameProcessMerged=self.get_histoNameProcess(variable,category,processMerged)
                     histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcessMerged,name="",returnDummyIfNotFound=False,debug=self.debug)
-                    if "2tag2jet" in self.category:
+                    blinding=["threshold",0.05] # default blinding if S/B > 0.05 in any bin
+                    if "2tag2jet" in category:
                         if "mBB" in variable and variable!="mBBJ":
                             if self.period=="a" or self.period=="d" or self.period=="ad":
                                 blinding=["range",[100,140]] # unblind the diboson peak
@@ -2080,8 +2081,6 @@ class Analysis:
                             # done if
                         elif variable=="mva" or variable=="mvadiboson":
                             blinding=["range",[0.3,1.0]]
-                        else:
-                            blinding=["threshold",0.05]
                         # done if
                     # done if
 
