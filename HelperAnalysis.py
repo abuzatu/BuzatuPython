@@ -1344,7 +1344,7 @@ class Analysis:
                             print "No histogram in this category, so set a dummy histogram, taken from the first process in the list that exists, and then reset"
                         if self.debug:
                             print "self.list_process", self.list_process
-                        process=self.list_process[0]
+                        process=self.list_process[1]
                         histoNameProcess      =self.get_histoNameProcess_new(variable,category,process)
                         histo=retrieveHistogram(fileName=inputFileName,histoPath="",histoName=histoNameProcess,name=histoNameProcessMerged,returnDummyIfNotFound=False,debug=self.debug)
                         histoProcessMerged=histo
@@ -2518,6 +2518,10 @@ class Analysis:
             # 2L 150-inf SR
             "MVA_2L_2tag2jet_150ptv_SR":"Region_BMin150_Y4033_DSR_T2_L2_distmva_J2",
             "MVA_2L_2tag3pjet_150ptv_SR":"Region_BMin150_incJet1_Y4033_DSR_T2_L2_distmva_J3",
+            "MVA_2L_2tag2jet_150_250ptv_SR":"Region_BMin150_Y4033_DSR_T2_L2_distmva_J2",
+            "MVA_2L_2tag3pjet_150_150ptv_SR":"Region_BMin150_incJet1_Y4033_DSR_T2_L2_distmva_J3",
+            "MVA_2L_2tag2jet_250ptv_SR":"Region_BMin150_Y4033_DSR_T2_L2_distmva_J2",
+            "MVA_2L_2tag3pjet_250ptv_SR":"Region_BMin150_incJet1_Y4033_DSR_T2_L2_distmva_J3",
             # 2L 150-inf CR (topemucr)
             "MVA_2L_2tag2jet_150ptv_topemucr":"Region_BMin150_Y4033_Dtopemucr_T2_L2_distmBBMVA_J2",
             "MVA_2L_2tag3pjet_150ptv_topemucr":"Region_BMin150_incJet1_Y4033_Dtopemucr_T2_L2_distmBBMVA_J3",
