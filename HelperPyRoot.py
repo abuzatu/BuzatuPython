@@ -2132,7 +2132,7 @@ def compareHistogramsWithLabelsBinByBin(list_tuple_h1D,fileName="file.txt",debug
 # for statistical error band
 # code example: https://www.desy.de/~stanescu/my-tmp/plotUpDownSys.C
 # its plot:https://www.desy.de/~stanescu/my-tmp/AFII/Nom-Up-Down-A500-tb050/jes1_h_ttbar_chi2_m_inc_res_mu.png
-def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,min_multiply=0.9,max_multiply=1.4,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; Hinv analysis}?#bf{"+"category"+"}?#bf{"+"systematicStem"+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False):
+def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option="histo",doValidationPlot=False,canvasname="canvasname",addHistogramInterpolate=False,addfitinfo=False,addMedianInFitInfo=False,isHistoAveragedPerBinWidth=True,addintegralinfo=False,significantDigits=("3","3","3","3"),min_value=-1,max_value=-1,min_multiply=0.9,max_multiply=1.4,YTitleOffset=0.45,doRatioPad=True,min_value_ratio=0,max_value_ratio=3,statTitle="MC. stat uncertainty",statColor=6,ratioTitle="Ratio to first",plot_option="HIST E",plot_option_ratio="E",text_option=("#bf{#it{#bf{ATLAS} Simulation Internal}}?#bf{#sqrt{s}=13 TeV; Hinv analysis}?#bf{"+"category"+"}?#bf{"+"systematicStem"+"}",0.04,13,0.15,0.88,0.05),legend_info=[0.70,0.70,0.88,0.88,72,0.037,0],line_option=([0,0.5,0,0.5],2),debug=False):
     if debug:
         print "Start overlayHistograms(...)"
         print "option",option
@@ -2216,6 +2216,10 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
         #legend.AddEntry(None,"#bf{"+titleLegend+"}","")
         legend.SetHeader("#bf{"+titleLegend+"}")
     # done if addfitinfo
+
+    if addintegralinfo:
+        titleLegend2="histo: integral"
+        legend.SetHeader("#bf{"+titleLegend2+"}")
 
     if debug:
         print "Done legend title, starting loop over list_tuple_h1D"
@@ -2335,10 +2339,28 @@ def overlayHistograms(list_tuple_h1D,fileName="overlay",extensions="pdf",option=
                 legend_text=tempString % (result_fit[2][0],result_fit[3][0],ratio(result_fit[3][0],result_fit[2][0]))
             # done if addMedianInFitInfo
         # done if fit is Linear or not
+                
         # legend text is done, now plot it
         legend.AddEntry(h1D,legend_name,"f")
         if addfitinfo:
             legend.AddEntry(None,legend_text,"")
+        # done if
+        if addintegralinfo:
+            if debug:
+                print "just integral",h1D.Integral()
+            if isHistoAveragedPerBinWidth==True:
+                integraloption="width"
+            else:
+                integraloption=""
+            (integral,error)=get_histo_integral_error(h1D,myRange=0,option=integraloption,debug=debug)
+            tempString="#bf{%."+significantDigits[1]+"f +/- %."+significantDigits[1]+"f}"
+            if debug:
+                print "tempString",tempString
+            legend_text2=tempString % (integral,error)
+            if debug:
+                print "integral,error",(integral,error)
+            legend.AddEntry(None,legend_text2,"")
+        # done if
         legend.SetBorderSize(0)
         # add ATLAS
         # ex: setupTextOnPlot("#bf{#it{#bf{ATLAS } Simulation Internal}}",0.05,13,0.17,0.85,0.09)
@@ -4055,7 +4077,9 @@ def do_error_myRange(myRange):
 # myRange=0 without underflow and overflow bins
 # option="" just add the bin contentss
 # option="width" add the bin contents multiplied by the respective bin width (key for asymmetric bins)
-def get_histo_integral_error(histo,myRange=0,option="",debug=False):
+def get_histo_integral_error(histo,myRange=0,option="",debug=True):
+    if False:
+        getBinValues(histo,significantDigits=3,doRescaleMeVtoGeV=False,doUnderflow=True,doOverflow=True,debug=True)
     if myRange==-1:
         myRange=[0,histo.GetNbinsX()+1] # with    overflow bins
     elif myRange==-2:
@@ -4085,9 +4109,17 @@ def get_histo_integral_error(histo,myRange=0,option="",debug=False):
         None
     # range is good and defined, we can move on
     array_error=array("d",[0])
+    if debug:
+        print "array_error",array_error
+        print "myRange[0]",myRange[0]
+        print "myRange[1]",myRange[1]
+        print "option",option
     # option "" or "width" 
     integral=histo.IntegralAndError(myRange[0],myRange[1],array_error,option)
     error=array_error[0]
+    if debug:
+        print "integral",integral
+        print "array_error",array_error
     if debug:
         print "integral +- error: %-.3f +- %-.3f" % (integral,error)
     return (integral,error)
