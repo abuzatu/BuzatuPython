@@ -43,11 +43,13 @@ list_plot=[
     "A",
     "B",
     "C",
+    "D",
 ]
 dict_plot_list_name={
     "A":["Soybean","Corn","CrudeOil","DXY","S&P500"],
     "B":["Soybean","Corn"],
     "C":["Soybean"],
+    "D":["Soybean","Corn","CrudeOil","DXY","S&P500","StockToUse"],
 }
 
 
@@ -202,6 +204,8 @@ def doPlot(dict_name_nparray_value_daily,list_name_daily,dict_name_nparray_value
     # 20/07/17        102.7   404.75          47.34   94.269997       2473.449951
     # so we modify 102.7 to 1027.0
     #
+    # and for stock to use, fill the missing data of Oct 2013 due to government showdown with the average of the periods before and after
+    # and also a factor of 10 on this line 10/01/14        0.453995157, replacing with 10/01/14        0.045399516
     xAxisName="Date"
     for plot in list_plot:
         list_name=dict_plot_list_name[plot]
@@ -211,7 +215,12 @@ def doPlot(dict_name_nparray_value_daily,list_name_daily,dict_name_nparray_value
         for name in list_name:
             if name=="Date":
                 continue
-            plt.plot(dict_name_nparray_value_daily[xAxisName],scaleNPArray(dict_name_nparray_value_daily[name],option),label=name)
+            if name=="StockToUse":
+                # from the monthly
+                plt.plot(dict_name_nparray_value_monthly[xAxisName],scaleNPArray(dict_name_nparray_value_monthly[name],option),label=name)
+            else:
+                # from the daily
+                plt.plot(dict_name_nparray_value_daily[xAxisName],scaleNPArray(dict_name_nparray_value_daily[name],option),label=name)
         # done loop over name
         plt.xlabel(xAxisName)
         plt.ylabel("Value at that particular day")
@@ -219,9 +228,12 @@ def doPlot(dict_name_nparray_value_daily,list_name_daily,dict_name_nparray_value
         fig.autofmt_xdate()
         plt.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
         plt.title("Time series of values as a function of day")
-        plt.legend(loc="lower left")
+        if plot=="D":
+            plt.legend(loc="upper right")
+        else:
+            plt.legend(loc="lower left")
         # plt.show() # shows in GUI, but for script we want to store in file
-        plt.savefig("./output/overlay_daily_"+plot+"_"+option+".png")
+        plt.savefig("./output/overlay_daily_"+plot+"_"+option+".png",bbox_inches='tight')
         plt.close()
     # done loop over plot
 # done function
