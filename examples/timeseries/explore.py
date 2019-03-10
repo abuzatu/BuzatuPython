@@ -1,9 +1,24 @@
 #!/usr/bin/python
-from HelperPython import *
-# sphinx_gallery_thumbnail_number = 3
+# time series analysis step by step example by Adrian Buzatu (Adrian.Buzatu@cern.ch) 
+# started on 10 March 2019
+# not using directly pandas, but starting with simple Python to read data files
+# but using numpy and matplotlib
+# later pandas, DataFrame and Jupyter notebook
+
+#################################################################
+################### Configurations ##############################
+#################################################################
+
+# import basic python
+import sys
+# import for data analysis and plotting
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
 
+#################################################################
+################### Configurations ##############################
+#################################################################
 
 total = len(sys.argv)
 # number of arguments plus 1
@@ -27,8 +42,11 @@ fileNameMonthly="./input/study_case_monthly.txt"
 ################### Functions ###################################
 #################################################################
 
-def readFileDaily(fileName):
-    dict_date_name_values={}
+def readFile(fileName):
+    # the first line gives the name of the variables, so we take it from there
+    # that way we can have only one function that can read any number of data files
+    # both the daily and the monthly for example
+    counter=0
     f=open(fileName,"r")
     for line in f:
         line=line.rstrip()
@@ -37,45 +55,70 @@ def readFileDaily(fileName):
         list_line=line.split()
         if debug:
             print "list_line",list_line
-        dateString                  =list_line[0]
-        dict_name_values={}
-        dict_name_values["soybean"] =list_line[1]
-        dict_name_values["corn"]    =list_line[2]
-        dict_name_values["crudeOil"]=list_line[3]
-        dict_name_values["DXY"]     =list_line[4]
-        dict_name_values["S&P500"]  =list_line[5]
-        if debug:
-            print "dateString",dateString,"dict_name_values",dict_name_values
-        dict_date_name_values[dateString]=dict_name_values
-    # done for loop over all the lines
+        counter+=1
+        if counter==1:
+            list_name=list_line
+            break
+    # done loop over the file first
     if debug:
-        print "List content of dictionary:"
-        for date in dict_date_name_values:
-            print date,dict_date_name_values[date]
-# done function
-
-def readFileMonthly(fileName):
-    dict_date_name_values={}
-    f=open(fileName,"r")
-    for line in f:
-        line=line.rstrip()
-        if debug:
-            print "line",line
-        list_line=line.split()
-        if debug:
-            print "list_line",list_line
-        dateString                  =list_line[0]
-        dict_name_values={}
-        dict_name_values["stockToUse"] =list_line[1]
-        if debug:
-            print "dateString",dateString,"dict_name_values",dict_name_values
-        dict_date_name_values[dateString]=dict_name_values
-    # done for loop over all the lines
+        print "list_name",list_name
     if debug:
         print ""
-        print "List content of dictionary:"
-        for date in dict_date_name_values:
-            print date,dict_date_name_values[date]
+        print "Start loop again over the files"
+    # to plot we need numpyarrays, to create them we need lists
+    dict_name_list_value={}
+    for name in list_name:
+        dict_name_list_value[name]=[]
+    f=open(fileName,"r")
+    counter=0
+    for line in f:
+        line=line.rstrip()
+        if debug:
+            print "line",line
+        counter+=1
+        if counter==1:
+            continue
+        # now we are from the first line with values
+        list_line=line.split()
+        if debug:
+            print "list_line",list_line
+        dict_name_value={}
+        for i,name in enumerate(list_name):
+            dict_name_value[name]=list_line[i]
+            if name=="Date":
+                # convert from 31/02/17 to 2017-02-31 and overwrite
+                list_dateElement=dict_name_value[name].split("/")
+                if debug:
+                    print "list_dateElement",list_dateElement
+                    dict_name_value[name]="20"+list_dateElement[2]+"-"+list_dateElement[1]+"-"+list_dateElement[0]
+            else:
+                None
+            # done if
+        # for each name, append to its list
+        for name in list_name:
+            if debug:
+                print "name",name,"value",dict_name_value[name]
+            dict_name_list_value[name].append(dict_name_value[name])
+    # done for loop over all the lines
+    # from lists create numpy arrays
+    dict_name_nparray_value={}
+    for name in list_name:
+        if debug:
+            print "name",name,"list_value",dict_name_list_value[name]
+        if name=="Date":            
+            dict_name_nparray_value[name]=np.array(dict_name_list_value[name],dtype='datetime64[D]')
+        else:
+            dict_name_nparray_value[name]=np.array(dict_name_list_value[name])
+        if debug and name=="Date":
+            print "name",name,"np.array",dict_name_nparray_value[name]
+    # done loop over names
+    for name in list_name:
+        if debug:
+            # if name=="Date":
+            if True:
+                print "name",name,"nparray_value",dict_name_nparray_value[name]
+    # ready to return
+    return dict_name_nparray_value
 # done function
 
 def testPlot():
@@ -93,12 +136,25 @@ def testPlot():
     plt.show()
 # done function
 
+def doPlot(dict_name_nparray_value_daily,dict_name_nparray_value_monthly):
+    fig = plt.figure()  # an empty figure with no axes
+    plt.plot(dict_name_nparray_value_daily["Date"],dict_name_nparray_value_daily["S&P500"],label="Test")
+    plt.plot(dict_name_nparray_value_daily["Date"],dict_name_nparray_value_daily["Soybean"],label="Test")
+    plt.xlabel("x label")
+    plt.ylabel("y label")
+    plt.title("Simple plot")
+    plt.legend()
+    plt.show()
+# done function
+
+
 def doItOne(option):
     if debug:
         print "doItOne() with option",option
-    # readFileDaily(fileNameDaily)
-    readFileMonthly(fileNameMonthly)
-    testPlot()
+    dict_name_nparray_value_daily=readFile(fileNameDaily)
+    dict_name_nparray_value_monthly=readFile(fileNameMonthly)
+    # testPlot()
+    doPlot(dict_name_nparray_value_daily,dict_name_nparray_value_monthly)
     None
 # done function
 
