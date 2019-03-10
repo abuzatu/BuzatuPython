@@ -37,10 +37,22 @@ debug=True
 list_option="A".split(",")
 fileNameDaily="./input/study_case_daily.txt"
 fileNameMonthly="./input/study_case_monthly.txt"
+doStartFromUnity=False
+
 
 #################################################################
 ################### Functions ###################################
 #################################################################
+
+def ratio(a,b):
+    result=0.0
+    if b==0:
+        print "WARNING, division by zero, will return 0.0!"
+        result=0.0
+    else:
+        result=a/b
+    return result
+# done function
 
 def readFile(fileName):
     # the first line gives the name of the variables, so we take it from there
@@ -83,6 +95,7 @@ def readFile(fileName):
         if debug:
             print "list_line",list_line
         dict_name_value={}
+        # loop over names and fill the dictionary of values in the correct format (date and floats)
         for i,name in enumerate(list_name):
             dict_name_value[name]=list_line[i]
             if name=="Date":
@@ -92,8 +105,11 @@ def readFile(fileName):
                     print "list_dateElement",list_dateElement
                     dict_name_value[name]="20"+list_dateElement[2]+"-"+list_dateElement[1]+"-"+list_dateElement[0]
             else:
-                None
+                # convert from string to float
+                dict_name_value[name]=float(dict_name_value[name])
             # done if
+            if debug:
+                print "counter",counter,"i",i,"name",name,"value",dict_name_value[name],"type",type(dict_name_value[name])
         # for each name, append to its list
         for name in list_name:
             if debug:
@@ -123,8 +139,6 @@ def readFile(fileName):
 
 def testPlot():
     fig = plt.figure()  # an empty figure with no axes
-    #fig.suptitle('No axes on this figure')  # Add a title so we know which it is
-    #fig, ax_lst = plt.subplots(2, 2)  # a figure with a 2x2 grid of Axes
     x = np.linspace(0, 2, 100)
     plt.plot(x,x,label="linear")
     plt.plot(x,x**2,label="quadratic")
@@ -136,15 +150,29 @@ def testPlot():
     plt.show()
 # done function
 
+def scaleNPArrayToHaveFirstElementAtUnity(nparray):
+    first=nparray[0]
+    scaled_nparray=nparray*ratio(1.0,first)
+    if debug:
+        print "scaled_nparray",scaled_nparray
+    return scaled_nparray
+# done function
+
 def doPlot(dict_name_nparray_value_daily,dict_name_nparray_value_monthly):
     fig = plt.figure()  # an empty figure with no axes
-    plt.plot(dict_name_nparray_value_daily["Date"],dict_name_nparray_value_daily["S&P500"],label="Test")
-    plt.plot(dict_name_nparray_value_daily["Date"],dict_name_nparray_value_daily["Soybean"],label="Test")
-    plt.xlabel("x label")
-    plt.ylabel("y label")
-    plt.title("Simple plot")
+    xAxisName="Date"
+    if doStartFromUnity==True:
+        plt.plot(dict_name_nparray_value_daily[xAxisName],scaleNPArrayToHaveFirstElementAtUnity(dict_name_nparray_value_daily["S&P500"]),label="Test")
+        plt.plot(dict_name_nparray_value_daily[xAxisName],scaleNPArrayToHaveFirstElementAtUnity(dict_name_nparray_value_daily["Soybean"]),label="Test")
+    else:
+        plt.plot(dict_name_nparray_value_daily[xAxisName],dict_name_nparray_value_daily["S&P500"],label="Test")
+        plt.plot(dict_name_nparray_value_daily[xAxisName],dict_name_nparray_value_daily["Soybean"],label="Test")
+    plt.xlabel(xAxisName)
+    plt.ylabel("Value at that particular day")
+    plt.title("Time series of values as a function of day")
     plt.legend()
-    plt.show()
+    # plt.show() # shows in GUI, but for script we want to store in file
+    plt.savefig("./output/test.png")
 # done function
 
 
