@@ -6,7 +6,7 @@
 # later pandas, DataFrame and Jupyter notebook
 
 #################################################################
-################### Configurations ##############################
+################### Includes       ##############################
 #################################################################
 
 # import basic python
@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #################################################################
-################### Configurations ##############################
+################### Command line arguemnts ######################
 #################################################################
 
 total = len(sys.argv)
@@ -32,12 +32,23 @@ if total!=1:
 ################### Configurations ##############################
 #################################################################
 
-debug=True
-# list_option="A,B,C".split(",")
-list_option="A".split(",")
+debug=False
+verbose=True
 fileNameDaily="./input/study_case_daily.txt"
 fileNameMonthly="./input/study_case_monthly.txt"
-doStartFromUnity=False
+# 0 plot their absolute values; 1 scale to first entry to compare relative performance
+# list_option="0,1".split(",") 
+list_option="1".split(",")
+list_plot=[
+    "A",
+    "B",
+    "C",
+]
+dict_plot_list_name={
+    "A":["Soybean","Corn","CrudeOil","DXY","S&P500"],
+    "B":["Soybean","Corn"],
+    "C":["Soybean"],
+}
 
 
 #################################################################
@@ -103,7 +114,7 @@ def readFile(fileName):
                 list_dateElement=dict_name_value[name].split("/")
                 if debug:
                     print "list_dateElement",list_dateElement
-                    dict_name_value[name]="20"+list_dateElement[2]+"-"+list_dateElement[1]+"-"+list_dateElement[0]
+                dict_name_value[name]="20"+list_dateElement[2]+"-"+list_dateElement[1]+"-"+list_dateElement[0]
             else:
                 # convert from string to float
                 dict_name_value[name]=float(dict_name_value[name])
@@ -123,6 +134,7 @@ def readFile(fileName):
             print "name",name,"list_value",dict_name_list_value[name]
         if name=="Date":            
             dict_name_nparray_value[name]=np.array(dict_name_list_value[name],dtype='datetime64[D]')
+            dict_name_nparray_value[name]=dict_name_nparray_value[name].astype('O')
         else:
             dict_name_nparray_value[name]=np.array(dict_name_list_value[name])
         if debug and name=="Date":
@@ -134,7 +146,7 @@ def readFile(fileName):
             if True:
                 print "name",name,"nparray_value",dict_name_nparray_value[name]
     # ready to return
-    return dict_name_nparray_value
+    return list_name,dict_name_nparray_value
 # done function
 
 def testPlot():
@@ -150,48 +162,83 @@ def testPlot():
     plt.show()
 # done function
 
-def scaleNPArrayToHaveFirstElementAtUnity(nparray):
+def scaleNPArray(nparray,option="0"):
     first=nparray[0]
-    scaled_nparray=nparray*ratio(1.0,first)
+    if option=="0":
+        # do nothing
+        scaled_nparray=nparray
+    elif option=="1":
+        # scale all values relative to the first entry, so that the first entry is one
+        scaled_nparray=nparray*ratio(1.0,first)
+    else:
+        print "In scaleNPArray(), option",option,"not known. Choose 0 or 1. Will ABORT!!!"
+        assert(False)
+    # done if
     if debug:
         print "scaled_nparray",scaled_nparray
     return scaled_nparray
 # done function
 
-def doPlot(dict_name_nparray_value_daily,dict_name_nparray_value_monthly):
-    fig = plt.figure()  # an empty figure with no axes
+def doPlot(dict_name_nparray_value_daily,list_name_daily,dict_name_nparray_value_monthly,list_name_monthly,option):
+    if debug or verbose:
+        print "Start doPlot"
+    # 
+    # Soybean has two big dips. Looking quickly through the values does not spot them. 
+    # So let's use the computer to plot when the change with respect to the previous value is more than 10%, then we will tune the value
+    previous_value=1.0
+    for i,value in enumerate(scaleNPArray(dict_name_nparray_value_daily["Soybean"],option)):
+        if debug:
+            print "value",value
+        if abs(value/previous_value-1)>0.30:
+            print i,"previous_value",previous_value,"current_value",value
+    # with this I found the two values that were 10 times lower, it seems like a typo when introducing the values
+    # this gives
+    # 154 previous_value 1.0 current_value 0.0976628091672
+    # 905 previous_value 1.0 current_value 0.093215339233
+    # then we open the input file with emacs -nw and we go to that line with M-x goto-line: 154
+    # 28/07/14       107.6   428.25          88.52   81.029999       1978.910034
+    # so we modify by hand 107.6 to 1076.0
+    # also 
+    # 20/07/17        102.7   404.75          47.34   94.269997       2473.449951
+    # so we modify 102.7 to 1027.0
+    #
     xAxisName="Date"
-    if doStartFromUnity==True:
-        plt.plot(dict_name_nparray_value_daily[xAxisName],scaleNPArrayToHaveFirstElementAtUnity(dict_name_nparray_value_daily["S&P500"]),label="Test")
-        plt.plot(dict_name_nparray_value_daily[xAxisName],scaleNPArrayToHaveFirstElementAtUnity(dict_name_nparray_value_daily["Soybean"]),label="Test")
-    else:
-        plt.plot(dict_name_nparray_value_daily[xAxisName],dict_name_nparray_value_daily["S&P500"],label="Test")
-        plt.plot(dict_name_nparray_value_daily[xAxisName],dict_name_nparray_value_daily["Soybean"],label="Test")
-    plt.xlabel(xAxisName)
-    plt.ylabel("Value at that particular day")
-    plt.title("Time series of values as a function of day")
-    plt.legend()
-    # plt.show() # shows in GUI, but for script we want to store in file
-    plt.savefig("./output/test.png")
+    for plot in list_plot:
+        list_name=dict_plot_list_name[plot]
+        if debug or verbose:
+            print "list_name",list_name
+        fig=plt.figure()
+        for name in list_name:
+            if name=="Date":
+                continue
+            plt.plot(dict_name_nparray_value_daily[xAxisName],scaleNPArray(dict_name_nparray_value_daily[name],option),label=name)
+        # done loop over name
+        plt.xlabel(xAxisName)
+        plt.ylabel("Value at that particular day")
+        # rotate and align the tick labels so they look better
+        fig.autofmt_xdate()
+        plt.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
+        plt.title("Time series of values as a function of day")
+        plt.legend(loc="lower left")
+        # plt.show() # shows in GUI, but for script we want to store in file
+        plt.savefig("./output/overlay_daily_"+plot+"_"+option+".png")
+        plt.close()
+    # done loop over plot
 # done function
 
-
-def doItOne(option):
-    if debug:
-        print "doItOne() with option",option
-    dict_name_nparray_value_daily=readFile(fileNameDaily)
-    dict_name_nparray_value_monthly=readFile(fileNameMonthly)
-    # testPlot()
-    doPlot(dict_name_nparray_value_daily,dict_name_nparray_value_monthly)
-    None
-# done function
 
 def doItAll():
+    if debug:
+        print "doItOne() with option",option
+    list_name_daily,dict_name_nparray_value_daily=readFile(fileNameDaily)
+    list_name_monthly,dict_name_nparray_value_monthly=readFile(fileNameMonthly)
+    if False:
+        testPlot()
     for option in list_option:
         if debug:
             print "option",option
-        doItOne(option)
-    None  
+        doPlot(dict_name_nparray_value_daily,list_name_daily,dict_name_nparray_value_monthly,list_name_monthly,option)
+    None
 # done function
 
 #################################################################
