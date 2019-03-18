@@ -33,23 +33,24 @@ if total!=1:
 ################### Configurations ##############################
 #################################################################
 
-debug=True
-verbose=True
+debug=False
+verbose=False
 fileName="./input/data.txt"
 # 0 plot their absolute values; 1 scale to first entry to compare relative performance
 # list_option="0,1".split(",") 
 list_option="0".split(",")
 list_plot=[
-    "A",
-    #"B",
+    "Range",
+    "Consumption",
     #"C",
     #"D",
 ]
 dict_plot_list_name={
-    "A":["Range_City"],
-    "B":["Range_City","Range_Highway"],
+    "Range":["Range_City","Range_Combined","Range_Highway"],
+    "Consumption":["Consumption_City","Consumption_Combined","Consumption_Highway"],
 }
 
+list_color=["r","b","g"]
 
 #################################################################
 ################### Functions ###################################
@@ -76,7 +77,8 @@ def readFile(fileName):
         if debug:
             print "line",line
         if line.startswith("#"):
-            print "Skipping line",line
+            if debug or verbose:
+                print "Skipping line",line
             continue
         list_line=line.split()
         if debug:
@@ -185,91 +187,40 @@ def scaleNPArray(nparray,option="0"):
 def doPlot(dict_name_nparray_value,list_name,option):
     if debug or verbose:
         print "Start doPlot"
-    #names = ['anne','barbara','cathy']
-    #counts = [3230,2002,5456]
-    doConsumption=True
-    doRange=False
-    if True:
-        pylab.figure(1)
-        x=range(len(dict_name_nparray_value["Car"]))
-        pylab.xticks(x, dict_name_nparray_value["Car"])
-        if doConsumption:
-            pylab.plot(x,scaleNPArray(dict_name_nparray_value["Consumption_City"],option),"r",label="Consumption_City")
-            pylab.plot(x,scaleNPArray(dict_name_nparray_value["Consumption_Combined"],option),"b",label="Consumption_Combined")
-            pylab.plot(x,scaleNPArray(dict_name_nparray_value["Consumption_Highway"],option),"g",label="Consumption_Highway")
-        if doRange:
-            pylab.plot(x,scaleNPArray(dict_name_nparray_value["Range_City"],option),"r",label="Range_City")
-            pylab.plot(x,scaleNPArray(dict_name_nparray_value["Range_Combined"],option),"b",label="Range_Combined")
-            pylab.plot(x,scaleNPArray(dict_name_nparray_value["Range_Highway"],option),"g",label="Range_Highway")
-        #pylab.plot(x,scaleNPArray(dict_name_nparray_value["Range_Combined"],option),"r",label="Range_Combined")
-        #pylab.plot(x,scaleNPArray(dict_name_nparray_value["Range_Combined"],option),"g",label="Range_Combined")
-        pylab.xlabel("Electric Car brand")
-        if doConsumption:
-            pylab.ylabel("Electrical energy used per 100 miles")
-        if doRange:
-            pylab.ylabel("Range in miles with a full battery charge")
-        pylab.subplots_adjust(bottom=0.45)
-        pylab.xticks(rotation=90)
-        if doConsumption:
-            pylab.legend(loc="upper right")
-            pylab.axis([0, len(dict_name_nparray_value["Car"])-1, 20, 50])
-            pylab.savefig("Consumption.png")
-        if doRange:
-            pylab.legend(loc="upper right")
-            pylab.axis([0, len(dict_name_nparray_value["Car"])-1, 0, 300])
-            pylab.savefig("Range.png")
-        pylab.close()
-        return
-    #for tick in pylab.get_xticklabels():
-    #    tick.set_rotation(45)
-    #x = range(len(time))
-    #plt.xticks(x,  time)
-    #locs, labels = plt.xticks()
-    #plt.setp(labels, rotation=90)
-    #plt.plot(x, delay)
-
     xAxisName=list_name[0]
-    print "xAxisName",xAxisName
-    x=range(len(dict_name_nparray_value["Car"]))
-    #plt.plot(dict_name_nparray_value["Car"],scaleNPArray(dict_name_nparray_value["Range_Combined"],option),label="Range_Combined")
-    #plt.savefig("test.png")
-    #plt.close()
-    #return
+    if debug:
+        print "xAxisName",xAxisName
+    x=range(len(dict_name_nparray_value[xAxisName]))
+    if debug:
+        print "x",x
+        print "list_plot",list_plot
     for plot in list_plot:
         plot_list_name=dict_plot_list_name[plot]
         if debug or verbose:
             print "plot",plot,"plot_list_name",plot_list_name
-        #fig=plt.figure()
         pylab.figure(1)
-        for i,name in enumerate(plot_list_name):
-            print "i",i,"name",name
-            if i==0:
-                # the product we want to put on the horisontal axis
-                continue
-            else:
-                print "i",i,"name",name
-                # the values for the different products
-                pylab.xticks(x, dict_name_nparray_value[xAxisName])
-                pylab.plot(x,scaleNPArray(dict_name_nparray_value["Consumption_Combined"],option),"g",label="bla")
-                # pylab.plot(dict_name_nparray_value[xAxisName],scaleNPArray(dict_name_nparray_value[name],option),label=name)
-                #plt.plot(dict_name_nparray_value[xAxisName],scaleNPArray(dict_name_nparray_value[name],option),label=name)
-                # plt.plot(scaleNPArray(dict_name_nparray_value[name],option),scaleNPArray(dict_name_nparray_value[name],option),label=name)
-                #plt.plot(scaleNPArray(list_name,scaleNPArray(dict_name_nparray_value[name],option),label=name)
-        # done loop over name
+        pylab.xticks(x, dict_name_nparray_value[xAxisName])
+        pylab.xlabel("Electric Car brand")
         pylab.subplots_adjust(bottom=0.45)
         pylab.xticks(rotation=90)
-        #plt.xlabel(xAxisName)
-        #plt.ylabel("Value at that particular day")
-        # rotate and align the tick labels so they look better
-        #fig.autofmt_xdate()
-        #plt.title("Time series of values as a function of day")
-        if plot=="D":
-            plt.legend(loc="upper right")
-        else:
-            plt.legend(loc="lower left")
-        # plt.show() # shows in GUI, but for script we want to store in file
-        plt.savefig("./output/overlay_"+plot+"_"+option+".png",bbox_inches='tight')
-        plt.close()
+        if debug:
+            print "plot_list_name",plot_list_name
+        for i,name in enumerate(plot_list_name):
+            if debug:
+                print "i",i,"name",name
+            pylab.plot(x,scaleNPArray(dict_name_nparray_value[name],option),list_color[i],label=name)
+        # done loop over name
+        if "Consumption" in name:
+            pylab.ylabel("Electrical energy used per 100 miles")
+            pylab.legend(loc="upper right")
+            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 20, 50])
+        if "Range" in name:
+            pylab.ylabel("Range in miles with a full battery charge")
+            pylab.legend(loc="upper right")
+            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 300])
+        # done if
+        pylab.savefig("./output/"+plot+".png")
+        pylab.close()
     # done loop over plot
 # done function
 
