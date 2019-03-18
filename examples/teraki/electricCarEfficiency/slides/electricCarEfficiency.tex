@@ -1,0 +1,125 @@
+\documentclass{beamer}
+%\usepackage[latin1]{inputenc}
+\usepackage{epstopdf}
+\usepackage{tabularx}
+\usepackage{adjustbox}
+\usepackage{pdflscape}
+%\usepackage{url}
+%\usepackage{\usepackage{catchfile}
+\usepackage{/Users/abuzatu/Work/ATLAS/Analyses/BuzatuAll/BuzatuATLAS/LaTex/atlasphysics}
+%\usepackage{/afs/cern.ch/user/a/abuzatu/work/public/BuzatuAll/BuzatuATLAS/LaTex/atlasphysics}
+%\usepackage{./ATLAS_style/atlasphysics}
+\usepackage[]{hyperref}
+\definecolor{links}{HTML}{0B610B} % dark green
+%\definecolor{links}{HTML}{2A1B81} % dark blue
+\hypersetup{colorlinks,linkcolor=,urlcolor=links}
+\usepackage{adjustbox}
+\usepackage{pdflscape}
+% tables
+\usepackage{multirow}
+% multiple columns in page
+\usepackage{multicol}
+\usepackage{subfig}
+\usepackage{graphicx}
+%\usepackage{subcaption}
+%\input{rgb}
+%\usetheme{Warsaw}
+\usetheme{Madrid}
+\title[AD impact on electric car efficiency]{Impact of Autonomous Driving on Electric Car Efficiency}
+%\subtitle[P\&P Week]{Presentation at the ATLAS P\&P Week}
+
+%\author[Adrian Buzatu (Academia Sinica) ]{Adrian Buzatu, on behalf of the $VH(bb)$ analysis team} 
+\author[Adrian Buzatu (TERAKI) ]{Adrian Buzatu (TERAKI)} 
+%\author[Adrian Buzatu (Academia Sinica) ]{\underline{Adrian Buzatu}, Wei Wang, Song-Ming Wang (Academia Sinica)} 
+ %\vskip 0.7cm
+%\author[Adrian Buzatu (Academia Sinica)]{\small \underline{Adrian Buzatu} (Academia Sinica), Yara do Amaral Coutinho (Rio de Janeiro)}
+%\author[Adrian Buzatu (Academia Sinica)]{\small Adrian Buzatu (Academia Sinica), \underline{Yara do Amaral Coutinho} (Rio de Janeiro)}
+%\author[Adrian Buzatu (Academia Sinica)]{Jon Hays (QMUL, London, UK), \\ Steve Sekula (Southern Methodist University, Dallas, USA), \small \underline{Adrian Buzatu} (Academia Sinica, Taipei, Taiwan) \\ \ \\ CxAOD collaborative tools: \href{https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/CxAODFramework}{Twiki} \href{https://e-groups.cern.ch/e-groups/EgroupsSearch.do?searchScope=1&searchMethod=1&searchValue=atlas-phys-higgs-hsg5framework}{Mailing-list}  \href{https://its.cern.ch/jira/projects/CXAOD/issues/}{JIRA} \href{https://gitlab.cern.ch/CxAODFramework/}{GitLab} \href{https://mattermost.web.cern.ch/signup_user_complete/?id=1krhp8so1iyb3bcwrzdnouxqnh}{Mattermost}}
+
+%\titlegraphic{\includegraphics[width=4cm]{/Users/abuzatu/Work/ATLAS/Analyses/BuzatuAll/BuzatuATLAS/LaTex/Logo/AcademiaSinica_Logo.png}}
+%\titlegraphic{\includegraphics[width=4cm]{/afs/cern.ch/user/a/abuzatu/work/public/BuzatuAll/BuzatuATLAS/LaTex/Logo/AcademiaSinica_Logo.png}}
+
+%\titlegraphic{\includegraphics[width=4cm]{/Users/abuzatu/Work/ATLAS/Analyses/BuzatuAll/BuzatuATLAS/LaTex/Logo/AcademiaSinica_Logo.png}\hspace*{1.75cm}~%
+%   \includegraphics[width=1.2cm]{./Logo/UFRJ_Logo.jpeg}
+%}
+
+\titlegraphic{
+%\includegraphics[height=1.1cm]{/Users/abuzatu/Work/ATLAS/Analyses/BuzatuAll/BuzatuATLAS/LaTex/Logo/QMUL_Logo.jpg}\hspace*{1.05cm}~%
+%\includegraphics[height=1.1cm]{/Users/abuzatu/Work/ATLAS/Analyses/BuzatuAll/BuzatuATLAS/LaTex/Logo/SMU_Logo.jpg}\hspace*{1.05cm}~%
+%\includegraphics[height=1.1cm]{/Users/abuzatu/Work/ATLAS/Analyses/BuzatuAll/BuzatuATLAS/LaTex/Logo/AcademiaSinica_Logo.png}
+\includegraphics[height=2.1cm]{./TerakiLogo.jpg}			
+}
+
+\date{18 March 2019}
+
+%remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+\begin{document}
+
+%\renewcommand{\inserttotalframenumber}{20} % do not count backup slides, but tell it by hand at what slide to stop counting
+
+\frame{\titlepage} 
+\def \AdrianSize {0.45}
+\def \AdrianSizeOne {0.95}
+
+
+%\end{document}
+
+\begin{frame}{AD model}
+\begin{enumerate}
+\item[o] Assume the following typical velocities and power for computing for autonomous driving (AD).
+\item[o] City: 31 mph, 2500 W
+\item[o] Highway: 56 mph, 1500 W
+\item[o] Combined: 43 mph, 2000 W
+\item[o] Mileage and consumption in these three environements for important brands from \href{https://pushevs.com/electric-car-range-efficiency-epa/}{here}, re-organised for this study \href{https://gitlab.cern.ch/abuzatu/BuzatuPython/blob/master/examples/teraki/electricCarEfficiency/input/data.txt}{here}.
+\item[o] From these other quantities are derived, with code \href{https://gitlab.cern.ch/abuzatu/BuzatuPython/blob/master/examples/teraki/electricCarEfficiency/electricCarEfficiency.py}{here}.
+\item[o] The idea is that the AD computations need power, which will reduce the range and duration of the driving electric cars.
+\item[o] These slides are a preliminary look with a simple model of what can be the impact in city and high ways.
+\item[o] About 30\% of reduction is seen in cities. 
+\item[o] Teraki can reduce this by making the calculations and data transmision via wifi much more effective.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Range and Duration without (left) and with (right) AD}
+\centering
+\includegraphics[width=\AdrianSize\textwidth]{../output/RangeNoAD.png}
+\includegraphics[width=\AdrianSize\textwidth]{../output/RangeWithAD.png}\\
+\includegraphics[width=\AdrianSize\textwidth]{../output/DurationNoAD.png}
+\includegraphics[width=\AdrianSize\textwidth]{../output/DurationWithAD.png}\\
+\end{frame}
+
+\begin{frame}{Consumption without AD}
+\centering
+\includegraphics[width=\AdrianSizeOne\textwidth]{../output/ConsumptionNoAD.png}
+\end{frame}
+
+\begin{frame}{Range and Duration without (left) and with (right) AD}
+\centering
+\includegraphics[width=\AdrianSize\textwidth]{../output/EnergyBatteryCharged.png}
+\includegraphics[width=\AdrianSize\textwidth]{../output/EnergyAD.png}\\
+\includegraphics[width=\AdrianSize\textwidth]{../output/FractionADToBatteryCharged.png}
+\includegraphics[width=\AdrianSize\textwidth]{../output/FractionBatteryDriveWithAD.png}\\
+\end{frame}
+
+\end{document}
+
+\begin{frame}{}
+\begin{enumerate}
+\item[o] 
+\item[o] 
+\item[o] 
+\item[o] 
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{}
+\begin{enumerate}
+\item[o] 
+\item[o] 
+\item[o] 
+\item[o] 
+\end{enumerate}
+\end{frame}
+
+\end{document}

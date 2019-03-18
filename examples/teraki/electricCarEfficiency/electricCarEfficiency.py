@@ -276,11 +276,11 @@ def doPlot(dict_name_nparray_value,list_name,option):
             pylab.legend(loc="upper right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 30])
         elif "FractionADToBatteryCharged" in name:
-            pylab.ylabel("Ratio of AD to full battery")
+            pylab.ylabel("Ratio of AD energy to full battery")
             pylab.legend(loc="upper right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0.00, 0.60])
         elif "FractionBatteryDriveWithAD" in name:
-            pylab.ylabel("Fraction of battery availabe to drive when AI is on")
+            pylab.ylabel("Fraction of battery for drive when AD is on")
             pylab.legend(loc="lower right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0.30, 1.00])
         else:
