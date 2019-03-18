@@ -68,14 +68,6 @@ list_plot=[
     "EnergyComputing",
     "ComputingFraction",
 ]
-dict_plot_list_name={
-    "Range":["Range_City","Range_Combined","Range_Highway"],
-    "Consumption":["Consumption_City","Consumption_Combined","Consumption_Highway"],
-    "EnergyBattery":["EnergyBattery_City","EnergyBattery_Combined","EnergyBattery_Highway"],
-    "Duration":["Duration_City","Duration_Combined","Duration_Highway"],
-    "EnergyComputing":["EnergyComputing_City","EnergyComputing_Combined","EnergyComputing_Highway"],
-    "ComputingFraction":["ComputingFraction_City","ComputingFraction_Combined","ComputingFraction_Highway"],
-}
 
 list_color=["r","b","g"]
 
@@ -234,9 +226,8 @@ def doPlot(dict_name_nparray_value,list_name,option):
         print "x",x
         print "list_plot",list_plot
     for plot in list_plot:
-        plot_list_name=dict_plot_list_name[plot]
         if debug or verbose:
-            print "plot",plot,"plot_list_name",plot_list_name
+            print "plot",plot
         pylab.figure(1)
         pylab.xticks(x, dict_name_nparray_value[xAxisName])
         pylab.xlabel("Electric Car brand")
@@ -244,10 +235,11 @@ def doPlot(dict_name_nparray_value,list_name,option):
         pylab.xticks(rotation=90)
         if debug:
             print "plot_list_name",plot_list_name
-        for i,name in enumerate(plot_list_name):
+        for i,environment in enumerate(list_environment):
+            name=plot+"_"+environment
             if debug:
-                print "i",i,"name",name
-            pylab.plot(x,scaleNPArray(dict_name_nparray_value[name],option),list_color[i],label=name)
+                print "i",i,"environment",environment,"name",name
+            pylab.plot(x,scaleNPArray(dict_name_nparray_value[name],option),list_color[i],label=environment)
         # done loop over name
         if "Consumption" in name:
             pylab.ylabel("Electrical energy / 100 miles no AD [kWh]")
