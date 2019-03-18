@@ -36,18 +36,34 @@ if total!=1:
 debug=False
 verbose=False
 fileName="./input/data.txt"
+
+# these physics parameters can change, we may want to overlay several plots with several of these parameters
+PowerComputing=1500.0 # in W (Watt)
+Velocity=56.0 # in miles per hour (90 km/h)
+
 # 0 plot their absolute values; 1 scale to first entry to compare relative performance
 # list_option="0,1".split(",") 
 list_option="0".split(",")
+list_environment=[
+    "City",
+    "Highway",
+    "Combined",
+]
 list_plot=[
     "Range",
     "Consumption",
-    #"C",
-    #"D",
+    "EnergyBattery",
+    "Duration",
+    "EnergyComputing",
+    "ComputingFraction",
 ]
 dict_plot_list_name={
     "Range":["Range_City","Range_Combined","Range_Highway"],
     "Consumption":["Consumption_City","Consumption_Combined","Consumption_Highway"],
+    "EnergyBattery":["EnergyBattery_City","EnergyBattery_Combined","EnergyBattery_Highway"],
+    "Duration":["Duration_City","Duration_Combined","Duration_Highway"],
+    "EnergyComputing":["EnergyComputing_City","EnergyComputing_Combined","EnergyComputing_Highway"],
+    "ComputingFraction":["ComputingFraction_City","ComputingFraction_Combined","ComputingFraction_Highway"],
 }
 
 list_color=["r","b","g"]
@@ -154,6 +170,16 @@ def readFile(fileName):
     return list_name,dict_name_nparray_value
 # done function
 
+def extend_dict_name_nparray_value(dict_name_nparray_value):
+    for environment in list_environment:
+        dict_name_nparray_value["EnergyBattery_"+environment]=dict_name_nparray_value["Range_"+environment]*dict_name_nparray_value["Consumption_"+environment]*ratio(1,100.0)
+        dict_name_nparray_value["Duration_"+environment]=dict_name_nparray_value["Range_"+environment]*ratio(1.0,Velocity)
+        dict_name_nparray_value["EnergyComputing_"+environment]=dict_name_nparray_value["Duration_"+environment]*ratio(PowerComputing,1000.0)
+        dict_name_nparray_value["ComputingFraction_"+environment]=dict_name_nparray_value["EnergyComputing_"+environment]/dict_name_nparray_value["EnergyBattery_"+environment]
+
+    return dict_name_nparray_value
+# done function
+
 def testPlot():
     fig = plt.figure()  # an empty figure with no axes
     x = np.linspace(0, 2, 100)
@@ -211,13 +237,32 @@ def doPlot(dict_name_nparray_value,list_name,option):
             pylab.plot(x,scaleNPArray(dict_name_nparray_value[name],option),list_color[i],label=name)
         # done loop over name
         if "Consumption" in name:
-            pylab.ylabel("Electrical energy used per 100 miles")
+            pylab.ylabel("Electrical energy used per 100 miles [kWh]")
             pylab.legend(loc="upper right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 20, 50])
-        if "Range" in name:
-            pylab.ylabel("Range in miles with a full battery charge")
+        elif "Range" in name:
+            pylab.ylabel("Range with a full battery charge [mile]")
             pylab.legend(loc="upper right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 300])
+        elif "EnergyBattery" in name:
+            pylab.ylabel("Energy of the charged battery [kWh]")
+            pylab.legend(loc="upper right")
+            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 100])
+        elif "Duration" in name:
+            pylab.ylabel("Duration with full battery at "+str(Velocity)+" mph")
+            pylab.legend(loc="upper right")
+            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 5])
+        elif "EnergyComputing" in name:
+            pylab.ylabel("Energy AD at "+str(Velocity)+" mph + "+str(PowerComputing)+" W [kWh]")
+            pylab.legend(loc="upper right")
+            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 10])
+        elif "ComputingFraction" in name:
+            pylab.ylabel("Ratio AD at "+str(Velocity)+" mph + "+str(PowerComputing)+" W [kWh]")
+            pylab.legend(loc="upper right")
+            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0.05, 0.20])
+        else:
+            print "name", name,"does not find any of the options Consumption, Range, BatteryEnergy, Duration, BatteryComputing, so will ABORT!!!"
+            assert(False)
         # done if
         pylab.savefig("./output/"+plot+".png")
         pylab.close()
@@ -229,6 +274,7 @@ def doItAll():
     if debug:
         print "doItAll()"
     list_name,dict_name_nparray_value=readFile(fileName)
+    dict_name_nparray_value=extend_dict_name_nparray_value(dict_name_nparray_value)
     #if False:
     #    testPlot()
     for option in list_option:
