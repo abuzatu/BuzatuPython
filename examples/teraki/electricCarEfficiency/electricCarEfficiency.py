@@ -61,12 +61,15 @@ dict_environment_PowerComputing={
 } 
 
 list_plot=[
-    "Range",
-    "Consumption",
-    "EnergyBattery",
-    "Duration",
-    "EnergyComputing",
-    "ComputingFraction",
+    "RangeNoAD",
+    "ConsumptionNoAD",
+    "EnergyBatteryCharged",
+    "DurationNoAD",
+    "EnergyAD",
+    "FractionADToBatteryCharged",
+    "FractionBatteryDriveWithAD",
+    "RangeWithAD",
+    "DurationWithAD",
 ]
 
 list_color=["r","b","g"]
@@ -177,10 +180,13 @@ def extend_dict_name_nparray_value(dict_name_nparray_value):
     for environment in list_environment:
         Velocity=dict_environment_Velocity[environment]
         PowerComputing=dict_environment_PowerComputing[environment]
-        dict_name_nparray_value["EnergyBattery_"+environment]=dict_name_nparray_value["Range_"+environment]*dict_name_nparray_value["Consumption_"+environment]*ratio(1,100.0)
-        dict_name_nparray_value["Duration_"+environment]=dict_name_nparray_value["Range_"+environment]*ratio(1.0,Velocity)
-        dict_name_nparray_value["EnergyComputing_"+environment]=dict_name_nparray_value["Duration_"+environment]*ratio(PowerComputing,1000.0)
-        dict_name_nparray_value["ComputingFraction_"+environment]=dict_name_nparray_value["EnergyComputing_"+environment]/dict_name_nparray_value["EnergyBattery_"+environment]
+        dict_name_nparray_value["EnergyBatteryCharged_"+environment]=dict_name_nparray_value["RangeNoAD_"+environment]*dict_name_nparray_value["ConsumptionNoAD_"+environment]*ratio(1,100.0)
+        dict_name_nparray_value["DurationNoAD_"+environment]=dict_name_nparray_value["RangeNoAD_"+environment]*ratio(1.0,Velocity)
+        dict_name_nparray_value["EnergyAD_"+environment]=dict_name_nparray_value["DurationNoAD_"+environment]*ratio(PowerComputing,1000.0)
+        dict_name_nparray_value["FractionADToBatteryCharged_"+environment]=dict_name_nparray_value["EnergyAD_"+environment]/dict_name_nparray_value["EnergyBatteryCharged_"+environment]
+        dict_name_nparray_value["FractionBatteryDriveWithAD_"+environment]=(dict_name_nparray_value["EnergyBatteryCharged_"+environment]-dict_name_nparray_value["EnergyAD_"+environment])/dict_name_nparray_value["EnergyBatteryCharged_"+environment]
+        dict_name_nparray_value["RangeWithAD_"+environment]=dict_name_nparray_value["RangeNoAD_"+environment]*dict_name_nparray_value["FractionBatteryDriveWithAD_"+environment]
+        dict_name_nparray_value["DurationWithAD_"+environment]=dict_name_nparray_value["DurationNoAD_"+environment]*dict_name_nparray_value["FractionBatteryDriveWithAD_"+environment]
 
     return dict_name_nparray_value
 # done function
@@ -241,30 +247,42 @@ def doPlot(dict_name_nparray_value,list_name,option):
                 print "i",i,"environment",environment,"name",name
             pylab.plot(x,scaleNPArray(dict_name_nparray_value[name],option),list_color[i],label=environment)
         # done loop over name
-        if "Consumption" in name:
+        if "ConsumptionNoAD" in name:
             pylab.ylabel("Electrical energy / 100 miles no AD [kWh]")
             pylab.legend(loc="upper right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 20, 50])
-        elif "Range" in name:
-            pylab.ylabel("Range with a full battery charge no AD [mile]")
+        elif "RangeNoAD" in name:
+            pylab.ylabel("Range no AD with a full battery charge [mile]")
             pylab.legend(loc="upper right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 300])
-        elif "EnergyBattery" in name:
+        elif "RangeWithAD" in name:
+            pylab.ylabel("Range with AD with a full battery charge [mile]")
+            pylab.legend(loc="upper right")
+            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 300])
+        elif "EnergyBatteryCharged" in name:
             pylab.ylabel("Energy of the charged battery [kWh]")
             pylab.legend(loc="upper right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 100])
-        elif "Duration" in name:
-            pylab.ylabel("Duration full battery at typical v no AD [h]")
+        elif "DurationNoAD" in name:
+            pylab.ylabel("Duration no AD full battery at typical v [h]")
             pylab.legend(loc="upper right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 10])
-        elif "EnergyComputing" in name:
-            pylab.ylabel("Energy AD at typical v and P [kWh]")
+        elif "DurationWithAD" in name:
+            pylab.ylabel("Duration with AD full battery at typical v [h]")
+            pylab.legend(loc="upper right")
+            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 10])
+        elif "EnergyAD" in name:
+            pylab.ylabel("Energy of AD at typical v and P [kWh]")
             pylab.legend(loc="upper right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 30])
-        elif "ComputingFraction" in name:
-            pylab.ylabel("Ratio of AD to full battery at typical v and P [kWh]")
+        elif "FractionADToBatteryCharged" in name:
+            pylab.ylabel("Ratio of AD to full battery")
             pylab.legend(loc="upper right")
             pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0.00, 0.60])
+        elif "FractionBatteryDriveWithAD" in name:
+            pylab.ylabel("Fraction of battery availabe to drive when AI is on")
+            pylab.legend(loc="lower right")
+            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0.30, 1.00])
         else:
             print "name", name,"does not find any of the options Consumption, Range, BatteryEnergy, Duration, BatteryComputing, ComputingFraction, so will ABORT!!!"
             assert(False)
