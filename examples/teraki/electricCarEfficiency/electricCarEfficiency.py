@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # electric car efficiency study of battery vs milleage by Adrian Buzatu (Adrian.Buzatu@teraki.ch) 
-# started on 19 March 2019
+# started on 18 March 2019
 # not using directly pandas, but starting with simple Python to read data files
 # but using numpy and matplotlib
 # later pandas, DataFrame and Jupyter notebook
@@ -60,26 +60,40 @@ dict_environment_PowerComputing={
     "Combined":2000.0,
 } 
 
+# overlay based on AD off or on
 list_plot=[
-    #"RangeNoAD",
-    #"ConsumptionNoAD",
-    #"EnergyBatteryCharged",
-    #"DurationNoAD",
-    #"EnergyAD",
-    #"FractionADToBatteryCharged",
-    #"FractionBatteryDriveWithAD",
-    "RangeWithAD",
-    #"DurationWithAD",
-]
-
-list_plot2=[
     "Range",
     "Duration",
 ]
 
-dict_plot2_list_var={
+dict_plot_info={
     "Range":[["RangeNoAD","RangeWithAD"],["Range on a full charge [mile]",[0,300]]],
     "Duration":[["DurationNoAD","DurationWithAD"],["Duration on a full charge [hour]",[0,10]]],
+}
+
+# overlay based on environment
+list_plot2=[
+    "RangeNoAD",
+    "ConsumptionNoAD",
+    "EnergyBatteryCharged",
+    "DurationNoAD",
+    "EnergyAD",
+    "FractionADToBatteryCharged",
+    "FractionBatteryDriveWithAD",
+    "RangeWithAD",
+    "DurationWithAD",
+]
+
+dict_plot2_info={
+    "RangeWithAD":[[],["Range with AD on a full charge [mile]",[0,300]],["upper right"]],
+    "RangeNoAD":[[],["Range no AD with a full battery charge [mile]",[0,300]],["upper right"]],
+    "ConsumptionNoAD":[[],["Electrical energy / 100 miles no AD [kWh]",[20,50]],["upper right"]],
+    "EnergyBatteryCharged":[[],["Energy of the charged battery [kWh]",[0,100]],["upper right"]],
+    "DurationNoAD":[[],["Duration no AD full battery at typical v [h",[0,10]],["upper right"]],
+    "DurationWithAD":[[],["Duration with AD full battery at typical v [h]",[0,10]],["upper right"]],
+    "EnergyAD":[[],["Energy of AD at typical v and P [kWh]",[0,30]],["upper right"]],
+    "FractionADToBatteryCharged":[[],["Ratio of AD energy to full battery",[0,0.60]],["upper right"]],
+    "FractionBatteryDriveWithAD":[[],["Fraction of battery for drive when AD is on",[0.30,1.00]],["lower right"]],
 }
 
 list_color=["b","r","g"]
@@ -267,93 +281,32 @@ def doPlot(dict_name_nparray_value,list_name,option):
         print "xAxisName",xAxisName
     nparray_value_x=dict_name_nparray_value[xAxisName]
     if debug:
-        print "X axis:"
+        print "x-axis:"
         print nparray_value_x
     # y axis will vary from plots to plots
+    # plot - overlay witout and with AD, for each environment and variable of interest
     for environment in list_environment:
-        for plot2 in list_plot2:
-            info=dict_plot2_list_var[plot2]
+        for plot in list_plot:
+            info=dict_plot_info[plot]
             list_var=info[0]
             info_y=info[1]
             list_tuple_y=[]
             for var in list_var:
                 list_tuple_y.append([dict_name_nparray_value[var+"_"+environment],var+"_"+environment])
-            fileName="./output/overlay_"+plot2+"_"+environment
+            fileName="./output/overlay_AD_"+plot+"_"+environment
             overlayGraphs(nparray_value_x,list_tuple_y,fileName=fileName,extensions="png",info_x=["Electric Car brand",0.45,90],info_y=info_y,info_legend=["upper right"])
+    # plotEnvironment - overlay the three enviroments for each variable of interest
+    for plot2 in list_plot2:
+        var=plot2
+        info=dict_plot2_info[plot2]
+        info_y=info[1]
+        info_legend=info[2]
+        list_tuple_y=[]
+        for environment in list_environment:
+            list_tuple_y.append([dict_name_nparray_value[var+"_"+environment],environment])
+        fileName="./output/overlay_environment_"+plot2
+        overlayGraphs(nparray_value_x,list_tuple_y,fileName=fileName,extensions="png",info_x=["Electric Car brand",0.45,90],info_y=info_y,info_legend=info_legend)
 # done function
-
-def doPlotOld(dict_name_nparray_value,list_name,option):
-    if debug or verbose:
-        print "Start doPlot"
-    xAxisName=list_name[0]
-    if debug:
-        print "xAxisName",xAxisName
-    x=range(len(dict_name_nparray_value[xAxisName]))
-    if debug:
-        print "x",x
-        print "list_plot",list_plot
-    for plot in list_plot:
-        if debug or verbose:
-            print "plot",plot
-        pylab.figure(1)
-        pylab.xticks(x, dict_name_nparray_value[xAxisName])
-        pylab.xlabel("Electric Car brand")
-        pylab.subplots_adjust(bottom=0.45)
-        pylab.xticks(rotation=90)
-        if debug:
-            print "plot_list_name",plot_list_name
-        for i,environment in enumerate(list_environment):
-            name=plot+"_"+environment
-            if debug:
-                print "i",i,"environment",environment,"name",name
-            pylab.plot(x,scaleNPArray(dict_name_nparray_value[name],option),list_color[i],label=environment)
-        # done loop over name
-        if "ConsumptionNoAD" in name:
-            pylab.ylabel("Electrical energy / 100 miles no AD [kWh]")
-            pylab.legend(loc="upper right")
-            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 20, 50])
-        elif "RangeNoAD" in name:
-            pylab.ylabel("Range no AD with a full battery charge [mile]")
-            pylab.legend(loc="upper right")
-            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 300])
-        elif "RangeWithAD" in name:
-            pylab.ylabel("Range with AD with a full battery charge [mile]")
-            pylab.legend(loc="upper right")
-            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 300])
-        elif "EnergyBatteryCharged" in name:
-            pylab.ylabel("Energy of the charged battery [kWh]")
-            pylab.legend(loc="upper right")
-            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 100])
-        elif "DurationNoAD" in name:
-            pylab.ylabel("Duration no AD full battery at typical v [h]")
-            pylab.legend(loc="upper right")
-            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 10])
-        elif "DurationWithAD" in name:
-            pylab.ylabel("Duration with AD full battery at typical v [h]")
-            pylab.legend(loc="upper right")
-            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 10])
-        elif "EnergyAD" in name:
-            pylab.ylabel("Energy of AD at typical v and P [kWh]")
-            pylab.legend(loc="upper right")
-            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0, 30])
-        elif "FractionADToBatteryCharged" in name:
-            pylab.ylabel("Ratio of AD energy to full battery")
-            pylab.legend(loc="upper right")
-            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0.00, 0.60])
-        elif "FractionBatteryDriveWithAD" in name:
-            pylab.ylabel("Fraction of battery for drive when AD is on")
-            pylab.legend(loc="lower right")
-            pylab.axis([0, len(dict_name_nparray_value[xAxisName])-1, 0.30, 1.00])
-        else:
-            print "name", name,"does not find any of the options Consumption, Range, BatteryEnergy, Duration, BatteryComputing, ComputingFraction, so will ABORT!!!"
-            assert(False)
-        # done if
-        pylab.savefig("./output/"+plot+".png")
-        pylab.savefig("./output/"+plot+".pdf")
-        pylab.close()
-    # done loop over plot
-# done function
-
 
 def doItAll():
     if debug:
