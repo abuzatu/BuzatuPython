@@ -61,18 +61,28 @@ dict_environment_PowerComputing={
 } 
 
 list_plot=[
-    "RangeNoAD",
-    "ConsumptionNoAD",
-    "EnergyBatteryCharged",
-    "DurationNoAD",
-    "EnergyAD",
-    "FractionADToBatteryCharged",
-    "FractionBatteryDriveWithAD",
+    #"RangeNoAD",
+    #"ConsumptionNoAD",
+    #"EnergyBatteryCharged",
+    #"DurationNoAD",
+    #"EnergyAD",
+    #"FractionADToBatteryCharged",
+    #"FractionBatteryDriveWithAD",
     "RangeWithAD",
-    "DurationWithAD",
+    #"DurationWithAD",
 ]
 
-list_color=["r","b","g"]
+list_plot2=[
+    "Range",
+    "Duration",
+]
+
+dict_plot2_list_var={
+    "Range":[["RangeNoAD","RangeWithAD"],["Range on a full charge [mile]",[0,300]]],
+    "Duration":[["DurationNoAD","DurationWithAD"],["Duration on a full charge [hour]",[0,10]]],
+}
+
+list_color=["b","r","g"]
 
 #################################################################
 ################### Functions ###################################
@@ -187,7 +197,6 @@ def extend_dict_name_nparray_value(dict_name_nparray_value):
         dict_name_nparray_value["FractionBatteryDriveWithAD_"+environment]=(dict_name_nparray_value["EnergyBatteryCharged_"+environment]-dict_name_nparray_value["EnergyAD_"+environment])/dict_name_nparray_value["EnergyBatteryCharged_"+environment]
         dict_name_nparray_value["RangeWithAD_"+environment]=dict_name_nparray_value["RangeNoAD_"+environment]*dict_name_nparray_value["FractionBatteryDriveWithAD_"+environment]
         dict_name_nparray_value["DurationWithAD_"+environment]=dict_name_nparray_value["DurationNoAD_"+environment]*dict_name_nparray_value["FractionBatteryDriveWithAD_"+environment]
-
     return dict_name_nparray_value
 # done function
 
@@ -221,7 +230,59 @@ def scaleNPArray(nparray,option="0"):
     return scaled_nparray
 # done function
 
+def overlayGraphs(nparray_value_x,list_tuple_y,fileName="overlay",extensions="pdf,png",info_x=["Electric Car brand",0.45,90],info_y=["Range on a full charge [mile]",[0,300]],info_legend=["upper right"]):
+    if debug:
+        print "Start overlayGraphs"
+    N=len(nparray_value_x)
+    x=range(N)
+    # create empty figure
+    pylab.figure(1)
+    # draw the x axis and its labels
+    pylab.xticks(x,nparray_value_x)
+    pylab.xlabel(info_x[0])
+    pylab.subplots_adjust(bottom=info_x[1])
+    pylab.xticks(rotation=info_x[2])
+    # draw values on the y axis
+    for i,tuple_y in enumerate(list_tuple_y):
+        pylab.plot(x,tuple_y[0],list_color[i],label=tuple_y[1])
+    # draw the Y axis label
+    pylab.ylabel(info_y[0])
+    # set the range for the Y axis
+    pylab.axis([0,N-1,info_y[1][0],info_y[1][1]])
+    # set position of the legend
+    pylab.legend(loc=info_legend[0])
+    # for each extension create a plot
+    for extension in extensions.split(","):
+        pylab.savefig(fileName+"."+extension)
+    # close the figure
+    pylab.close()
+# done function
+
 def doPlot(dict_name_nparray_value,list_name,option):
+    if debug or verbose:
+        print "Start doPlot"
+    # x axis will be the same for all types of plots
+    xAxisName=list_name[0]
+    if debug:
+        print "xAxisName",xAxisName
+    nparray_value_x=dict_name_nparray_value[xAxisName]
+    if debug:
+        print "X axis:"
+        print nparray_value_x
+    # y axis will vary from plots to plots
+    for environment in list_environment:
+        for plot2 in list_plot2:
+            info=dict_plot2_list_var[plot2]
+            list_var=info[0]
+            info_y=info[1]
+            list_tuple_y=[]
+            for var in list_var:
+                list_tuple_y.append([dict_name_nparray_value[var+"_"+environment],var+"_"+environment])
+            fileName="./output/overlay_"+plot2+"_"+environment
+            overlayGraphs(nparray_value_x,list_tuple_y,fileName=fileName,extensions="png",info_x=["Electric Car brand",0.45,90],info_y=info_y,info_legend=["upper right"])
+# done function
+
+def doPlotOld(dict_name_nparray_value,list_name,option):
     if debug or verbose:
         print "Start doPlot"
     xAxisName=list_name[0]
