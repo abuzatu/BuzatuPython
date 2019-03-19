@@ -288,6 +288,7 @@ def doPlot(dict_name_nparray_value,list_name,option):
             assert(False)
         # done if
         pylab.savefig("./output/"+plot+".png")
+        pylab.savefig("./output/"+plot+".pdf")
         pylab.close()
     # done loop over plot
 # done function
