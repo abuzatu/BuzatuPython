@@ -16,6 +16,9 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pylab
 import numpy as np
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.gridspec as gridspec
 
 #################################################################
 ################### Command line arguemnts ######################
@@ -39,7 +42,7 @@ fileName="./input/data.txt"
 
 # 0 plot their absolute values; 1 scale to first entry to compare relative performance
 # list_option="0,1".split(",") 
-list_option="0".split(",")
+list_option="".split(",")
 list_environment=[
     "City",
     "Highway",
@@ -83,6 +86,7 @@ list_plot2=[
     "RangeWithAD",
     "DurationWithAD",
 ]
+#list_plot2=[]
 
 dict_plot2_info={
     "RangeWithAD":[[],["Range with AD on a full charge [mile]",[0,300]],["upper right"]],
@@ -200,6 +204,23 @@ def readFile(fileName):
     return list_name,dict_name_nparray_value
 # done function
 
+def scaleNPArray(nparray,option="0"):
+    first=nparray[0]
+    if option=="0":
+        # do nothing
+        scaled_nparray=nparray
+    elif option=="1":
+        # scale all values relative to the first entry, so that the first entry is one
+        scaled_nparray=nparray*ratio(1.0,first)
+    else:
+        print "In scaleNPArray(), option",option,"not known. Choose 0 or 1. Will ABORT!!!"
+        assert(False)
+    # done if
+    if debug:
+        print "scaled_nparray",scaled_nparray
+    return scaled_nparray
+# done function
+
 def extend_dict_name_nparray_value(dict_name_nparray_value):
     for environment in list_environment:
         Velocity=dict_environment_Velocity[environment]
@@ -227,21 +248,103 @@ def testPlot():
     plt.show()
 # done function
 
-def scaleNPArray(nparray,option="0"):
-    first=nparray[0]
-    if option=="0":
-        # do nothing
-        scaled_nparray=nparray
-    elif option=="1":
-        # scale all values relative to the first entry, so that the first entry is one
-        scaled_nparray=nparray*ratio(1.0,first)
-    else:
-        print "In scaleNPArray(), option",option,"not known. Choose 0 or 1. Will ABORT!!!"
-        assert(False)
-    # done if
+def testPlot2():
+    x = np.arange(0, 10, 0.2)
+    y = np.sin(x)
+    
+    # definitions for the axes
+    left, width = 0.07, 0.65
+    bottom, height = 0.1, .8
+    bottom_h = left_h = left+width+0.02
+    
+    rect_cones = [left, bottom, width, height]
+    rect_box = [left_h, bottom, 0.17, height]
+    
+    fig = plt.figure()
+    
+    cones = plt.axes(rect_cones)
+    box = plt.axes(rect_box)
+    
+    cones.plot(x, y)
+    
+    box.plot(y, x)
+    
+    plt.show()
+
+def testPlot4():
+    # generate some data
+    x = np.arange(0, 10, 0.2)
+    y = np.sin(x)
+    # plot it
+    fig = plt.figure(figsize=(8, 6)) 
+    gs = gridspec.GridSpec(2, 1, height_ratios=[3, 1]) 
+    ax0 = plt.subplot(gs[0])
+    ax0.plot(x, y)
+    ax1 = plt.subplot(gs[1])
+    ax1.plot(y, x)
+    plt.tight_layout()
+    plt.savefig('grid_figure.pdf')
+# done function
+
+def testPlot3():
+    fig = Figure()
+    canvas = FigureCanvas(fig)
+    plt.subplot(211)
+    plt.subplot(213)
+    plt.show()
+    #ax.plot([1, 2, 3])
+    #ax.set_title('hi mom')
+    ##ax.grid(True)
+    #ax.set_xlabel('time')
+    #ax.set_ylabel('volts')
+    #canvas.print_figure('test')
+# done function
+
+def overlayGraphsTest(nparray_value_x,list_tuple_y,fileName="overlay",extensions="pdf,png",info_x=["Electric Car brand",0.45,90],info_y=["Range on a full charge [mile]",[0,300]],info_legend=["upper right"]):
     if debug:
-        print "scaled_nparray",scaled_nparray
-    return scaled_nparray
+        print "Start overlayGraphs"
+    N=len(nparray_value_x)
+    x=range(N)
+    # create empty figure
+    pylab.figure(1)
+    # split into two
+    gs = gridspec.GridSpec(4, 1, height_ratios=[1, 1]) 
+    # in top bad to the regular plot
+    ax1 = pylab.subplot(gs[0])
+    # draw the x axis and its labels
+    pylab.xticks(x,nparray_value_x)
+    pylab.xlabel(info_x[0])
+    pylab.subplots_adjust(bottom=info_x[1])
+    pylab.xticks(rotation=info_x[2])
+    # draw values on the y axis
+    for i,tuple_y in enumerate(list_tuple_y):
+        pylab.plot(x,tuple_y[0],list_color[i],label=tuple_y[1])
+    # draw the Y axis label
+    pylab.ylabel(info_y[0])
+    # set the range for the Y axis
+    pylab.axis([0,N-1,info_y[1][0],info_y[1][1]])
+    # set position of the legend
+    pylab.legend(loc=info_legend[0])
+    # below
+    ax2 = pylab.subplot(gs[1])
+    # pylab.xticks(x,nparray_value_x)
+    # pylab.xlabel(info_x[0])
+    # pylab.subplots_adjust(bottom=info_x[1])
+    # pylab.xticks(rotation=info_x[2])
+    # draw values on the y axis
+    for i,tuple_y in enumerate(list_tuple_y):
+        pylab.plot(x,tuple_y[0],list_color[i],label=tuple_y[1])
+    # draw the Y axis label
+    # pylab.ylabel(info_y[0])
+    # set the range for the Y axis
+    pylab.axis([0,N-1,0.0,1.0])
+    # set position of the legend
+    #pylab.legend(loc=info_legend[0])
+    # for each extension create a plot
+    for extension in extensions.split(","):
+        pylab.savefig(fileName+"."+extension)
+    # close the figure
+    pylab.close()
 # done function
 
 def overlayGraphs(nparray_value_x,list_tuple_y,fileName="overlay",extensions="pdf,png",info_x=["Electric Car brand",0.45,90],info_y=["Range on a full charge [mile]",[0,300]],info_legend=["upper right"]):
@@ -315,6 +418,8 @@ def doItAll():
     dict_name_nparray_value=extend_dict_name_nparray_value(dict_name_nparray_value)
     #if False:
     #    testPlot()
+    #if True:
+    #    testPlot2()
     for option in list_option:
         if debug:
             print "option",option
