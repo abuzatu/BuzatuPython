@@ -1,6 +1,5 @@
 #!/usr/bin/python
-from HelperPyRoot import *
-ROOT.gROOT.SetBatch(True)
+from HelperPython import *
 
 total = len(sys.argv)
 # number of arguments plus 1
@@ -15,7 +14,7 @@ if total!=1:
 #################################################################
 
 debug=True
-list_option="A".split(",")
+list_option="A,B,C".split(",")
 
 #################################################################
 ################### Functions ###################################
@@ -24,8 +23,6 @@ list_option="A".split(",")
 def doItOne(option):
     if debug:
         print "doItOne() with option",option
-    
-
     None
 # done function
 
