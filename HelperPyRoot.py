@@ -1197,9 +1197,9 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
     elif fit=="Bukin":
         if debug:
             print "We are starting the Bukin fit"
-        if entries>cutnentries and rms>0.02:
+        if h.Integral()>0 and entries>cutnentries and rms>0.02:
             if debug:
-                print "we do the fit, as entries>cutnentries and rms>0.02"
+                print "we do the fit, as integral > 0 (not made from dummy histogram with zero entries as histogarm was missing) and in addition entries>cutnentries and rms>0.02"
             if fitRangeDefault==True:
                 xmin=mean-3*rms
                 xmax=mean+3*rms
@@ -1222,6 +1222,8 @@ def fit_hist(h=TH1F(),fitRange=[-1,-1],defaultFunction=TF1(),fit="None",addMedia
             #function.SetParameter(5,0.005)
             if debug:
                 print "we just set the function used for the fit"
+            if debug:
+                print "h.Integral()",h.Integral()
             h.Fit("bukin","RQ",plot_option+"same",xmin,xmax)
             if debug:
                 print "we just performed the fit"
