@@ -26,7 +26,7 @@ svg_file_name="./points.svg"
 TAG_NAME_CIRCLE='{http://www.w3.org/2000/svg}circle'
 TAG_NAME_GROUP='{http://www.w3.org/2000/svg}g'
 
-list_tolerance=[50.0,50.0,0.40]
+list_tolerance=[50.0,50.0,0.20]
 
 # assume a point is an ntuple with its positions
 
@@ -90,12 +90,14 @@ def get_list_point_with_the_same_group_id(tree, group_id):
 
 def get_distance_squared(pointA,pointB,list_tolerance):
     # these steps are called destructurize the ntuples in X,Y,I
-    A0,A1,A2,=pointA
+    A0,A1,A2=pointA
     B0,B1,B2=pointB
+    #
     d0=abs(A0-B0)
     d1=abs(A1-B1)
     d2=abs(A2-B2)
     euclidean_distance_squared=d0*d0+d1*d1
+    # 
     if list_tolerance==None:
         distance_squared=euclidean_distance_squared
     else:
@@ -103,7 +105,13 @@ def get_distance_squared(pointA,pointB,list_tolerance):
             print "list_tolerance",list_tolerance,"does not have 3 elements for XYI, so we ABORT!!!"
             assert(False)
         else:
-            if d0>list_tolerance[0] or d1>list_tolerance[1] or d2>list_tolerance[2]:
+            t0=list_tolerance[0]
+            t1=list_tolerance[1]
+            t2=list_tolerance[2]
+            #
+            if d0>t0 or d1>t1 or d2>t2:
+                if debug:
+                    print "tolerance failed","d0",d0,"t0",t0,"d1",d1,"t1",t1,"d2",d2,"t2",t2,"A",pointA,"B",pointB
                 distance_squared=None
             else:
                 distance_squared=euclidean_distance_squared
@@ -116,16 +124,17 @@ def get_distance_squared(pointA,pointB,list_tolerance):
 # done function
 
 def get_closest_point(pivot,list_point,list_tolerance):
-    closest_distance_squared=None
+    closest_index=None
     closest_point=None
-    for current_point in list_point:
+    closest_distance_squared=None
+    for current_index,current_point in enumerate(list_point):
         if debug:
-            print "current_point",current_point
+            print "current_index",current_index,"current_point",current_point
         current_distance_squared=get_distance_squared(pivot,current_point,list_tolerance)
-        if current_distance_squared=="None": # it did not pass tolerances, so we ignore it
+        if current_distance_squared==None: # it did not pass tolerances, so we ignore it
             new_closest_distance=False
         else:
-            if current_distance_squared<closest_distance_squared:
+            if closest_distance_squared==None or current_distance_squared<closest_distance_squared:
                 new_closest_distance=True
             else:
                 new_closest_distance=False
@@ -133,17 +142,17 @@ def get_closest_point(pivot,list_point,list_tolerance):
         # done if 
         if debug:
             print "current_distance_squared",current_distance_squared,"new_closest_distance",new_closest_distance
-        if closest_distance_squared==None or current_distance_squared<closest_distance_squared:
+        if new_closest_distance:
+            closest_index=current_index
+            closest_point=current_point
             closest_distance_squared=current_distance_squared
-            if closest_distance_squared!=None:
-                closest_point=current_point
         if debug:
-            print "closest_point",closest_point,"closest_distance_squared",closest_distance_squared
+            print "closest_index",closest_index,"closest_point",closest_point,"closest_distance_squared",closest_distance_squared
         # done if
     # done for loop
     if debug or verbose:
-        print "Evaluated the closest point in euclidian space in 2D but with the constraints of being within the tolerances for the x, y and i.\nThe closest point to the pivot",pivot,"is the point",closest_point
-    return closest_point, closest_distance_squared
+        print "Evaluated the closest point in euclidian space in 2D but with the constraints of being within the tolerances for the x, y and i.\nThe closest point to the pivot",pivot,"is the point",closest_point,"with the closest_index",closest_index,"got closest_distance_squared",closest_distance_squared
+    return closest_index,closest_point, closest_distance_squared
 # done function
 
 ### putting it all together to prepare to run ###
@@ -156,7 +165,7 @@ def doItOne(option):
     print "list_point",list_point
     [pivot]=get_list_point_with_the_same_point_id(tree, "pivot")
     print "pivot",pivot
-    closest_point,closest_distance_squared=get_closest_point(pivot,list_point,list_tolerance)
+    closest_index,closest_point,closest_distance_squared=get_closest_point(pivot,list_point,list_tolerance)
     None
 # done function
 
