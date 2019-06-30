@@ -88,29 +88,40 @@ def get_list_point_with_the_same_group_id(tree, group_id):
 
 ### find the closest point with the brute force method ###
 
-def get_distance_squared(pointA,pointB):
-    # these steps are called destructurize the ntuples
-    A0,A1,A2=pointA
+def get_distance_squared(pointA,pointB,list_tolerance):
+    # these steps are called destructurize the ntuples in X,Y,I
+    A0,A1,A2,=pointA
     B0,B1,B2=pointB
     d0=abs(A0-B0)
     d1=abs(A1-B1)
     d2=abs(A2-B2)
-    if d0>list_tolerance[0] or  d1>list_tolerance[1] or d2>list_tolerance[2]:
-        distance_squared=None
+    euclidean_distance_squared=d0*d0+d1*d1
+    if list_tolerance==None:
+        distance_squared=euclidean_distance_squared
     else:
-        distance_squared=d0*d0+d1*d1
+        if len(list_tolerance)!=3:
+            print "list_tolerance",list_tolerance,"does not have 3 elements for XYI, so we ABORT!!!"
+            assert(False)
+        else:
+            if d0>list_tolerance[0] or d1>list_tolerance[1] or d2>list_tolerance[2]:
+                distance_squared=None
+            else:
+                distance_squared=euclidean_distance_squared
+            # done if
+        # done if
+    # done if
     if debug:
         print "A0",A0,"B0",B0,"A1",A1,"B1",B1,"A2",A2,"B2",B2,"distance_squared",distance_squared
     return distance_squared
 # done function
 
-def get_closest_point(list_point, pivot):
+def get_closest_point(pivot,list_point,list_tolerance):
     closest_distance_squared=None
     closest_point=None
     for current_point in list_point:
         if debug:
             print "current_point",current_point
-        current_distance_squared=get_distance_squared(pivot,current_point)
+        current_distance_squared=get_distance_squared(pivot,current_point,list_tolerance)
         if current_distance_squared=="None": # it did not pass tolerances, so we ignore it
             new_closest_distance=False
         else:
@@ -145,7 +156,7 @@ def doItOne(option):
     print "list_point",list_point
     [pivot]=get_list_point_with_the_same_point_id(tree, "pivot")
     print "pivot",pivot
-    closest_point,closest_distance_squared=get_closest_point(list_point,pivot)
+    closest_point,closest_distance_squared=get_closest_point(pivot,list_point,list_tolerance)
     None
 # done function
 
