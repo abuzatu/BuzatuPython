@@ -8,6 +8,9 @@ import pprint
 import time
 
 # re-implement on 19 June 2019 the example from https://github.com/tsoding/kdtree-in-python/blob/master/main.py
+# to add here the aspects of the brute force with tolerances, as this file compares brute force with KDTree
+# later to update the KDTree method to also take into account the tolerances
+# first on x,y, then on x,y,i, and after that also build the kdtree from x,y,i
 
 total = len(sys.argv)
 # number of arguments plus 1
