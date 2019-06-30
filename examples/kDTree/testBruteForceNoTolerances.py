@@ -21,13 +21,12 @@ verbose=True
 
 list_option="A".split(",")
 
-svg_file_name="./points2.svg"
+svg_file_name="./points2Tutorial.svg"
 
 TAG_NAME_CIRCLE='{http://www.w3.org/2000/svg}circle'
 TAG_NAME_GROUP='{http://www.w3.org/2000/svg}g'
 
 # assume a point is an ntuple with its positions
-
 
 #################################################################
 ################### Functions ###################################
