@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 
 # re-implement on 19 June 2019 the example from https://github.com/tsoding/kdtree-in-python/blob/master/main.py
-# then added two things: 
+# then added three things: 
 # 1. attributes, in addition to the coordinates
 # 2. tolerances for each of the coordinates and attributes - can be none and then come back to standard case
 # 3. any number of dimensions for both coordinates and attributes
@@ -177,7 +177,7 @@ def get_distance_squared(pointA,pointB,list_tolerance=None,metric="euclidean"):
     # done if
 # done function
 
-def get_closest_point(pivot,list_point,list_tolerance):
+def get_closest_point(pivot,list_point,list_tolerance=None):
     closest_index=None
     closest_point=None
     closest_distance_squared=infinity
@@ -215,12 +215,12 @@ def doItOne(option):
         print "pivot",pivot
     if verbose:
         print ""
-        print "with list_tolerance",list_tolerance
-    closest_index,closest_point,closest_distance_squared=get_closest_point(pivot,list_point,list_tolerance)
+        print "with list_tolerance",None
+    closest_index,closest_point,closest_distance_squared=get_closest_point(pivot,list_point)
     if verbose:
         print ""
-        print "with list_tolerance",None
-    closest_index,closest_point,closest_distance_squared=get_closest_point(pivot,list_point,None)
+        print "with list_tolerance",list_tolerance
+    closest_index,closest_point,closest_distance_squared=get_closest_point(pivot,list_point,list_tolerance)
 # done function
 
 def doItAll():
