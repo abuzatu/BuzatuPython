@@ -36,21 +36,24 @@ verbose=True
 list_option="brute_force,kdtree_naive,kdtree_advanced".split(",")
 #list_option="kdtree_advanced".split(",")
 
-#svg_file_name="./points.svg"
+svg_file_name="./points.svg"
 #svg_file_name="./points2.svg"
-svg_file_name="./pointsTutorial.svg"
+#svg_file_name="./pointsTutorial.svg"
 
 TAG_NAME_CIRCLE='{http://www.w3.org/2000/svg}circle'
 TAG_NAME_GROUP='{http://www.w3.org/2000/svg}g'
 
-#list_tolerance=[50.0,50.0,0.20]
-list_tolerance=[50.0,50.0]
-#list_tolerance=None
+
+list_list_tolerance=[
+    None,
+    # [50.0,50.0],
+    [50.0,50.0,0.20],   
+]
 
 infinity=float("inf")
 
 dimensionCoordinates=2
-dimensionAttributes=0
+dimensionAttributes=1
 dimensionPoint=dimensionCoordinates+dimensionAttributes
 k=dimensionPoint # the number of demensions for the k-d tree
 
@@ -210,7 +213,7 @@ def get_closest_point_brute_force(pivot,list_point,list_tolerance):
             print "closest_index",closest_index,"closest_point",closest_point,"closest_distance_squared",closest_distance_squared
         # done if
     # done for loop
-    if debug or verbose:
+    if debug:
         print "Studied in the euclidian space in "+str(dimensionPoint)+" total dimenensions, made of "+str(dimensionCoordinates)+" coordinates plus "+str(dimensionAttributes)+" attributes. Searched the closest point for the",pivot," with list_tolerances",list_tolerance," The result is the point",closest_point,"with the closest_index",closest_index,"got closest_distance_squared",closest_distance_squared
     return closest_index,closest_point,closest_distance_squared
 # done function
@@ -388,7 +391,7 @@ def get_closest_point_kdtree_advanced(pivot,kdtree,list_tolerance,depth):
 
 ### putting it all together to prepare to run ###
 
-def doItOne(pivot,list_point,option):
+def doItOne(pivot,list_point,option,list_tolerance):
     if debug:
         print "doItOne() with option",option
     if option=="brute_force":
@@ -432,14 +435,17 @@ def doItAll():
     if debug or verbose:
         print "list_point",list_point
     for option in list_option:
-        if debug:
-            print "option",option
-        start = time.time()
-        closest_point=doItOne(pivot,list_point,option)
-        end = time.time()
-        if debug or verbose:
-            print "Option","%-15s" % option,", timing",end-start,"seconds, closest_point",closest_point
-    # done if
+        for list_tolerance in list_list_tolerance:
+            if debug or verbose:
+                print "option",option,"list_tolerance",list_tolerance
+            start = time.time()
+            closest_point=doItOne(pivot,list_point,option,list_tolerance)
+            end = time.time()
+            if debug or verbose:
+                print "Option","%-15s" % option,", timing",end-start,"seconds, closest_point",closest_point
+            # done if
+        # done for over list_tolerance
+    # done for over option
 # done function
 
 #################################################################
