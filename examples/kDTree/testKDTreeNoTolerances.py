@@ -94,7 +94,7 @@ def get_list_point_with_the_same_group_id(tree, group_id):
     return list_point
 # done function
 
-### find the closest point with the brute force method ###
+### find the distance between two points without tolerances ###
 
 def get_distance_squared(point1,point2):
     # these steps are called destructurize the ntuples
@@ -107,6 +107,8 @@ def get_distance_squared(point1,point2):
         print "x1",x1,"y1",y1,"x2",x2,"y2",y2,"distance_squared",distance_squared
     return distance_squared
 # done function
+
+### find the closest point with the brute force method ###
 
 def get_closest_point_brute_force(pivot,list_point):
     closest_distance_squared=None
@@ -127,13 +129,13 @@ def get_closest_point_brute_force(pivot,list_point):
     return closest_point, closest_distance_squared
 # done function
 
-### find the closest point via a k-d tree ###
+### find the closest point via a k-d tree (common to the naive and avanced methods) ###
 
 # recursive function that builds the k-d tree a the list of points
 # when it splits, it wil have as input a list which is a subset of the previous list
 # and a depth increased by one
 # depths starts with the default value of zero, for when we first invoke the function
-def get_kdtree(list_point,depth=0):
+def get_kdtree(list_point,depth):
     N=len(list_point)
     # if no points, we can not build any kdtree, so return None
     if N<=0:
@@ -181,11 +183,13 @@ def get_kdtree(list_point,depth=0):
         }
 # done function
 
+### find the closest point with the k-d tree naive ###
+
 # the kdtree is the root tree, the big tree of the kdtree
 # need to keep track of the depth starting with the default of 0
 # need to keep track of the closest point, starting with the default of None
 # this is a recursive function too
-def get_closest_point_kdtree_naive(pivot,kdtree,depth=0,closest_point=None):
+def get_closest_point_kdtree_naive(pivot,kdtree,depth,closest_point):
     # deal with edge (corner) cases first
     if kdtree is None:
         # we reached the leaf of the kdtree and we must return the best result and stop the recursion
@@ -245,9 +249,11 @@ def get_closest_of_two_points(pivot,point1,point2):
         return point2
 # done function
 
+### find the closest point with the k-d tree advanced ###
 
 # iterative function, we maintain depth, but not closest_point
-def get_closest_point_kdtree_advanced(pivot,kdtree,depth=0):
+# default value of depth=0
+def get_closest_point_kdtree_advanced(pivot,kdtree,depth):
     if debug:
         print "depth",depth,"splitting point",kdtree['point']
 
@@ -312,7 +318,7 @@ def doItOne(pivot,list_point,option):
         # advantage in speed vs brute force is that we do not need to traverse all the tree branches
         # but rather discard those that can not meet our criteria, and thus gain time
         # one recursion inside the main function
-        closest_point=get_closest_point_kdtree_naive(pivot,kdtree)
+        closest_point=get_closest_point_kdtree_naive(pivot,kdtree,depth=0,closest_point=None)
     elif option=="kdtree_advanced":
         # step 1: build the k-d tree
         kdtree=get_kdtree(list_point,depth=0)
@@ -321,9 +327,9 @@ def doItOne(pivot,list_point,option):
         # step 2 the advanced approach
         # two recursions inside the main function, but second only inside an if, so not always
         # to check if in the opposite branch there is no closer point
-        closest_point=get_closest_point_kdtree_advanced(pivot,kdtree)
+        closest_point=get_closest_point_kdtree_advanced(pivot,kdtree,depth=0)
     else:
-        print "option",option,"not known. Choose brute_force, kdtree_naive. Will ABORT!!!"
+        print "option",option,"not known. Choose brute_force, kdtree_naive, kdtree_advanced. Will ABORT!!!"
         assert(False)
     # done if
     return closest_point
