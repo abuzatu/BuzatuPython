@@ -41,8 +41,8 @@ svg_file_name="./points2Tutorial.svg"
 TAG_NAME_CIRCLE='{http://www.w3.org/2000/svg}circle'
 TAG_NAME_GROUP='{http://www.w3.org/2000/svg}g'
 
-list_tolerance=[50.0,50.0,0.20]
-#list_tolerance=[10.0,10.0]
+#list_tolerance=[50.0,50.0,0.20]
+list_tolerance=[10.0,10.0]
 #list_tolerance=None
 
 infinity=float("inf")
@@ -84,6 +84,10 @@ def get_point_from_circle(circle):
     if debug:
         print "point",point
     return point 
+# done function
+
+def get_tree(svg_file_name):
+    return ET.parse(svg_file_name)
 # done function
 
 def get_list_point(tree):
@@ -283,13 +287,13 @@ def get_closest_point_kdtree_naive(pivot,kdtree,depth=0,closest_point=None):
     next_kdtree=None
 
     # to answer the first question, we need to compare two distances squared (squared to be faster)
-    # 1) get_distance_squared(pivot,current_closest_point)
-    # 2) get_distance_squared(pivot,current_point)
+    # 1) get_distance_squared(pivot,current_closest_point,list_tolerance)
+    # 2) get_distance_squared(pivot,current_point_list_tolerance)
     # But what is the current_point? None other the splitting point of the current node of the kdtree
-    # 2) get_distance_squared(pivot,kdtree['point'])
+    # 2) get_distance_squared(pivot,kdtree['point'],list_tolerance)
     # but remember that the current_closest_point can be None at first, and in that case we just
     # want to assign the first value
-    if closest_point is None or get_distance_squared(pivot,kdtree['point']) < get_distance_squared(pivot,closest_point):
+    if closest_point is None or get_distance_squared(pivot,kdtree['point'],list_tolerance) < get_distance_squared(pivot,closest_point,list_tolerance):
         next_closest_point=kdtree['point']
     else:
         next_closest_point=closest_point
