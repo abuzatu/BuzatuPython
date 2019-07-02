@@ -21,7 +21,9 @@ verbose=True
 
 list_option="A".split(",")
 
-svg_file_name="./points2Tutorial.svg"
+#svg_file_name="./points.svg"
+#svg_file_name="./points2.svg"
+svg_file_name="./pointsTutorial.svg"
 
 TAG_NAME_CIRCLE='{http://www.w3.org/2000/svg}circle'
 TAG_NAME_GROUP='{http://www.w3.org/2000/svg}g'

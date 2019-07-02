@@ -27,7 +27,7 @@ verbose=True
 list_option="brute_force,kdtree_naive,kdtree_advanced".split(",")
 #list_option="kdtree_advanced".split(",")
 
-svg_file_name="./points2Tutorial.svg"
+svg_file_name="./pointsTutorial.svg"
 
 TAG_NAME_CIRCLE='{http://www.w3.org/2000/svg}circle'
 TAG_NAME_GROUP='{http://www.w3.org/2000/svg}g'

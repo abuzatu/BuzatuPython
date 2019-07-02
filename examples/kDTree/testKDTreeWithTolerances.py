@@ -36,14 +36,16 @@ verbose=True
 list_option="brute_force,kdtree_naive,kdtree_advanced".split(",")
 #list_option="kdtree_advanced".split(",")
 
-svg_file_name="./points2Tutorial.svg"
+#svg_file_name="./points.svg"
+#svg_file_name="./points2.svg"
+svg_file_name="./pointsTutorial.svg"
 
 TAG_NAME_CIRCLE='{http://www.w3.org/2000/svg}circle'
 TAG_NAME_GROUP='{http://www.w3.org/2000/svg}g'
 
 #list_tolerance=[50.0,50.0,0.20]
-list_tolerance=[10.0,10.0]
-#list_tolerance=None
+#list_tolerance=[10.0,10.0]
+list_tolerance=None
 
 infinity=float("inf")
 
