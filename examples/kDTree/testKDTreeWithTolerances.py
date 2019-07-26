@@ -150,9 +150,17 @@ def get_distance_squared(pointA,pointB,list_tolerance=None,metric="euclidean"):
         assert(False)
     # done if
     # convert to numpy arrays so that we can make the differences one by one
-    nparray_A=np.asarray(pointA) # A
-    nparray_B=np.asarray(pointB) # B
+    nparray_A=np.asarray([value for value in pointA]) # A
+    nparray_B=np.asarray([value for value in pointB]) # B
+    if debug:
+        print "nparray_A",nparray_A,type(nparray_A)
+        print "nparray_B",nparray_B,type(nparray_B)
+    nparray_AB=nparray_A-nparray_B
+    if debug:
+        print "nparray_AB",nparray_AB 
     nparray_adAB=np.absolute(nparray_A-nparray_B) # element-wise absolute difference of A-B
+    if debug:
+        print "nparray_adAB",nparray_adAB
 
     # the squared distance in the space of N dimensions, find out what N is as a function of the metric
     if metric=="euclidean":
@@ -391,9 +399,9 @@ def get_closest_point_kdtree_advanced(pivot,kdtree,list_tolerance,depth):
 
 ### putting it all together to prepare to run ###
 
-def doItOne(pivot,list_point,option,list_tolerance):
+def get_closest_point(pivot,list_point,option,list_tolerance):
     if debug:
-        print "doItOne() with option",option
+        print "get_closest_point with option",option,"list_tolerance",list_tolerance
     if option=="brute_force":
         # step 1: does not exist, we do not need to build something, as we will use all events
         None
@@ -420,7 +428,7 @@ def doItOne(pivot,list_point,option,list_tolerance):
         # to check if in the opposite branch there is no closer point
         closest_point=get_closest_point_kdtree_advanced(pivot,kdtree,list_tolerance,depth=0)
     else:
-        print "option",option,"not known. Choose brute_force, kdtree_naive. Will ABORT!!!"
+        print "option",option,"not known. Choose brute_force, kdtree_naive, kdtree_advanced. Will ABORT!!!"
         assert(False)
     # done if
     return closest_point
