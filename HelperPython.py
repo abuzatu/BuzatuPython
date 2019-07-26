@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import numpy
+import numpy as np
 import math
 import inspect
 from array import array
