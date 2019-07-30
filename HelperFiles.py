@@ -43,6 +43,22 @@ def getFileNameStem(fileName,debug=False):
   return fileNameStem
 # done function
 
+def get_fileNameStem(fileName,debug=False):
+  if debug:
+    print "fileName",fileName
+  fileNameSplitBySlash=fileName.split("/")
+  # now pick the last element, which means with path removed
+  # find out how many elements are in the list
+  nrElements=len(fileNameSplitBySlash)
+  fileNameWithoutPath=fileNameSplitBySlash[nrElements-1]
+  if debug:
+    print "fileNameWithoutPath",fileNameWithoutPath
+  fileNameStem=fileNameWithoutPath.split(".")[0]
+  if debug:
+    print "fileNameStem",fileNameStem
+  return fileNameStem
+# done function
+
 def get_list_fileFromFolder(inputFolderName,fileSearch="*.root",debug=False):
     result=[]
     proc = subprocess.Popen(["ls -1 "+inputFolderName+"/"+fileSearch], stdout=subprocess.PIPE, shell=True)
