@@ -396,6 +396,16 @@ def get_duration_of_run(time_start,time_previous,option,debug):
   return time_previous,result
 # done function
 
+def get_use_from_bool(option,debug=False):
+    if option==True:
+        result="1"
+    else:
+        result="0"
+    if debug:
+        print "option",option,"result",result
+    return result
+# done function
+
 #########################################################
 ############### End all               ###################
 #########################################################
