@@ -85,3 +85,13 @@ def overlayGraphsValues(list_tupleArray,fileName="overlay",extensions="pdf,png",
     # close the figure
     plt.close()
 # done function
+
+def draw_histogram_from_nparray(nparray,nrBins=100,title="Title",xAxisTitle="x-axis",yAxisTitle="Number of points",extensions="png,pdf",outputFileName="./output_histo_from_nparray.png",debug=False,verbose=False):
+    plt.hist(nparray,bins=nrBins)
+    plt.title(title)
+    plt.xlabel(xAxisTitle)
+    plt.ylabel(yAxisTitle)
+    for extension in extensions.split(","):
+        plt.savefig(outputFileName+"."+extension)
+    plt.close()
+# done function

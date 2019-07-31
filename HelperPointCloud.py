@@ -270,7 +270,7 @@ def compare_two_point_clouds_with_same_order(pc_current,pc_reference,debug=False
         print pc_current_deviation
     N,M=pc_current.shape
     if debug:
-        print "N",N,"M"
+        print "N",N,"M",M
     # get numpy arrays of dimension M with the maximum and averages values of each column
     columns_max=np.max(pc_current_deviation,0)
     columns_avg=np.mean(pc_current_deviation,0)
