@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 
 # overlay two or more numpy arrays as graphs
 # info_legend="best", "uppler right", "lowerleft", etc
-def overlayGraphsValues(list_tupleArray,fileName="overlay",extensions="pdf,png",info_x=["Procent of data reduced",[0.0,1.0],"linear"],info_y=["Figure of merit of performance",[0.0,100000.0],"log"],info_legend=["best"],title="Compared performance of 3D point cloud compression",debug=False):
+def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf,png",info_x=["Procent of data reduced",[0.0,1.0],"linear"],info_y=["Figure of merit of performance",[0.0,100000.0],"log"],info_legend=["best"],title="Compared performance of 3D point cloud compression",debug=False):
     if debug:
         print "Start overlayGraphsValues"
-        print "fileName",fileName
+        print "outputFileName",outputFileName
         print "extensions",extensions
         print "info_x",info_x
         print "info_y",info_y
@@ -79,19 +79,36 @@ def overlayGraphsValues(list_tupleArray,fileName="overlay",extensions="pdf,png",
     plt.legend(loc=info_legend[0])
     # for each extension create a plot
     for extension in extensions.split(","):
-        fileNameFull=fileName+"."+extension
+        fileNameFull=outputFileName+"."+extension
         print "Saving plot at",fileNameFull
         plt.savefig(fileNameFull)
     # close the figure
     plt.close()
 # done function
 
-def draw_histogram_from_nparray(nparray,nrBins=100,title="Title",xAxisTitle="x-axis",yAxisTitle="Number of points",extensions="png,pdf",outputFileName="./output_histo_from_nparray.png",debug=False,verbose=False):
+def draw_histogram_from_nparray(nparray,outputFileName="./output_histo_from_nparray",extensions="png,pdf",nrBins=100,info_x=["x-axis","linear"],info_y=["Number of points","linear"],title="Title",debug=False,verbose=False):
     plt.hist(nparray,bins=nrBins)
+    if debug:
+        print "Start draw_histogram_from_nparray()"
+        print "outputFileName",outputFileName
+        print "extensions",extensions
+        print "info_x",info_x
+        print "info_y",info_y
+        print "title",title
+    # x_axis
+    x_label,x_scale=info_x
+    y_label,y_scale=info_y
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.yscale(x_scale)
+    plt.yscale(y_scale)
+    # title
     plt.title(title)
-    plt.xlabel(xAxisTitle)
-    plt.ylabel(yAxisTitle)
+    # for each extension create a plot
     for extension in extensions.split(","):
-        plt.savefig(outputFileName+"."+extension)
+        fileNameFull=outputFileName+"."+extension
+        print "Saving plot at",fileNameFull
+        plt.savefig(fileNameFull)
+    # close the figure
     plt.close()
 # done function
