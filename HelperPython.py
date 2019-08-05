@@ -406,6 +406,14 @@ def get_use_from_bool(option,debug=False):
     return result
 # done function
 
+def get_today_as_string(debug=False):
+    today=datetime.date.today()
+    string_today=today.strftime("%d %b %Y") # e.g. 04 Aug 2019
+    if debug:
+        print "string_today",string_today
+    return string_today
+# done function
+
 #########################################################
 ############### End all               ###################
 #########################################################

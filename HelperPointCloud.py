@@ -292,5 +292,5 @@ def compare_two_point_clouds_with_same_order(pc_current,pc_reference,debug=False
             # and save it in a plot
         # done loop over dimensions
     # done if
-    return columns_max,columns_avg
+    return pc_current_deviation,columns_max,columns_avg
 # done function
