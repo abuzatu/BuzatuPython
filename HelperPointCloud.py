@@ -276,7 +276,7 @@ def reorder_one_point_cloud_to_match_a_reference_with_last_element_an_id(pc_refe
     if debug:
         print "pc_current_reordered",pc_current_reordered,type(pc_current_reordered)
     # calculate distance for the spatial dimensions S
-    distances_current_to_reference_reshaped=np.sqrt(np.sum((pc_current_reordered-pc_reference)**2[:,:S],axis=-1))
+    distances_current_to_reference_reshaped=np.sqrt(np.sum(np.square(pc_current_reordered-pc_reference)[:,:S],axis=-1))
     if debug:
         pc_diff=(pc_current_reordered-pc_reference)**2
         print "pc_diff",pc_diff,type(pc_diff),pc_diff.shape
