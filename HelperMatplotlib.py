@@ -3,10 +3,11 @@ from HelperPython import *
 # import for data analysis and plotting
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import matplotlib.axes as ax
 # from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 # from matplotlib.figure import Figure
 # import matplotlib.gridspec as gridspec
-# import pylab
+import pylab
 
 # overlay two or more numpy arrays as graphs
 # info_legend="best", "uppler right", "lowerleft", etc
@@ -86,8 +87,7 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
     plt.close()
 # done function
 
-def draw_histogram_from_nparray(nparray,outputFileName="./output_histo_from_nparray",extensions="png,pdf",nrBins=100,info_x=["x-axis","linear"],info_y=["Number of points","linear"],title="Title",debug=False,verbose=False):
-    plt.hist(nparray,bins=nrBins)
+def draw_histogram_from_nparray(nparray,outputFileName="./output_histo_from_nparray",extensions="png,pdf",nrBins=100,info_x=["x-axis","linear"],info_y=["Number of points","linear"],title="Title",text=None,debug=False,verbose=False):
     if debug:
         print "Start draw_histogram_from_nparray()"
         print "outputFileName",outputFileName
@@ -95,15 +95,27 @@ def draw_histogram_from_nparray(nparray,outputFileName="./output_histo_from_npar
         print "info_x",info_x
         print "info_y",info_y
         print "title",title
-    # x_axis
+    # 
+    fig=pylab.figure()
+    ax = fig.add_subplot(111)
+    n,b,patches=ax.hist(nparray,bins=nrBins)
+    if debug:
+        print "n",n
+        print "b",b
+        print "patches",patches
+        print "max",n.max()
+    # axes
     x_label,x_scale=info_x
     y_label,y_scale=info_y
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.yscale(x_scale)
     plt.yscale(y_scale)
+    plt.ylim(0,n.max()*1.2)
     # title
     plt.title(title)
+    if text is not None:
+        plt.text(0.2,0.9,text,bbox=dict(facecolor='red', alpha=0.5),horizontalalignment="left",fontstyle="oblique",transform=ax.transAxes)
     # for each extension create a plot
     for extension in extensions.split(","):
         fileNameFull=outputFileName+"."+extension
