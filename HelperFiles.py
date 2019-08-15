@@ -139,13 +139,6 @@ def get_value_from_file(fileName,debug):
 ################### Write values nicely in a table format later to be read as numpy ######################
 ##########################################################################################################
 
-# e.g. 
-# list_list_varInfo=[
-#    ["option","s",18,"l",0],
-#    ["value","f",9,"r",2],
-#    ]
-# append_performance_to_file(performanceFileName,list_list_varInfo,dict_varName_value)
-
 def get_stringFormat(list_varInfo,option,debug=False):
     varName,varType,stringLength,side,nrDigitsAfterDot=list_varInfo
     # overwrite the float to s for the first line of header of the file
@@ -218,7 +211,7 @@ def get_performanceText_values(list_list_varInfo,dict_varName_value,debug):
     return performanceText        
 # done function
 
-def append_performance_to_file(performanceFileName,list_list_varInfo,dict_varName_value,debug):
+def append_performance_to_file(performanceFileName,list_list_varInfo,dict_varName_value,debug=False,verbose=False):
     exists=os.path.isfile(performanceFileName)
     if exists==False:
         with open(performanceFileName, "w") as myFile:
