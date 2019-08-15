@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
 from HelperPython import *
 # import for data analysis and plotting
 import matplotlib.dates as mdates

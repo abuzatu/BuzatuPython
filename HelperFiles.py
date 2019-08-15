@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from HelperPython import *
 
 def example_format_string():

@@ -1,4 +1,4 @@
-# !/usr/bin/python
+# !/usr/bin/env python
 # Adrian Buzatu (adrian.buzatu@cern.ch)
 # 03 Feb 2017, Python classes to summarise most common steps 
 # when doing a data analysis, like looping about categories, variables,

@@ -1,4 +1,4 @@
-# !/usr/bin/python
+# !/usr/bin/env python
 # Adrian Buzatu (adrian.buzatu@glasgow.ac.uk)
 # 20 May 2013, Python functions to manipulate and draw histograms
 
