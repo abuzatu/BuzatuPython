@@ -3,7 +3,10 @@
 from HelperStatistics import *
 from plyfile import PlyData, PlyElement
 import numpy as np
+import pandas as pd
 from sklearn.neighbors import NearestNeighbors
+from timeit import default_timer as timer
+
 
 def get_plyData_from_ply_ascii_file(inputFileName,debug=False):
     if debug:
@@ -17,6 +20,7 @@ def get_plyData_from_ply_ascii_file(inputFileName,debug=False):
 # where each point is a numpy array of dimension M
 def get_list_point(plyData,expected_M=0,debug=False,verbose=False):
     list_pointTuple=plyData.elements[0].data
+    print end-start,"seconds to read nparray from ascii .ply"
     N=len(list_pointTuple)
     M=len(list_pointTuple[0])
     if verbose or debug:
@@ -57,7 +61,7 @@ def get_list_point(plyData,expected_M=0,debug=False,verbose=False):
 def get_list_point_from_ply_ascii_file(inputFileName,expected_M=0,debug=False,verbose=False):
     if debug:
         print "Reading numpy from ply ascii file",inputFileName
-    return get_list_point(PlyData.read(inputFileName),expected_M=0,debug=debug,verbose=debug)
+    return get_list_point(PlyData.read(inputFileName),expected_M=0,debug=debug,verbose=verbose)
 # done function
 
 # get a point cloud of N points, each with M properties (x,y,z, etc)
@@ -65,7 +69,10 @@ def get_list_point_from_ply_ascii_file(inputFileName,expected_M=0,debug=False,ve
 # each row is a new point of dimension M; so there are M columns
 # there are N points, so N rows
 def get_nparray(plyData,expected_M=0,debug=False,verbose=False):
+    # start=timer()
     list_pointTuple=plyData.elements[0].data
+    # end=timer()
+    # print end-start,"seconds list_pointTuple"
     N=len(list_pointTuple)
     M=len(list_pointTuple[0])
     if debug:
@@ -79,25 +86,34 @@ def get_nparray(plyData,expected_M=0,debug=False,verbose=False):
         print list_pointTuple[0]
     # done if
     # convert point from tuple to numpy array, () -> []
+    # start=timer()
     nparray_shape=(N,M)
     nparray=np.zeros(nparray_shape,dtype=np.float32)
+    # end=timer()
+    # print end-start,"seconds nparray with zero velues"
     if debug:
         print "nparray"
         print nparray
+    # start=timer()
     for i in xrange(0,N):
         nparray[i,:]=np.array([value for value in list_pointTuple[i]])
+    # end=timer()
+    # print end-start,"seconds fill the values of the nparray"
     if debug:
         print "nparray after filling"
         print nparray  
     # calculate the min and max for each dimension
     if debug:
         print "Calculate min and max on each axis:"
+    # start=timer()
     for i in xrange(M):
         nparrayD=nparray[:,i]
         minValue=np.min(nparrayD)
         maxValue=np.max(nparrayD)
         if debug:
             print "axis %i: (min,max)=(%.3f, %.3f);" % (i,minValue,maxValue)
+    # end=timer()
+    # print end-start,"seconds to get nparrayD and get max and min"
     if debug:
         print ""
     # done
@@ -109,6 +125,117 @@ def get_nparray_from_ply_ascii_file(inputFileName,expected_M=0,debug=False,verbo
         print "Reading numpy from ply ascii file",inputFileName
     return get_nparray(PlyData.read(inputFileName),expected_M=0,debug=debug,verbose=verbose)
 # done function
+
+def get_nparray_from_ply_ascii_file2(inputFileName,expected_M=0,debug=False,verbose=False):
+    if debug:
+        print "Reading numpy from ply ascii file 2 (directly, not passing from PlyData library)",inputFileName
+    # the typical way of reading line by line and filling the array
+    # curious to time to see if we get better than with the method above
+    # it turns out it is very slow and not worth it
+    print "inputFileName",inputFileName
+    f=open(inputFileName,"r")
+    after_header=False
+    i=0
+    M=0
+    for line in f:
+        line=line.rstrip()
+        list_line=line.split()
+        if False:
+            print list_line
+        if after_header==False:
+            if list_line[0]=="element" and list_line[1]=="vertex":
+                N=int(list_line[2])
+            elif list_line[0]=="property" and list_line[1]=="float":
+                print list_line
+                M+=1
+            elif line=="end_header":
+                after_header=True
+            continue
+        # done if
+        nparray_shape=(N,M)
+        # print "nparray_shape",nparray_shape
+        nparray=np.zeros(nparray_shape,dtype=np.float32)
+        assert(len(list_line)==M)
+        if i>=N:
+            continue
+        for j in range(M):
+            nparray[i,j]=float(list_line[j])
+        if i%1000==0:
+            print "list_line"
+            print "i",nparray[i,:]
+        i+=1
+    # done for loop over lines
+# done function
+
+def get_nparray_from_ply_ascii_file_via_pandas(inputFileName,expected_M=0,debug=False,verbose=False):
+    if debug:
+        print "Reading numpy from ply ascii file3 (using pandas)",inputFileName
+    # NrLinesHeader is the number of lines that are represented by the header
+    NrLinesHeader=0
+    with open(inputFileName,"r") as f:
+        for line in f:
+            NrLinesHeader+=1
+            list_line=line.rstrip().split(" ")
+            if debug:
+                print(list_line)
+            if list_line[0]=="element":
+                N=int(list_line[2]) # number of points
+            if list_line[0]=="end_header":
+                break
+        # done loop over lines
+    # done with the file
+    # 
+    # read the file in a panda data frame, saying to skip some lines (NrLinesHeader)
+    # and to read a certain number of lines (N, nr of points)
+    # this ensures that it also does not read the last line as a footer that exists in some files
+    # there is an option to skip the footer in this command too, but it makes it very slow
+    # so we do not use the number of lines in footer directly
+    #start2=timer()
+    if debug:
+        print "NrLinesHeader",NrLinesHeader,"N",N
+    names=[]
+    for m in range(expected_M):
+        names.append("axis-"+str(m))
+    # done for loop creating names
+    pandasDataFrame=pd.read_csv(inputFileName,skiprows=NrLinesHeader,sep=" ",nrows=N,names=names)
+    #pandasDataFrame.columns = ["X","Y","Z"]
+    #end2=timer()
+    #print end2-start2,"seconds to read in style 3 panda frame from ascii .ply"
+    if debug:
+        print "pandasDataFrame"
+        print pandasDataFrame
+    # convert pandas data frame to a numpy array
+    # nparray=pandasDataFrame.to_numpy() # needs python3
+    nparray=pandasDataFrame.values # needs python3
+    if debug:
+        print "nparray",nparray,nparray.shape,nparray.dtype
+    # done all
+    return nparray
+# done function
+
+def get_nparray_from_binary_file(inputFileName,expected_M=0,debug=False,verbose=False):
+    if debug:
+        print "Reading numpy from ply ascii file4 (np.fromfile()",inputFileName
+    #start2=timer()
+    nparray=np.fromfile(inputFileName,dtype=np.float32)
+    if debug:
+        print "nparray",nparray,nparray.shape,nparray.dtype
+    # reshape
+    NrValues=nparray.shape[0]
+    M=expected_M # nr of dimensions of the point
+    if debug:
+        print "M",M,type(M)
+    assert(NrValues%M==0)
+    N=NrValues/M # nr of points
+    nparray=nparray.reshape(N,M)
+    #end2=timer()
+    #print end2-start2,"seconds to read in style 4 frame from buffer .ply"
+    if debug:
+        print "nparray",nparray,nparray.shape,nparray.dtype
+    # done all
+    return nparray
+# done function
+
 
 # write a point cloud represented as a nparray to an ASCII .ply file
 # so that we can visualize in CloudCompare smaller point clouds we create

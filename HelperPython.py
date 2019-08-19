@@ -17,6 +17,7 @@ from glob import glob
 import datetime
 # time measurement
 from time import time
+from timeit import default_timer as timer
 # deep copy for dictionaries
 from copy import deepcopy
 import copy
