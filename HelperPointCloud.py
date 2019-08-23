@@ -417,6 +417,46 @@ def reorder_one_point_cloud_to_match_a_reference_with_last_element_an_id(pc_refe
     return pc_current_reordered,distances_current_to_reference_reshaped              
 # done function
 
+# applicable for the particular case of S=1, M=2 with a spatial value and an attribute which is an id as integer
+# we compress with a tolerance on the integer < 0.49 so the id remains the same in the compression
+# so we sort by simply matching the id
+def reorder_one_point_cloud_to_match_a_reference_with_last_element_an_id_new_way(pc_reference,pc_current,S,M,debug=False,verbose=False):
+    if debug or verbose:
+        print ""
+        print "Start reorder_one_point_cloud_to_match_a_reference_with_last_element_an_id()"
+    pc_current_reordered=np.copy(pc_current)
+    if debug:
+        print "pc_current",type(pc_current)
+        print pc_current
+        print "pc_current[:,1]",type(pc_current[:,1])
+        print pc_current[:,1]
+        print "[np.round(pc_current[:,1]).astype(np.uint32)",type(np.round(pc_current[:,1]).astype(np.uint32))
+        print np.round(pc_current[:,1]).astype(np.uint32)
+    # do the reordering
+    pc_current_reordered[np.round(pc_current[:,-1]).astype(np.uint32),:]=1*pc_current
+    if debug:
+        print "before reshape pc_current_reordered"
+        print pc_current_reordered,type(pc_current_reordered)
+    # create a new array without the last column
+    pc_current_reordered=pc_current_reordered[:,:M] # to skip the last element the index
+    if debug:
+        print "after reshape pc_current_reordered"
+        print pc_current_reordered,type(pc_current_reordered)
+    # calculate distance for the spatial dimensions S
+    distances_current_to_reference_reshaped=np.sqrt(np.sum(np.square(pc_current_reordered-pc_reference)[:,:S],axis=-1))
+    if debug:
+        pc_diff=(pc_current_reordered-pc_reference)**2
+        print "pc_diff",pc_diff,type(pc_diff),pc_diff.shape
+        pc_a=pc_diff[:,:S]
+        print "pc_a",pc_a,type(pc_a),pc_a.shape
+        pc_s2=np.sum(pc_a,axis=-1)
+        print "pc_s2",pc_s2,type(pc_s2),pc_s2.shape
+        pc_s=np.sqrt(pc_s2)
+        print "pc_s",pc_s,type(pc_s),pc_s.shape
+    # done all
+    return pc_current_reordered,distances_current_to_reference_reshaped              
+# done function
+
 def compare_two_point_clouds_with_same_order(pc_current,pc_reference,debug=False,verbose=False):
     pc_current_deviation=np.absolute(pc_current-pc_reference)
     if debug:
