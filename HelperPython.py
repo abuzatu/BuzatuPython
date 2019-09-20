@@ -5,7 +5,7 @@ import inspect
 from array import array
 # this allows you to call console (bash) commands into your script
 from subprocess import call
-import subprocess
+import subprocess 
 # help us see if a file exists
 import os.path
 # import operator needed to sort dictionaries in a list
@@ -13,6 +13,8 @@ import operator
 # to catch the stdout from ROOT in a text file
 import os,sys
 from glob import glob
+# shell utitiles, e.g. rmtree remove recursively in the folder
+import shutil as sh
 # for checking the itme stamps on the files
 import datetime
 # time measurement

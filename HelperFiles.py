@@ -43,7 +43,7 @@ def getFileNameStem(fileName,debug=False):
   return fileNameStem
 # done function
 
-def get_fileNameStem(fileName,debug=False):
+def get_fileNameStemOld(fileName,debug=False):
   if debug:
     print "fileName",fileName
   fileNameSplitBySlash=fileName.split("/")
@@ -59,17 +59,30 @@ def get_fileNameStem(fileName,debug=False):
   return fileNameStem
 # done function
 
+def get_fileNameStem(fileName,debug=False):
+  if debug:
+    print "fileName",fileName
+  fileNameStem=os.path.splitext(os.path.basename(fileName))[0]
+  if debug:
+    print "fileNameStem",fileNameStem
+  return fileNameStem
+# done function
+
 def get_list_fileFromFolder(inputFolderName,fileSearch="*.root",debug=False):
-    result=[]
-    proc = subprocess.Popen(["ls -1 "+inputFolderName+"/"+fileSearch], stdout=subprocess.PIPE, shell=True)
-    (out, err) = proc.communicate()
-    if debug:
-        print type(out),out
-    for file in out.split():
+    result=glob(inputFolderName+"/"+fileSearch)
+    if False:
+        # old code below deprecated by this glob command
+        result=[]
+        proc = subprocess.Popen(["ls -1 "+inputFolderName+"/"+fileSearch], stdout=subprocess.PIPE, shell=True)
+        (out, err) = proc.communicate()
         if debug:
-            print "file",file
-        result.append(file.strip('\n'))
-    # the file name contains full path
+            print type(out),out
+        for file in out.split():
+            if debug:
+                print "file",file
+            result.append(file.strip('\n'))
+        # the file name contains full path
+    # done if
     if debug:
         print "list_file:"
         for file in result:
