@@ -236,6 +236,53 @@ def get_nparray_from_binary_file(inputFileName,expected_M=0,debug=False,verbose=
     return nparray
 # done function
 
+def get_nparray_from_structured_array_from_binary_file(inputFileName,expected_M=0,debug=False,verbose=False):
+    if debug:
+        print "Reading numpy from structured array from a binary file",inputFileName
+    # start2=timer()
+    # read structured array
+    structured_array=np.load(inputFileName)
+    if debug:
+        print "structured_array:"
+        print "type",type(structured_array),"size",structured_array.size,"shape",structured_array.shape
+        print structured_array
+        # [('x', '<f4'), ('y', '<f4'), ('z', '<f4'), ('red', 'u1'), ('green', 'u1'), ('blue', 'u1'), ('index', '<f4')]
+        print "type",structured_array.dtype,"its type",type(structured_array.dtype)
+        print "descr",structured_array.dtype.descr,type(structured_array.dtype.descr)
+        print "names",structured_array.dtype.names,type(structured_array.dtype.names)
+    # done if 
+    temp_data = []
+    for i,axisName in enumerate(structured_array.dtype.names):
+        if debug:
+            print "i",i,"axisName",axisName
+            print axisName,structured_array[axisName],type(structured_array[axisName]),structured_array[axisName].dtype
+            print axisName,structured_array[axisName].astype('f4'),type(structured_array[axisName].astype('f4')),structured_array[axisName].astype('f4').dtype
+        # done if
+        temp_data.append(structured_array[axisName].astype('f4'))
+    # done for loop
+    if debug:
+        print "temp_data"
+        print temp_data,type(temp_data)
+    nparray_vstack=np.vstack(temp_data)
+    if debug:
+        print "nparray_vstack",nparray_vstack.dtype,nparray_vstack.shape
+        print nparray_vstack
+    nparray=nparray_vstack.T
+    if debug:
+        print "nparray",nparray.dtype,nparray.shape
+        print nparray
+    # check that it has the same number of axes (M) as expected
+    if expected_M!=nparray.shape[1]:
+        print "ERROR!!! Expected number of axes=M_expecte=",expected_M,"but obtained",nparray.shape[1],". Will ABORT!!!"
+        assert(False)
+    # done all
+    # end2=timer()
+    # print end2-start2,"seconds to Reading numpy from structured array from a binary file",inputFileName
+    # note, all of the file could be done in these two lines, but no gain in speed is observed
+    # structured_array=np.load(inputFileName)
+    # return np.vstack([structured_array[axisName].astype('f4') for i,axisName in enumerate(structured_array.dtype.names)]).T
+    return nparray
+# done function
 
 # write a point cloud represented as a nparray to an ASCII .ply file
 # so that we can visualize in CloudCompare smaller point clouds we create
