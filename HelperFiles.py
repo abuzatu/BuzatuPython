@@ -238,6 +238,20 @@ def append_performance_to_file(performanceFileName,list_list_varInfo,dict_varNam
     myFile.close()
 # done function
 
+def reduce_file_by_skipping_lines_starting_with_element_from_list(inputFileName,outputFileName,list_firstElement,debug):
+    f=open(inputFileName,"r")
+    o=open(outputFileName,"w")
+    for line in f:
+        # skip line if the first element of the line is in the list of elements to ignore
+        if line.split()[0] not in list_firstElement:
+            continue
+        # if here the line is good, so write it to the new file
+        o.write(line)
+    # done loop over lines
+    o.close()
+    f.close()
+# done function
+
 def read_file_with_values_in_numpy_array(fileName,debug):
     # the first line gives the name of the variables, so we take it from there
     # that way we can have only one function that can read any number of data files
