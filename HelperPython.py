@@ -377,6 +377,49 @@ def get_string_scale_resolution(fit_name,scale_value,resolution_value):
     return result
 # done function
 
+# dict_A: dictionary A -> a list of B
+# dict_B; dictionary B -> a list of C
+# one C can appear in several of lists of C
+# here we want a combined list of A where each element of A appears only once
+# here we want a combined list of B where each element of B appears only once
+# here we want a combined list of C where each element of C appears only once
+def get_lists_with_unique_elements_from_two_nested_dictionaries(dict_A,dict_B,debug=False,verbose=False):
+    list_A=dict_A.keys()
+    list_B=[]
+    list_C=[]
+    for A in list_A:
+        current_list_B=dict_A[A]
+        for B in current_list_B:
+            if B in list_B:
+                continue
+            list_B.append(B)
+            current_list_C=dict_B[B]
+            for C in current_list_C:
+                if C in list_C:
+                    continue
+                list_C.append(C)
+            # done loop over current_list_C
+        # done for loop over current_list_B
+    # done for loop over dict_A
+    # sort the lists alphabetically
+    list_A=sorted(list_A)
+    list_B=sorted(list_B)
+    list_C=sorted(list_C)
+    if debug:
+        print "list_A:"
+        for A in list_A:
+            print A
+        print "list_B:"
+        for B in list_B:
+            print B
+        print "list_C:"
+        for C in list_C:
+            print C
+    # done if
+    # all done, so return
+    return list_A,list_B,list_C
+# done function
+
 def get_duration_of_run(time_start,time_previous,option,debug):
   if option=="start":
     time_first=time_start
