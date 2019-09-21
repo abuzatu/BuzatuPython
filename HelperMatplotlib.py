@@ -83,9 +83,13 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
             print "i",i,"len",len(tupleArray)
         x=tupleArray[0]
         y=tupleArray[1]
-        c=tupleArray[2]
-        l=tupleArray[3]
-        plt.plot(x,y,c,label=l)
+        color=tupleArray[2]
+        marker=tupleArray[3]
+        l=tupleArray[4]
+        # print "c",c
+        # plt.plot(x,y,c,label=l)
+        # https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.plot.html
+        plt.plot(x,y,color=color,marker=marker,label=l)
     # done loop over each element to plot
     # set legend
     plt.legend(loc=info_legend[0])
