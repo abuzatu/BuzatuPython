@@ -70,6 +70,8 @@ def get_fileNameStem(fileName,debug=False):
 
 def get_list_fileFromFolder(inputFolderName,fileSearch="*.root",debug=False):
     result=glob(inputFolderName+"/"+fileSearch)
+    # since the results are returned in arbitrary order, let's sort the list to be in alphabetical order
+    result=sorted(result)
     if False:
         # old code below deprecated by this glob command
         result=[]
