@@ -460,6 +460,13 @@ def get_today_as_string(debug=False):
     return string_today
 # done function
 
+def a():
+    print ""
+    print ""
+    print "ABORT voluntarity so that we run the code only up to this point for debugging."
+    assert(False)
+# done function
+
 #########################################################
 ############### End all               ###################
 #########################################################
