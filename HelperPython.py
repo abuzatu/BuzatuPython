@@ -1,4 +1,5 @@
-#!/usr/bin/bin python
+#!/usr/bin/env python3
+
 import numpy as np
 import math
 import inspect
@@ -53,26 +54,26 @@ def updateListVariables(prefix,name,suffix):
 
 def getValues(event,listVariables,debug=False):
   if debug:
-    print "listVariables",listVariables
+      print("listVariables",listVariables)
   return numpy.array([getattr(event,variableName) for variableName in listVariables.split(',')])
 # done function
 
 def getProcessName(fileNameStem,debug=False):
   if debug:
-    print "fileNameStem",fileNameStem
+    print("fileNameStem",fileNameStem)
   fileNameStemSplitByUnderscore=fileNameStem.split("_")
   # now pick the last before last element, which means the process
   # as the last means _merged or _0
   processName=fileNameStemSplitByUnderscore[-2]
   if debug:
-    print "processStem",processName
+    print("processStem",processName)
   return processName
 # done function
 
 def doesFileExist(filename, debug):
     if os.path.isfile(filename):
         if debug:
-            print "DEBUG: File: %s Exisits" % (filename)
+            print("DEBUG: File: %s Exisits" % (filename))
         return True
     else:
         return False
@@ -82,34 +83,12 @@ def OpenFile(filename, debug):
     try:
         file = open(filename,"r")
         if debug:
-            print "DEBUG: Opening File: %s" % (filename)
+            print("DEBUG: Opening File: %s" % (filename))
         return file
-    except IOError, (erno, sterror):
-        print "IOError error(%s): %s" % (errno, strerror)
+    except IOError (erno, sterror):
+        print("IOError error(%s): %s" % (errno, strerror))
     except:
-        print "Unexpected error:", system.exc_info()[0]
-        raise
-# done function
-
-def doesFileExist(filename, debug):
-    if os.path.isfile(filename):
-        if debug:
-            print "DEBUG: File: %s Exisits" % (filename)
-        return True
-    else:
-        return False
-# done function
-
-def OpenFile(filename, debug):
-    try:
-        file = open(filename,"r")
-        if debug:
-            print "DEBUG: Opening File: %s" % (filename)
-        return file
-    except IOError, (erno, sterror):
-        print "IOError error(%s): %s" % (errno, strerror)
-    except:
-        print "Unexpected error:", system.exc_info()[0]
+        print("Unexpected error:", system.exc_info()[0])
         raise
 # done function
 
@@ -122,7 +101,7 @@ def dictMaker(dictObjects, debug):
         dict[name.split(":")[0]] = name.split(":")[1]
 
     if debug :
-        print "DEBUG: Dict: %s" % (dict)
+        print("DEBUG: Dict: %s" % (dict))
     return dict
 # done function
 
@@ -134,7 +113,7 @@ def tupleMaker(filename, debug):
       parsed_arg = [x.strip() for x in histo_info.split(',')]
       tuple.append(parsed_arg)
       if debug:
-        print "\nDEBUG: TUPLE OF FILE: %s\n %s\n" % (filename, tuple)
+        print("\nDEBUG: TUPLE OF FILE: %s\n %s\n" % (filename, tuple))
   return tuple
 # done function
 
@@ -144,25 +123,25 @@ def tupleMaker(filename, debug):
 # we run on all events with a step of 50000
 def getListSteps(nrEntries,event_step,debug):
   if debug:
-    print type(nrEntries)
-    print type(event_step)
-    print "event_step",event_step
+    print(type(nrEntries))
+    print(type(event_step))
+    print("event_step",event_step)
   result=[]
   remainder=nrEntries%event_step
   nrSteps=(nrEntries-remainder)/event_step
   if debug:
-    print "nrEntries",nrEntries,"event_step",event_step,"nrSteps",nrSteps,"plus remainder",remainder
+    print("nrEntries",nrEntries,"event_step",event_step,"nrSteps",nrSteps,"plus remainder",remainder)
   for i in xrange(nrSteps):
     result.append((1+i*event_step,(i+1)*event_step))
   result.append((1+nrSteps*event_step,nrEntries))
   if debug:
-    print "getListSteps",result
+    print("getListSteps",result)
   return result
 #done function
 
 def getModTime(file,debug):
   if debug:
-    print "file name",file
+    print("file name",file)
   if os.path.exists(file):
     t = os.path.getmtime(file)
     result=datetime.datetime.fromtimestamp(t)
@@ -170,7 +149,7 @@ def getModTime(file,debug):
     result=0
   # done if
   if debug:
-    print "result=",result
+    print("result=",result)
   return result
 # done function
 
@@ -185,10 +164,10 @@ def find_if_we_run_given_timestamps_input_output_files(fileInputName,fileOutputN
   # run only if the input file exists and either the output file does not exist or it is older than the input file
   shall_we_run=file_input_exists and (not file_output_exists or file_input_newer_than_file_output)
   if debug:
-    print "file_input_exists", file_input_exists
-    print "file_output_exists", file_output_exists
-    print "file_input_newer_than_file_output", file_input_newer_than_file_output
-    print "shall_we_run",shall_we_run
+    print("file_input_exists", file_input_exists)
+    print("file_output_exists", file_output_exists)
+    print("file_input_newer_than_file_output", file_input_newer_than_file_output)
+    print("shall_we_run",shall_we_run)
   # ready to return
   return shall_we_run
 # done function
@@ -211,14 +190,14 @@ def testTrainRankCalc(t_train, t_test):
 
 def get_numpyarray_from_listString(listString,debug=False):
   if debug:
-    print "listString",listString
+    print("listString",listString)
   listFloat=[]
   for string in listString:
     listFloat.append(float(string))
   # done for loop
   numpyarray=numpy.array(listFloat)
   if debug:
-    print "numpyarray",numpyarray
+    print("numpyarray",numpyarray)
   return numpyarray
 # done function
 
@@ -252,8 +231,8 @@ def concatenate_two_listString(list1,list2,debug):
 
 def concatenate_two_list_bk1(list1,list2,debug):
   if debug:
-    print "list1",list1
-    print "list2",list2
+    print("list1",list1)
+    print("list2",list2)
   result=[]
   for i1 in list1:
     temp1=[]
@@ -269,8 +248,8 @@ def concatenate_two_list_bk1(list1,list2,debug):
 
 def concatenate_two_list(list1,list2,debug):
   if debug:
-    print "list1",list1
-    print "list2",list2
+    print("list1",list1)
+    print("list2",list2)
   result=[]
   for i2 in list2:
     temp2=list1[:]
@@ -284,19 +263,19 @@ def concatenate_all_list(listBig,debug):
   result=[]
   for big in listBig:
     if debug:
-      print "big",big
-      print "result before",result
+      print("big",big)
+      print("result before",result)
     result=concatenate_two_list(result,big,debug)
     if debug:
-      print "result after",result
+      print("result after",result)
   # done loop over listBig
   return result
 # done function
 
 def concatenate_2_list(list1,list2,debug):
   if debug:
-    print "list1",list1
-    print "list2",list2
+    print("list1",list1)
+    print("list2",list2)
   result=[]
   for i1 in list1:
     for i2 in list2:
@@ -308,9 +287,9 @@ def concatenate_2_list(list1,list2,debug):
 
 def concatenate_3_list(list1,list2,list3,debug):
   if debug:
-    print "list1",list1
-    print "list2",list2
-    print "list3",list3
+    print("list1",list1)
+    print("list2",list2)
+    print("list3",list3)
   result=[]
   for i1 in list1:
     for i2 in list2:
@@ -324,15 +303,15 @@ def concatenate_3_list(list1,list2,list3,debug):
 
 def concatenate_21_list(listList,list3,debug):
   if debug:
-    print "listList",listList
-    print "list3",list3
+    print("listList",listList)
+    print("list3",list3)
   result=[]
   for myList in listList:
     if debug:
-      print "myList",myList
+      print("myList",myList)
     for i3 in list3:
       if debug:
-        print "i3",i3
+        print("i3",i3)
       currentMyList=myList[:]
       currentMyList.append(i3)
       result.append(currentMyList)
@@ -343,15 +322,15 @@ def concatenate_21_list(listList,list3,debug):
 
 def concatenate_list_to_list_of_list(myListOfList,myNewList,debug):
   if debug:
-    print "myListOfList",myListOfList
-    print "myNewList",myNewList
+    print("myListOfList",myListOfList)
+    print("myNewList",myNewList)
   result=[]
   for myList in myListOfList:
     if debug:
-      print "myList",myList
+      print("myList",myList)
     for element in myNewList:
       if debug:
-        print "element",element
+        print("element",element)
       currentMyList=myList[:]
       currentMyList.append(element)
       result.append(currentMyList)
@@ -406,15 +385,15 @@ def get_lists_with_unique_elements_from_two_nested_dictionaries(dict_A,dict_B,de
     list_B=sorted(list_B)
     list_C=sorted(list_C)
     if debug:
-        print "list_A:"
+        print("list_A:")
         for A in list_A:
-            print A
-        print "list_B:"
+            print(A)
+        print("list_B:")
         for B in list_B:
-            print B
-        print "list_C:"
+            print(B)
+        print("list_C:")
         for C in list_C:
-            print C
+            print(C)
     # done if
     # all done, so return
     return list_A,list_B,list_C
@@ -426,19 +405,19 @@ def get_duration_of_run(time_start,time_previous,option,debug):
   elif option=="current":
     time_first=time_previous
   else:
-    print "Option",option,"not known in get_duration_of_run(...). Choose start or current. Will ABORT!!!"
+    print("Option",option,"not known in get_duration_of_run(...). Choose start or current. Will ABORT!!!")
     assert(False)
   # done if
   time_current=time()
   if debug:
-    print "current",time_current,"first",time_first,"previous",time_previous
+    print("current",time_current,"first",time_first,"previous",time_previous)
   seconds=time_current-time_first
   minutes=seconds/60.0
   hours=minutes/60.0
   result="%-.0f s. %-.1f min. %-.3f h." % (seconds,minutes,hours)
   time_previous=deepcopy(time_current)
   if debug:
-    print "result",result
+    print("result",result)
   return time_previous,result
 # done function
 
@@ -448,7 +427,7 @@ def get_use_from_bool(option,debug=False):
     else:
         result="0"
     if debug:
-        print "option",option,"result",result
+        print("option",option,"result",result)
     return result
 # done function
 
@@ -456,15 +435,41 @@ def get_today_as_string(debug=False):
     today=datetime.date.today()
     string_today=today.strftime("%d %b %Y") # e.g. 04 Aug 2019
     if debug:
-        print "string_today",string_today
+        print("string_today",string_today)
     return string_today
 # done function
 
 def a():
-    print ""
-    print ""
-    print "ABORT voluntarity so that we run the code only up to this point for debugging."
+    print("")
+    print("")
+    print("ABORT voluntarity so that we run the code only up to this point for debugging.")
     assert(False)
+# done function
+
+# user gives "101001"; this convers to int that is interpreted as bool
+# to decide what steps to run on on what steps not to run on
+def get_list_steps(doStage,debug=False):
+    if debug:
+        print("Start get_list_steps(doStage): len(doStage)",len(doStage),"doStage",doStage)
+    if len(doStage)==5:
+        list_steps=[]
+        for c in doStage:
+            if debug:
+                print("c",c)
+            if not (c=="0" or c=="1"):
+                print("character c",c,"not 0 or 1 as part of doStage",doStage,". Will ABORT!!!!")
+                assert(False)
+            # done if
+            list_steps.append(int(c))
+        # done loop over characters
+        if debug:
+            print("for 5 characters, list_steps",list_steps)
+    # done if doStage has 5 arguments
+    else:
+        print("doStage",doStage,"does not have 5 elements. Will ABORT!!!")
+        assert(False)
+    # done if
+    return list_steps
 # done function
 
 #########################################################

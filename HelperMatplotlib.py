@@ -1,15 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-from HelperPython import *
 # import for data analysis and plotting
-import matplotlib.dates as mdates
+import matplotlib.pylab as pylab
+#import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-import matplotlib.axes as ax
+#import matplotlib.axes as ax
 # from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 # from matplotlib.figure import Figure
 # import matplotlib.gridspec as gridspec
-import pylab
-import copy
 
 # a general function to print the values and other properties of a numpy array
 # use to see the values of the numpy arrays in our code for debugging and understanding the code flow
@@ -24,13 +22,13 @@ def print_nparray(name,nparray):
 # info_legend="best", "uppler right", "lowerleft", etc
 def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf,png",info_x=["Procent of data reduced",[0.0,1.0],"linear"],info_y=["Figure of merit of performance",[0.0,100000.0],"log"],info_legend=["best"],title="Compared performance of 3D point cloud compression",debug=False):
     if debug:
-        print "Start overlayGraphsValues"
-        print "outputFileName",outputFileName
-        print "extensions",extensions
-        print "info_x",info_x
-        print "info_y",info_y
-        print "info_legend",info_legend
-        print "title",title
+        print("Start overlayGraphsValues")
+        print("outputFileName",outputFileName)
+        print("extensions",extensions)
+        print("info_x",info_x)
+        print("info_y",info_y)
+        print("info_legend",info_legend)
+        print("title",title)
     # x axis
     x_label=info_x[0]
     x_lim=info_x[1]
@@ -42,11 +40,11 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
         x_set_lim=True
     x_scale=info_x[2]
     if debug:
-        print "x_label",x_label,type(x_label)
-        print "x_lim_min",x_lim_min,type(x_lim_min)
-        print "x_lim_max",x_lim_max,type(x_lim_max)
-        print "x_set_lim",x_set_lim,type(x_set_lim)
-        print "x_scale",x_scale,type(x_scale)
+        print("x_label",x_label,type(x_label))
+        print("x_lim_min",x_lim_min,type(x_lim_min))
+        print("x_lim_max",x_lim_max,type(x_lim_max))
+        print("x_set_lim",x_set_lim,type(x_set_lim))
+        print("x_scale",x_scale,type(x_scale))
     # y axis
     y_label=info_y[0]
     y_lim=info_y[1]
@@ -58,11 +56,11 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
         y_set_lim=True
     y_scale=info_y[2]
     if debug:
-        print "y_label",y_label,type(y_label)
-        print "y_lim_min",y_lim_min,type(y_lim_min)
-        print "y_lim_max",y_lim_max,type(y_lim_max)
-        print "y_set_lim",y_set_lim,type(y_set_lim)
-        print "y_scale",y_scale,type(y_scale)
+        print("y_label",y_label,type(y_label))
+        print("y_lim_min",y_lim_min,type(y_lim_min))
+        print("y_lim_max",y_lim_max,type(y_lim_max))
+        print("y_set_lim",y_set_lim,type(y_set_lim))
+        print("y_scale",y_scale,type(y_scale))
     # create empty figure
     plt.figure(1)
     # set x-axis
@@ -80,13 +78,13 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
     # fill content of plot
     for i,tupleArray in enumerate(list_tupleArray):
         if debug:
-            print "i",i,"len",len(tupleArray)
+            print("i",i,"len",len(tupleArray))
         x=tupleArray[0]
         y=tupleArray[1]
         color=tupleArray[2]
         marker=tupleArray[3]
         l=tupleArray[4]
-        # print "c",c
+        # print("c",c)
         # plt.plot(x,y,c,label=l)
         # https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.plot.html
         plt.plot(x,y,color=color,marker=marker,label=l)
@@ -96,7 +94,7 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
     # for each extension create a plot
     for extension in extensions.split(","):
         fileNameFull=outputFileName+"."+extension
-        print "Saving plot at",fileNameFull
+        print("Saving plot at",fileNameFull)
         plt.savefig(fileNameFull)
     # close the figure
     plt.close()
@@ -104,21 +102,22 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
 
 def draw_histogram_from_nparray(nparray,outputFileName="./output_histo_from_nparray",extensions="png,pdf",nrBins=100,info_x=["x-axis","linear"],info_y=["Number of points","linear"],title="Title",text=None,debug=False,verbose=False):
     if debug:
-        print "Start draw_histogram_from_nparray()"
-        print "outputFileName",outputFileName
-        print "extensions",extensions
-        print "info_x",info_x
-        print "info_y",info_y
-        print "title",title
+        print("Start draw_histogram_from_nparray()")
+        print("outputFileName",outputFileName)
+        print("extensions",extensions)
+        print("info_x",info_x)
+        print("info_y",info_y)
+        print("title",title)
     # 
     fig=pylab.figure()
+    #fig=matplotlib.pylab.figure()
     ax = fig.add_subplot(111)
     n,b,patches=ax.hist(nparray,bins=nrBins)
     if debug:
-        print "n",n
-        print "b",b
-        print "patches",patches
-        print "max",n.max()
+        print("n",n)
+        print("b",b)
+        print("patches",patches)
+        print("max",n.max())
     # axes
     x_label,x_scale=info_x
     y_label,y_scale=info_y
@@ -135,7 +134,7 @@ def draw_histogram_from_nparray(nparray,outputFileName="./output_histo_from_npar
     # for each extension create a plot
     for extension in extensions.split(","):
         fileNameFull=outputFileName+"."+extension
-        print "Saving plot at",fileNameFull
+        print("Saving plot at",fileNameFull)
         plt.savefig(fileNameFull)
     # close the figure
     plt.close()
@@ -172,19 +171,19 @@ def overlay_histogram_from_nparray(list_tupleArray,outputFileName="./output_hist
                 print("max_y",max_y)
     if style=="B":
         for i,tupleArray in enumerate(list_tupleArray):
-            print "tupleArray",tupleArray
+            print("tupleArray",tupleArray)
             nparray,legendText=tupleArray
-            print "nparray",nparray
-            print "legendText",legendText
-            print "i",i
+            print("nparray",nparray)
+            print("legendText",legendText)
+            print("i",i)
             
             y,x,a=plt.hist(nparray,bins=nrBins,alpha=1,color=list_color[i],histtype=histtype,label=legendText)
             # note y (vertical) is returned before x (horizontal)
-            print "x",type(x),x
-            print "y",type(y),y
-            #print type(x),x,len(x),x.shape,np.min(x),np.max(x),np.sum(x)
-            #print type(y),y,len(y),y.shape,np.min(y),np.max(y),np.sum(y)
-            #print type(a),a
+            print("x",type(x),x)
+            print("y",type(y),y)
+            #print(type(x),x,len(x),x.shape,np.min(x),np.max(x),np.sum(x))
+            #print(type(y),y,len(y),y.shape,np.min(y),np.max(y),np.sum(y))
+            #print(type(a),a)
             max_y=np.max(y)
             #print_nparray("x",legendText,"x",x)
             #print_nparray("x",legendText,"y",y)
@@ -234,7 +233,7 @@ def overlay_histogram_from_nparray_with_ratio(list_tupleArray,outputFileName="./
     n_reference=0
     for i,(nparray,legendText) in enumerate(list_tupleArray):
         if debug:
-            print "i",i,legendText,nparray
+            print("i",i,legendText,nparray)
         if doAddRatioPad:
             ax=fig.add_subplot(211)
         else:

@@ -1,5 +1,8 @@
-#!/usr/bin/env python
-from HelperPython import *
+#!/usr/bin/env python3
+
+import os
+from glob import glob
+import numpy as np
 
 def example_format_string():
     list_values=[
@@ -9,13 +12,13 @@ def example_format_string():
         ]
     for text,i,binLowEdge,binHighEdge,binContent,binError in list_values:
         line="%8s bin %4.0f range [%4.0f,%4.0f] value %8.2f error %8.2f" % (text,i,binLowEdge,binHighEdge,binContent,binError)
-        print line
+        print(line)
     #     bla bin    1 range [   0,  30] value     0.00 error     0.00
     #   bla22 bin    5 range [ 170, 190] value   559.06 error    30.65
     #  bla333 bin   16 range [ 500,1300] value     7.22 error     2.38
     for text,i,binLowEdge,binHighEdge,binContent,binError in list_values:
         line="%-8s bin %-4.0f range [%-4.0f,%4.0f] value %-8.2f error %-8.2f" % (text,i,binLowEdge,binHighEdge,binContent,binError)
-        print line
+        print(line)
     # bla      bin 1    range [0   ,  30] value 0.00     error 0.00    
     # bla22    bin 5    range [170 , 190] value 559.06   error 30.65   
     # bla333   bin 16   range [500 ,1300] value 7.22     error 2.38 
@@ -24,47 +27,47 @@ def example_format_string():
 
 def getFileNameStem(fileName,debug=False):
   if debug:
-    print "fileName",fileName
+    print("fileName",fileName)
   fileNameSplitBySlash=fileName.split("/")
   # now pick the last element, which means with path removed
   # find out how many elements are in the list
   nrElements=len(fileNameSplitBySlash)
   fileNameWithoutPath=fileNameSplitBySlash[nrElements-1]
   if debug:
-    print "fileNameWithoutPath",fileNameWithoutPath
+    print("fileNameWithoutPath",fileNameWithoutPath)
   fileNameStem=fileNameWithoutPath.split(".")[0]
   if debug:
-    print "fileNameStem",fileNameStem
+    print("fileNameStem",fileNameStem)
   # a bit hard coded, but we know the name of the root files start with
   # train_tree_ and we want to remove that, it has 11 characters
   fileNameStem=fileNameStem[12:]
   if debug:
-    print "fileNameStem",fileNameStem
+    print("fileNameStem",fileNameStem)
   return fileNameStem
 # done function
 
 def get_fileNameStemOld(fileName,debug=False):
   if debug:
-    print "fileName",fileName
+    print("fileName",fileName)
   fileNameSplitBySlash=fileName.split("/")
   # now pick the last element, which means with path removed
   # find out how many elements are in the list
   nrElements=len(fileNameSplitBySlash)
   fileNameWithoutPath=fileNameSplitBySlash[nrElements-1]
   if debug:
-    print "fileNameWithoutPath",fileNameWithoutPath
+    print("fileNameWithoutPath",fileNameWithoutPath)
   fileNameStem=fileNameWithoutPath.split(".")[0]
   if debug:
-    print "fileNameStem",fileNameStem
+    print("fileNameStem",fileNameStem)
   return fileNameStem
 # done function
 
 def get_fileNameStem(fileName,debug=False):
   if debug:
-    print "fileName",fileName
+    print("fileName",fileName)
   fileNameStem=os.path.splitext(os.path.basename(fileName))[0]
   if debug:
-    print "fileNameStem",fileNameStem
+    print("fileNameStem",fileNameStem)
   return fileNameStem
 # done function
 
@@ -78,17 +81,17 @@ def get_list_fileFromFolder(inputFolderName,fileSearch="*.root",debug=False):
         proc = subprocess.Popen(["ls -1 "+inputFolderName+"/"+fileSearch], stdout=subprocess.PIPE, shell=True)
         (out, err) = proc.communicate()
         if debug:
-            print type(out),out
+            print(type(out),out)
         for file in out.split():
             if debug:
-                print "file",file
+                print("file",file)
             result.append(file.strip('\n'))
         # the file name contains full path
     # done if
     if debug:
-        print "list_file:"
+        print("list_file:")
         for file in result:
-            print file
+            print(file)
     return result
 # done function
 
@@ -106,7 +109,7 @@ def get_python_list_filesFromFolder(inputFolderName,fileSearch="*.root",
         # will append
         None
     else:
-        print "optionOpenFile",optionOpenFile,"not known. Choose w (rewrite), a (append). Will ABORT!!!"
+        print("optionOpenFile",optionOpenFile,"not known. Choose w (rewrite), a (append). Will ABORT!!!")
         assert(False)
     # end if
     line=" \n"
@@ -115,7 +118,7 @@ def get_python_list_filesFromFolder(inputFolderName,fileSearch="*.root",
     outputFile.write(line)
     list_fileName=get_list_fileFromFolder(inputFolderName,fileSearch,debug)
     for fileName in list_fileName:
-        print "fileName",fileName
+        print("fileName",fileName)
         line="    \""+fileName+"\",\n"
         outputFile.write(line)
     # done loop over files
@@ -123,7 +126,7 @@ def get_python_list_filesFromFolder(inputFolderName,fileSearch="*.root",
     outputFile.write(line)
     outputFile.close()
     if True:
-        print "File ",outputFileName,"has been created."
+        print("File ",outputFileName,"has been created.")
 # done function
 
 def get_list_from_file(fileName,debug=False):
@@ -132,11 +135,11 @@ def get_list_from_file(fileName,debug=False):
     for line in open(fileName, 'r'):
         line=line.rstrip()
         if debug:
-            print "line",line
+            print("line",line)
         list_line.append(line)
     # done for loop over lines
     if debug:
-        print "list_line",list_line
+        print("list_line",list_line)
     return list_line
 # done function
 
@@ -146,7 +149,7 @@ def get_value_from_file(fileName,debug):
     with open(fileName) as f:
         value=float(f.readline().rstrip())
     if debug:
-        print "value from fileName",fileName,"is value",value
+        print("value from fileName",fileName,"is value",value)
     return value
 # done function
 
@@ -162,11 +165,11 @@ def get_stringFormat(list_varInfo,option,debug=False):
     elif option=="f":
         pass
     else:
-        print "option",option,"not known. Must be s or f. String or Float. Will ABORT!!!"
+        print("option",option,"not known. Must be s or f. String or Float. Will ABORT!!!")
         assert(False)
     # done if
     if debug:
-        print "option",option,"varType",varType
+        print("option",option,"varType",varType)
     # start build the stringFormat
     stringFormat="%"
     # add if arranged to the left of to the right
@@ -177,7 +180,7 @@ def get_stringFormat(list_varInfo,option,debug=False):
     elif side=="r":
         pass # %25s
     else:
-        print "side",side,"not known. Choose l or r. Left or Right. Will ABORT!!!"
+        print("side",side,"not known. Choose l or r. Left or Right. Will ABORT!!!")
         assert(False)
     # done if
     # add the length of the string
@@ -188,7 +191,7 @@ def get_stringFormat(list_varInfo,option,debug=False):
     elif varType=="f":
         stringFormat+="."+str(nrDigitsAfterDot)+"f" # %15.4f or %-15.4f
     else:
-        print "varType",varType,"not known. Choose s or f. String or Float. Will ABORT!!!"
+        print("varType",varType,"not known. Choose s or f. String or Float. Will ABORT!!!")
         assert(False)
     # done if
     return stringFormat
@@ -196,33 +199,33 @@ def get_stringFormat(list_varInfo,option,debug=False):
 
 def get_performanceText_names(list_list_varInfo,debug):
     if debug:
-        print "Start get_performanceText_names()"
+        print("Start get_performanceText_names()")
     performanceText=""
     for list_varInfo in list_list_varInfo:
         stringFormat=get_stringFormat(list_varInfo,"s")
         varName=list_varInfo[0]
         if debug:
-            print "stringFormat",stringFormat,"varName",varName
+            print("stringFormat",stringFormat,"varName",varName)
         performanceText+=stringFormat % varName
     # done for loop
     if debug:
-        print "performanceText",performanceText
+        print("performanceText",performanceText)
     return performanceText
 # done function
 
 def get_performanceText_values(list_list_varInfo,dict_varName_value,debug):
     if debug:
-        print "Start get_performanceText_values()"
+        print("Start get_performanceText_values()")
     performanceText=""
     for list_varInfo in list_list_varInfo:
         stringFormat=get_stringFormat(list_varInfo,"f")
         varName=list_varInfo[0]
         if debug:
-            print "stringFormat",stringFormat,"varName",varName
+            print("stringFormat",stringFormat,"varName",varName)
         performanceText+=stringFormat % dict_varName_value[varName]
     # done for loop
     if debug:
-        print "performanceText",performanceText
+        print("performanceText",performanceText)
     return performanceText        
 # done function
 
@@ -263,24 +266,24 @@ def read_file_with_values_in_numpy_array(fileName,debug):
     for line in f:
         line=line.rstrip()
         if debug:
-            print "line",line
+            print("line",line)
         if line.startswith("#"):
             if debug or verbose:
-                print "Skipping line",line
+                print("Skipping line",line)
             continue
         list_line=line.split()
         if debug:
-            print "list_line",list_line
+            print("list_line",list_line)
         counter+=1
         if counter==1:
             list_name=list_line
             break
     # done loop over the file first
     if debug:
-        print "list_name",list_name
+        print("list_name",list_name)
     if debug:
-        print ""
-        print "Start loop again over the files"
+        print("")
+        print("Start loop again over the files")
     # to plot we need numpyarrays, to create them we need lists
     dict_name_list_value={}
     for name in list_name:
@@ -290,9 +293,9 @@ def read_file_with_values_in_numpy_array(fileName,debug):
     for line in f:
         line=line.rstrip()
         if debug:
-            print "line",line
+            print("line",line)
         if line.startswith("#"):
-            print "Skipping line",line
+            print("Skipping line",line)
             continue
         counter+=1
         if counter==1:
@@ -300,7 +303,7 @@ def read_file_with_values_in_numpy_array(fileName,debug):
         # now we are from the first line with values
         list_line=line.split()
         if debug:
-            print "list_line",list_line
+            print("list_line",list_line)
         dict_name_value={}
         # loop over names and fill the dictionary of values in the correct format (date and floats)
         for i,name in enumerate(list_name):
@@ -313,25 +316,25 @@ def read_file_with_values_in_numpy_array(fileName,debug):
                 dict_name_value[name]=float(dict_name_value[name])
             # done if
             if debug:
-                print "counter",counter,"i",i,"name",name,"value",dict_name_value[name],"type",type(dict_name_value[name])
+                print("counter",counter,"i",i,"name",name,"value",dict_name_value[name],"type",type(dict_name_value[name]))
         # for each name, append to its list
         for name in list_name:
             if debug:
-                print "name",name,"value",dict_name_value[name]
+                print("name",name,"value",dict_name_value[name])
             dict_name_list_value[name].append(dict_name_value[name])
     # done for loop over all the lines
     # from lists create numpy arrays
     dict_name_nparray_value={}
     for name in list_name:
         if debug:
-            print "name",name,"list_value",dict_name_list_value[name]
+            print("name",name,"list_value",dict_name_list_value[name])
         if name=="Date":            
             dict_name_nparray_value[name]=np.array(dict_name_list_value[name],dtype='datetime64[D]')
             dict_name_nparray_value[name]=dict_name_nparray_value[name].astype('O')
         else:
             dict_name_nparray_value[name]=np.array(dict_name_list_value[name])
         if debug and name=="Date":
-            print "name",name,"np.array",dict_name_nparray_value[name]
+            print("name",name,"np.array",dict_name_nparray_value[name])
     # done loop over names
     # finished reading the file
     # print the output
@@ -339,7 +342,7 @@ def read_file_with_values_in_numpy_array(fileName,debug):
         if debug or True:
             # if name=="Date":
             if debug:
-                print "name",name,"nparray_value",dict_name_nparray_value[name]
+                print("name",name,"nparray_value",dict_name_nparray_value[name])
     # ready to return
     return list_name,dict_name_nparray_value
 # done function

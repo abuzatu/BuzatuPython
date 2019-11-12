@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import math
 
@@ -10,7 +10,7 @@ import math
 # 0.0, 5.0, 0.1 - from 0.0 to 5.0 with a step of 0.1
 def get_binRange(initial,end,step,debug=False):
     if debug:
-        print "Start get_binRange: initial",initial,"end",end,"step",step
+        print("Start get_binRange: initial",initial,"end",end,"step",step)
     result=str(initial)
     i=initial
     epsilon=0.0001
@@ -20,7 +20,7 @@ def get_binRange(initial,end,step,debug=False):
             i=0
         result+=","+str(i)
     if debug:
-        print "binRange("+str(initial)+","+str(end)+","+str(step)+")="+result
+        print("binRange("+str(initial)+","+str(end)+","+str(step)+")="+result)
     return result
 # done function
 
@@ -30,13 +30,13 @@ def remove_duplicates_from_generic_binRange(binRange="150,200,400",debug=False):
     # one ends and the other starts with the same value
     # in that case, skip one of them, as it gives incorrectly a bin of zero range
     if debug:
-        print "input binRange",binRange
+        print("input binRange",binRange)
     binRangeOutput=""
     previousEdge=""
     list_repeatedEdge=[]
     for i,currentEdge in enumerate(binRange.split(",")):
         if False:
-            print "previousEdge",previousEdge,"currentEdge",currentEdge
+            print("previousEdge",previousEdge,"currentEdge",currentEdge)
         if currentEdge!=previousEdge:
             if i!=0:
                 binRangeOutput+=","
@@ -45,7 +45,7 @@ def remove_duplicates_from_generic_binRange(binRange="150,200,400",debug=False):
         previousEdge=currentEdge
     # done for loop over bin edges
     if debug:
-        print "output binRange",binRangeOutput
+        print("output binRange",binRangeOutput)
     return binRangeOutput
 # done
 
@@ -55,7 +55,7 @@ def remove_duplicates_from_generic_binRange(binRange="150,200,400",debug=False):
 # for the all sample we use all events
 def keepEntry(sample,i,debug):
   if debug:
-    print "i",i,"sample",sample
+    print("i",i,"sample",sample)
   result=False
   if sample=="train":
     # keep only even-number entries (events or jets), as they were used in the training of the NN
@@ -69,7 +69,7 @@ def keepEntry(sample,i,debug):
     # keep all the entries (events or jets)
     result=True
   else:
-    print "sample",sample,"not known, will abort. Need to choose between train, test and all"
+    print("sample",sample,"not known, will abort. Need to choose between train, test and all")
     assert(False)
   # done if on sample
   return result
@@ -82,14 +82,14 @@ def keepEntry(sample,i,debug):
 
 def get_list_intervals(string_values="",addUnderflow=False,addOverflow=False,addInclusive=False,debug=False):
     if debug:
-        print "string_values",string_values
+        print("string_values",string_values)
     result=[]
     if string_values=="":
       result.append((float("-inf"),float("inf")))
     else:
       list_values=string_values.split(",")
       if debug:
-        print "list_values",list_values
+        print("list_values",list_values)
       if addUnderflow:
         # add underflow (from minus infinity to the first element)
         result.append((float("-inf"),float(list_values[0])))
@@ -107,7 +107,7 @@ def get_list_intervals(string_values="",addUnderflow=False,addOverflow=False,add
       result.append((float("-inf"),float("inf")))
     # check result
     if debug:
-        print "get_list_intervals",result
+        print("get_list_intervals",result)
     # return result
     return result   
 # done function
@@ -118,22 +118,22 @@ def find_bin_in_list(list_bin,value_bin,debug):
   for bin in list_bin:
     if bin[0]<=value_bin<bin[-1]:
       if debug:
-        print "The value_bin",value_bin,"is in the interval",bin
+        print("The value_bin",value_bin,"is in the interval",bin)
       return bin
 # done function
 
 def get_array_values(string_values,debug):
     if debug:
-        print "string_values",string_values
+        print("string_values",string_values)
     result=[]
     list_values=string_values.split(",")
     if debug:
-        print "list_values",list_values
+        print("list_values",list_values)
     for i in range(len(list_values)):
         result.append((float(list_values[i])))
     # check result
     if debug:
-        print "array_values",result
+        print("array_values",result)
     # return result
     return result   
 # done function
@@ -144,7 +144,7 @@ def get_array_values(string_values,debug):
 # so that we can do in TBrowswer histo_name->Draw(), etc
 def get_bin_string(bin,factor,debug):
     if debug:
-        print "bin",bin
+        print("bin",bin)
     result=""
     for i,value in enumerate(bin):
         if value==float("-inf") or value==float("inf"):
@@ -152,13 +152,13 @@ def get_bin_string(bin,factor,debug):
         else:
             value_string="%-.0f" % (value*factor)
         if debug:
-            print "i",i,"value_string",value_string
+            print("i",i,"value_string",value_string)
         if i!=0:
             result+="_"
         result+=value_string
     # done for loop over the two elements in the bin
     if debug:
-        print "bin_string",result
+        print("bin_string",result)
     return result
 # done function
 
@@ -167,7 +167,7 @@ def get_listBinSelected(listBin,binValue,debug):
     for bin in listBin:
         if bin[0]<=binValue<bin[-1]:
             if debug:
-                print "The binValue",binValue,"is in the interval",bin
+                print("The binValue",binValue,"is in the interval",bin)
             result.append(bin)
     # done for loop
     return result
@@ -181,7 +181,7 @@ def get_listBinMerged(listBin,binMerged,debug):
     for bin in listBin:
         if bin[0]>=binMerged[0] and bin[1]<=binMerged[1]:
             if debug:
-                print "The bin",bin,"is in the desired merged bin",binMerged
+                print("The bin",bin,"is in the desired merged bin",binMerged)
             result.append(bin)
     # done for loop
     return result
@@ -191,7 +191,7 @@ def get_listStringBin(binVariable,factor,listBin,debug):
     result=[]
     for bin in listBin:
         if debug:
-            print "bin",bin
+            print("bin",bin)
         currentString=binVariable
         if factor!=1:
           currentString+="x%-.0f" % factor
@@ -205,22 +205,22 @@ def get_listString_from_dict_binVariable_listBin(list_binVariable,dict_binVariab
   result=[]
   for i,binVariable in enumerate(list_binVariable):
     if debug:
-      print "binVariable",binVariable
+      print("binVariable",binVariable)
     factor=dict_binVariable_factor[binVariable]
     if debug:
-      print "factor",factor
+      print("factor",factor)
     listBin=dict_binVariable_listBin[binVariable]
     if debug:
-      print "listBin",listBin
+      print("listBin",listBin)
     listStringCurrent=get_listStringBin(binVariable,factor,listBin,debug)
     if debug:
-      print "listStringCurrent",listStringCurrent
+      print("listStringCurrent",listStringCurrent)
     if i==0:
       result=listStringCurrent
     else:
       result=concatenate_two_listString(result,listStringCurrent,debug)
     if debug:
-      print "aftr step",i,"result is",result
+      print("aftr step",i,"result is",result)
   # done loop over binVariable
   return result
 # done function
@@ -240,23 +240,23 @@ def split_listBin(list_binVariable,dict_binVariable_listBin,debug):
 
 def get_list_dict_binVariable_bin(list_binVariable,dict_binVariable_listBin,debug):
   result=[]
-  print ""
+  print("")
   for binVariable in list_binVariable:
     if debug:
-      print "binVariable",binVariable
+      print("binVariable",binVariable)
     dict_binVariable_bin={}
     listBin=dict_binVariable_listBin[binVariable]
     if debug:
-      print "listBin",listBin
+      print("listBin",listBin)
     dict_binVariable_bin[binVariable]=bin
   # 
   if debug:
-    print "dict_binVariable_bin",dict_binVariable_bin
+    print("dict_binVariable_bin",dict_binVariable_bin)
   return result
 # done function
 
 def get_list_list_dict_binVariable_bin(binVariable,dict_binVariable_listBin,debug):
-  print ""
+  print("")
   result=[]
   for bin in dict_binVariable_listBin[binVariable]:
     result.append([{binVariable:bin}])
@@ -265,7 +265,7 @@ def get_list_list_dict_binVariable_bin(binVariable,dict_binVariable_listBin,debu
 # done function
 
 def get_list_dict_binVariable_bin(binVariable,dict_binVariable_listBin,debug):
-  print ""
+  print("")
   result=[]
   for bin in dict_binVariable_listBin[binVariable]:
     result.append({binVariable:bin})
@@ -275,19 +275,19 @@ def get_list_dict_binVariable_bin(binVariable,dict_binVariable_listBin,debug):
 
 def concatenate_two_list_dict_binVariable_bin(list1,list2,debug):
   if debug:
-    print "list1",list1
-    print "list2",list2
+    print("list1",list1)
+    print("list2",list2)
   if len(list1)==0:
     return list2
   result=[]
   for i1 in list1:
     if debug:
-      print "i1",i1
+      print("i1",i1)
     for i2 in list2:
       if debug:
-        print "i2",i2
+        print("i2",i2)
       temp1=copy.deepcopy(i1)
-      print temp1.update(i2)
+      print(temp1.update(i2))
       result.append(temp1)
     # lone loop over list2
   # done loop over list1
@@ -322,7 +322,7 @@ def get_string_from_dict_binVariable_bin(list_binVariable,dict_binVariable_bin,d
 # start functions
 def percentageDifference(x,y,debug=False):
   if debug:
-    print "x",x,"y",y
+    print("x",x,"y",y)
   if -0.0001<y<0.0001:
     result=0.0
   else:
@@ -357,7 +357,7 @@ def combinations(iterable, r):
 
 def process_sample(list_value,debug=False):
     if debug:
-        print "list_value",list_value
+        print("list_value",list_value)
     N=len(list_value)
     Sum=0.0
     for value in list_value:
@@ -375,24 +375,24 @@ def process_sample(list_value,debug=False):
     # standard error 
     StdErr=ratio(StdDev,math.sqrt(N))
     if debug:
-        print "N=%.0f Mean=%.2f StdDev=%.2f StdErr=%.2f" % (N,Mean,StdDev,StdErr)
+        print("N=%.0f Mean=%.2f StdDev=%.2f StdErr=%.2f" % (N,Mean,StdDev,StdErr))
     return N,Mean,StdDev,StdErr
 # done function
 
 def tuple_times_scalar(myTuple,myScalar,debug=False):
     myTupleResult=(myTuple[0]*myScalar,myTuple[1]*myScalar)
     if debug:
-        print "myTuple",myTuple,"myScalar",myScalar,"myTupleResult",myTupleResult
+        print("myTuple",myTuple,"myScalar",myScalar,"myTupleResult",myTupleResult)
     return myTupleResult
 # done function
 
 # ratio, or s/b
 def ratio(s,b,debug=False):
     if debug:
-        print "ratio","s",s,"b",b
+        print("ratio","s",s,"b",b)
     if -0.00001<b<0.00001:
         if True:
-            print "WARNING! -0.0001<b<0.0001, returning result 0! s=",str(s)," b=",str(b) 
+            print("WARNING! -0.0001<b<0.0001, returning result 0! s=",str(s)," b=",str(b))
         result=0
     else:
         result=s/b
@@ -405,10 +405,10 @@ def ratio(s,b,debug=False):
 # ratio or s/b
 def ratioError(s,se,b,be,debug=False):
     if debug:
-        print "ratioError","s",s,"se",se,"b",b,"be",be
+        print("ratioError","s",s,"se",se,"b",b,"be",be)
     if b==0:
         if True:
-            print "WARNING! -0.0001<b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
+            print("WARNING! -0.0001<b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b))
         result=0.0
         error=0.0
     else:
@@ -429,10 +429,10 @@ def ratioTuple(tupleNumer,tupleDenom,debug=False):
 # slide 37 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
 def sensitivity(s,se,b,be,debug=False):
     if debug:
-        print "sensitivity ","s",s,"se",se,"b",b,"be",be
+        print("sensitivity ","s",s,"se",se,"b",b,"be",be)
     if b<0.0001:
         if True:
-            print "WARNING! b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
+            print("WARNING! b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b))
         result=0
         error=0
     else:
@@ -440,13 +440,13 @@ def sensitivity(s,se,b,be,debug=False):
         #error=result*math.sqrt( math.pow(se/s,2)+math.pow(-0.5*be/b,2) )
         dfds=1.0/math.sqrt(b)
         if debug:
-            print "dfds",dfds
+            print("dfds",dfds)
         dfdb=-s/(2.0*math.pow(b,3.0/2.0))
         if debug:
-            print "dfdb",dfdb
+            print("dfdb",dfdb)
         error=math.sqrt(math.pow(dfds,2)*math.pow(se,2)+math.pow(dfdb,2)*math.pow(be,2))
     if debug:
-        print "sensitivity ","content +/-error","%-.5f +/- %-.5f" % (result,error) 
+        print("sensitivity ","content +/-error","%-.5f +/- %-.5f" % (result,error))
     return (result,error)
 # done function
 
@@ -454,12 +454,12 @@ def sensitivity(s,se,b,be,debug=False):
 # slides 37 and 38 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
 def significance(s,se,b,be,debug=False):
     if debug:
-        print "significance","s",s,"se",se,"b",b,"be",be
+        print("significance","s",s,"se",se,"b",b,"be",be)
     if b<0.001:
         result=0
         error=0
         if True:
-            print "WARNING! b<0.001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
+            print("WARNING! b<0.001, returning result 0 and error 0! s=",str(s)," b=",str(b))
     else:
         # for very low numbers, the sensitivity is a very good approximation
         # of the significance, but the code runs out of digits and approximates
@@ -467,7 +467,7 @@ def significance(s,se,b,be,debug=False):
         # under the square root and then it crashes
         if s/b<0.000001:
             if True:
-                print "WARNING! s/b<0.000001, returning sensitivity s=",str(s)," b=",str(b),"s/b",str(s/b) 
+                print("WARNING! s/b<0.000001, returning sensitivity s=",str(s)," b=",str(b),"s/b",str(s/b))
             (result,error)=sensitivity(s,se,b,be,debug) # sensitivity
         else:
             # slide 39 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
@@ -478,13 +478,13 @@ def significance(s,se,b,be,debug=False):
             error=0.0
             #dfds=math.log(1.0+1.0*s/b)*math.pow((s+b)*math.log(1.0+1.0*s/b)-s,3.0/2.0)
             #if debug:
-            #    print "dfds",dfds
+            #    print("dfds",dfds)
             #dfdb=(1.0*s/b+math.log(1.0+1.0*s/b))*math.pow((s+b)*math.log(1.0+1.0*s/b)-s,3.0/2.0)
             #if debug:
-            #    print "dfdb",dfdb
+            #    print("dfdb",dfdb)
             #error=math.sqrt(math.pow(dfds,2)*math.pow(se,2)+math.pow(dfdb,2)*math.pow(be,2))
     if debug:
-        print "significance","content +/-error","%-.5f +/- %-.5f" % (result,error) 
+        print("significance","content +/-error","%-.5f +/- %-.5f" % (result,error))
     return (result,error)
 # done function
 
@@ -495,10 +495,10 @@ def significance(s,se,b,be,debug=False):
 # can be rewritten as slide 4 of Nicolas' https://indico.cern.ch/event/688766/contributions/2830787/attachments/1578214/2492928/ApproximateSignificance.pdf
 def sensitivitySigmaB(s,se,b,be,debug=False):
     if debug:
-        print "sensitivitySigmaB ","s",s,"se",se,"b",b,"be",be
+        print("sensitivitySigmaB ","s",s,"se",se,"b",b,"be",be)
     if b<0.0001:
         if True:
-            print "WARNING! b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
+            print("WARNING! b<0.0001, returning result 0 and error 0! s=",str(s)," b=",str(b))
         result=0
         error=0
     else:
@@ -508,7 +508,7 @@ def sensitivitySigmaB(s,se,b,be,debug=False):
         #error=ratio(se,math.sqrt(b+be*be),debug=False)
         error=result*ratio(se,s,debug=False)
     if debug:
-        print "sensitivity ","content +/-error","%-.5f +/- %-.5f" % (result,error) 
+        print("sensitivity ","content +/-error","%-.5f +/- %-.5f" % (result,error))
     return (result,error)
 # done function
 
@@ -525,47 +525,47 @@ def sensitivitySigmaB(s,se,b,be,debug=False):
 # Nicolas uses Gaussian prior, Cowan uses Poisson, so probably the results are very similar
 def significanceSigmaB(s,se,b,be,debug=False):
     if debug:
-        print "significanceSigmaB","s",s,"se",se,"b",b,"be",be
+        print("significanceSigmaB","s",s,"se",se,"b",b,"be",be)
     if b<0.0000001:
         result=0
         error=0
         if True:
-            print "WARNING! b<0.001, returning result 0 and error 0! s=",str(s)," b=",str(b) 
+            print("WARNING! b<0.001, returning result 0 and error 0! s=",str(s)," b=",str(b))
     else:
         if debug:
-            print "significanceSigmaB","s",s,"se",se,"b",b,"be",be,"s/b",s/b,"be*be/b",be*be/b
+            print("significanceSigmaB","s",s,"se",se,"b",b,"be",be,"s/b",s/b,"be*be/b",be*be/b)
         # for very low numbers, the sensitivity is a very good approximation
         # of the significance, but the code runs out of digits and approximates
         # the log(1+s/b) with zero, which makes it have negative values 
         # under the square root and then it crashes
         if s/b<0.0000001:
             if True:
-                print "WARNING! s/b<0.000001, returning sensitivitySigmaB s=",str(s)," b=",str(b),"s/b",str(s/b) 
+                print("WARNING! s/b<0.000001, returning sensitivitySigmaB s=",str(s)," b=",str(b),"s/b",str(s/b))
             (result,error)=sensitivitySigmaB(s,se,b,be,debug) # sensitivity
         else:
             # slide 45 of https://www.pp.rhul.ac.uk/~cowan/stat/aachen/cowan_aachen14_4.pdf
             # for s<<b and be*be<<b, it reduced to s/sqrt(b+be*be)
             #result2=math.sqrt(2.0*((s+b)*math.log(((s+b)*(b+be*be))/(b*b+(s+b)*(be*be)))-((b*b)/(be*be))*math.log(1.0+(be*be*s)/(b*(b+be*be)))))
             #if debug:
-            #    print "result2",result2
+            #    print("result2",result2)
             # result 2 has the same shape as below, where the terms are separate
             x=s/b
             y=be*be/b
             if debug:
-                print "x",x,"y",y
+                print("x",x,"y",y)
             alpha=(1.0+x)*math.log((1.0+x)*(1.0+y)/(1.0+(1.0+x)*y))
             if debug:
-                print "alpha",alpha
+                print("alpha",alpha)
             beta=(1.0/y)*math.log(1.0+x*y/(1.0+y))
             if debug:
-                print "beta",beta
+                print("beta",beta)
             result=math.sqrt(2.0*b*(alpha-beta))
             if debug:
-                print "result",result
+                print("result",result)
             # trial and error has shown that the signal error on the ratio is the same percentage than the signal error
             error=result*ratio(se,s)
     if debug:
-        print "significance","content +/-error","%-.5f +/- %-.5f" % (result,error) 
+        print("significance","content +/-error","%-.5f +/- %-.5f" % (result,error))
     return (result,error)
 # done function
 
@@ -582,10 +582,10 @@ def get_figure_of_merit(s,se,b,be,figureOfMerit="SignificanceSigmaB",debug=False
     elif figureOfMerit=="SignificanceSigmaB":
         result=significanceSigmaB(s,se,b,be,debug=debug)
     else:
-        print "figureOfMerit",figureOfMerit,"not know in get_figure_of_merit(). Will ABORT!!!"
+        print("figureOfMerit",figureOfMerit,"not know in get_figure_of_merit(). Will ABORT!!!")
         assert(False)
     if debug:
-        print "figureOfMerit",figureOfMerit
+        print("figureOfMerit",figureOfMerit)
     return result
 # done function
 
@@ -662,7 +662,7 @@ def sum_error_list(list_tuple,debug=False):
     sumError=math.sqrt(sumErrorSquared)
     result=(sum,sumError)
     if debug:
-        print "result",result,"input",list_tuple
+        print("result",result,"input",list_tuple)
     return result
 # done function
 
@@ -708,7 +708,7 @@ def average_error_list(list_tuple,debug=False):
     averageError=math.sqrt(sumErrorSquared)/N
     result=(average,averageError)
     if debug:
-        print "average",result,"input",list_tuple
+        print("average",result,"input",list_tuple)
     return result
 # done function
 
@@ -763,7 +763,7 @@ def add_in_quadrature_list(list_value,debug=False):
     # done loop over entries
     result=math.sqrt(result)
     if debug:
-        print "add_in_quadrature",result,"from input",list_value
+        print("add_in_quadrature",result,"from input",list_value)
     return result
 # done function
 
@@ -784,12 +784,12 @@ def add_in_quadrature_error_list(list_tuple,debug=False):
     else:
         resultError=math.sqrt(resultError)/result
     if debug:
-        print "add_in_quadrature",(result,resultError),"from input",list_tuple
+        print("add_in_quadrature",(result,resultError),"from input",list_tuple)
     return (result,resultError)
 # done function
 
 def print_figures_of_merit(s,b):
-    print "s",s,"b",b,"sensitivity",sensitivity(s,b),"significance",significance(s,b)
+    print("s",s,"b",b,"sensitivity",sensitivity(s,b),"significance",significance(s,b))
 # done function
 
 
@@ -805,21 +805,21 @@ def print_figures_of_merit(s,b):
 # if at least one weight is zero, return normal average
 def get_average_weighted_by_uncertainties(list_tuple,debug=False):
     if debug:
-        print "Calculated average weighted by their uncertainties for", list_tuple
+        print("Calculated average weighted by their uncertainties for", list_tuple)
     weightedsum=0.0
     sumofweights=0.0
     # check all weights are at least zero or positive
     for value,error in list_tuple:
         if debug:
-            print "new value",value,"error",error
+            print("new value",value,"error",error)
         if error<0:
-            print "error",error,"should be zero or positive. Will ABORT!!!"
+            print("error",error,"should be zero or positive. Will ABORT!!!")
             assert(False)
     areAllWeightsPositive=True
     # check if all weights are True
     for value,error in list_tuple:
         if debug:
-            print "new value",value,"error",error
+            print("new value",value,"error",error)
         if error==0:
             areAllWeightsPositive=False
     # start if
@@ -829,7 +829,7 @@ def get_average_weighted_by_uncertainties(list_tuple,debug=False):
         valueErrorSquared=0.0
         for value,error in list_tuple:
             if debug:
-                print "new value",value,"error",error
+                print("new value",value,"error",error)
             valueSum+=valueSum
             valueErrorSquared+=error*error
         # done for loop
@@ -840,21 +840,21 @@ def get_average_weighted_by_uncertainties(list_tuple,debug=False):
         # if all weights are positive return weighted average
         for value,error in list_tuple:
             if debug:
-                print "new value",value,"error",error
+                print("new value",value,"error",error)
             weight=1.0/(error*error)
             if debug:
-                print "weight",weight
+                print("weight",weight)
             weightedsum+=weight*value
             sumofweights+=weight
             if debug:
-                print "weightedsum",weightedsum
-                print "sumofweights",sumofweights
+                print("weightedsum",weightedsum)
+                print("sumofweights",sumofweights)
             # done loop
             average=weightedsum/sumofweights
             error=1.0/math.sqrt(sumofweights)
     # done if normal average (if at least one weight of zero) or weighted average (if all weights are larger than zero)
     if debug:
-        print "average",average,"error",error
+        print("average",average,"error",error)
     return average,error
 # done function
 
@@ -961,7 +961,7 @@ class Bukin:
       debug=False
 
       if debug:
-        print "******"
+        print("******")
       # inputs
       xx =x[0]
       norm = par[0] # overall normalization
@@ -971,13 +971,13 @@ class Bukin:
       rhoL = par[4] # size of the lower tail
       rhoR = par[5] # size of the higher tail
       if debug:
-        print "xx",xx
-        print "norm",norm
-        print "x0",x0
-        print "sigma",sigma
-        print "xi",xi
-        print "rhoL",rhoL
-        print "rhoR",rhoR
+        print("xx",xx)
+        print("norm",norm)
+        print("x0",x0)
+        print("sigma",sigma)
+        print("xi",xi)
+        print("rhoL",rhoL)
+        print("rhoR",rhoR)
   
       # initializations
       r1=0.0
@@ -998,32 +998,32 @@ class Bukin:
       r4=math.sqrt(math.pow(xi,2)+1.0)
       r1=xi/r4
       if debug:
-        print "consts",consts
-        print "hp",hp
-        print "r3",r3
-        print "r4",r4
-        print "r1",r1
-        print "x1",x1
-        print "x2",x2
-        print "x0",x0
-        print "xx",xx
-        print "xi",xi
-        print "math.exp(-6.)",math.exp(-6.)
+        print("consts",consts)
+        print("hp",hp)
+        print("r3",r3)
+        print("r4",r4)
+        print("r1",r1)
+        print("x1",x1)
+        print("x2",x2)
+        print("x0",x0)
+        print("xx",xx)
+        print("xi",xi)
+        print("math.exp(-6.)",math.exp(-6.))
 
       if abs(xi)>math.exp(-6.):
         r5=xi/math.log(r4+xi)
       else:
         r5=1.0
       if debug:
-        print "r5",r5
+        print("r5",r5)
 
       x1=x0+(hp/2)*(r1-1)
       x2=x0+(hp/2)*(r1+1)
       if debug:
-        print "x1",x1
-        print "x2",x2
-        print "x0",x0
-        print "xx",xx
+        print("x1",x1)
+        print("x2",x2)
+        print("x0",x0)
+        print("xx",xx)
 
       if xx<x1:
         # Left Side

@@ -1,0 +1,39 @@
+python3 -m venv env_python3
+ls
+[we see a folder env_python3]
+cd env_python3
+ls
+[bin        include    lib        pyvenv.cfg]
+cd lib && ls
+[python3.7]
+cd ../bin && ls
+[Adrians-MacBook-Pro:bin abuzatu$ ls -lh
+total 64
+-rw-r--r--  1 abuzatu  staff   2.2K Nov 11 17:17 activate
+-rw-r--r--  1 abuzatu  staff   1.3K Nov 11 17:17 activate.csh
+-rw-r--r--  1 abuzatu  staff   2.4K Nov 11 17:17 activate.fish
+-rwxr-xr-x  1 abuzatu  staff   279B Nov 11 17:17 easy_install
+-rwxr-xr-x  1 abuzatu  staff   279B Nov 11 17:17 easy_install-3.7
+-rwxr-xr-x  1 abuzatu  staff   261B Nov 11 17:17 pip
+-rwxr-xr-x  1 abuzatu  staff   261B Nov 11 17:17 pip3
+-rwxr-xr-x  1 abuzatu  staff   261B Nov 11 17:17 pip3.7
+lrwxr-xr-x  1 abuzatu  staff     7B Nov 11 17:17 python -> python3
+lrwxr-xr-x  1 abuzatu  staff    51B Nov 11 17:17 python3 -> /Library/Developer/CommandLineTools/usr/bin/python3]
+cd ../include && ls
+[empty]
+
+source env_python3/bin/activate
+[this activates the environment in this terminal; no output shown, but when running a new command, it shows that environment to the left in round brackets]
+(env_python3) Adrians-MacBook-Pro:PythonEnvironments abuzatu$ ls
+env_python3
+
+python
+[this will show we have Python 3.7.3]
+
+import numpy
+[we do not have numpy yet]
+
+pip install numpy
+[because my environment is python3, I can use pip and it will automatically choose pip3]
+
+pip install matplotlib
