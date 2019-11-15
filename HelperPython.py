@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import numpy as np
 import math
 import inspect
 from array import array
@@ -50,12 +49,6 @@ def listVariables(name,prefix):
 
 def updateListVariables(prefix,name,suffix):
   return prefix+name.replace(',',suffix+','+prefix)+suffix
-# done function
-
-def getValues(event,listVariables,debug=False):
-  if debug:
-      print("listVariables",listVariables)
-  return numpy.array([getattr(event,variableName) for variableName in listVariables.split(',')])
 # done function
 
 def getProcessName(fileNameStem,debug=False):
@@ -187,19 +180,6 @@ def testTrainRankCalc(t_train, t_test):
 #########################################################
 ############### Automatic binning #######################
 #########################################################
-
-def get_numpyarray_from_listString(listString,debug=False):
-  if debug:
-    print("listString",listString)
-  listFloat=[]
-  for string in listString:
-    listFloat.append(float(string))
-  # done for loop
-  numpyarray=numpy.array(listFloat)
-  if debug:
-    print("numpyarray",numpyarray)
-  return numpyarray
-# done function
 
 def get_string_from_listString(listString,debug=False):
   result=""
