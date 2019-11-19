@@ -4,6 +4,7 @@
 import matplotlib.pylab as pylab
 #import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import numpy as np
 #import matplotlib.axes as ax
 # from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 # from matplotlib.figure import Figure
@@ -20,7 +21,10 @@ def print_nparray(name,nparray):
 
 # overlay two or more numpy arrays as graphs
 # info_legend="best", "uppler right", "lowerleft", etc
-def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf,png",info_x=["Procent of data reduced",[0.0,1.0],"linear"],info_y=["Figure of merit of performance",[0.0,100000.0],"log"],info_legend=["best"],title="Compared performance of 3D point cloud compression",debug=False):
+# info_y: info_y=["Figure of merit of performance",[0.0,100000.0,-1]
+# info_y: info_y=["Figure of merit of performance",[-1,-1,1.5]
+
+def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf,png",info_x=["Procent of data reduced",[0.0,1.0],"linear"],info_y=["Figure of merit of performance",[0.0,100000.0,-1],"log"],info_legend=["best",6],title="Compared performance of 3D point cloud compression",debug=False):
     if debug:
         print("Start overlayGraphsValues")
         print("outputFileName",outputFileName)
@@ -50,6 +54,7 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
     y_lim=info_y[1]
     y_lim_min=y_lim[0]
     y_lim_max=y_lim[1]
+    y_lim_scale=y_lim[2]
     if y_lim_min==-1 and y_lim_max==-1:
         y_set_lim=False
     else:
@@ -61,6 +66,17 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
         print("y_lim_max",y_lim_max,type(y_lim_max))
         print("y_set_lim",y_set_lim,type(y_set_lim))
         print("y_scale",y_scale,type(y_scale))
+    # find the maximum y value
+    max_y=np.NINF
+    for i,tupleArray in enumerate(list_tupleArray):
+        if debug:
+            print("i",i,"len",len(tupleArray))
+        temp_max=np.max(tupleArray[1])
+        if temp_max>max_y:
+            max_y=temp_max
+    # done for loop
+    if debug:
+        print("max_y",max_y)
     # create empty figure
     plt.figure(1)
     # set x-axis
@@ -72,6 +88,12 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
     plt.ylabel(y_label)
     if y_set_lim==True:
         plt.ylim(y_lim_min,y_lim_max)
+    else:
+        if max_y>0:
+            # multiply by 1.4, to give enough space for the legend
+            plt.ylim(0,max_y*y_lim_scale)
+        # done if
+    # done if
     plt.yscale(y_scale)
     # set title
     plt.title(title)
@@ -90,7 +112,7 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
         plt.plot(x,y,color=color,marker=marker,label=l)
     # done loop over each element to plot
     # set legend
-    plt.legend(loc=info_legend[0])
+    plt.legend(loc=info_legend[0],prop={'size':info_legend[1]})
     # for each extension create a plot
     for extension in extensions.split(","):
         fileNameFull=outputFileName+"."+extension
