@@ -68,12 +68,16 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
         print("y_scale",y_scale,type(y_scale))
     # find the maximum y value
     max_y=np.NINF
+    min_y=np.inf
     for i,tupleArray in enumerate(list_tupleArray):
         if debug:
             print("i",i,"len",len(tupleArray))
         temp_max=np.max(tupleArray[1])
         if temp_max>max_y:
             max_y=temp_max
+        temp_min=np.min(tupleArray[1])
+        if temp_min<min_y:
+            min_y=temp_min
     # done for loop
     if debug:
         print("max_y",max_y)
@@ -89,9 +93,9 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
     if y_set_lim==True:
         plt.ylim(y_lim_min,y_lim_max)
     else:
-        if max_y>0:
-            # multiply by 1.4, to give enough space for the legend
-            plt.ylim(0,max_y*y_lim_scale)
+        if max_y>0 and min_y>0:
+            # multiply by y_lim_scale upwards to give enough space for the legend and by 0.9 downwards
+            plt.ylim(min_y*0.9,max_y*y_lim_scale)
         # done if
     # done if
     plt.yscale(y_scale)
@@ -112,7 +116,8 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
         plt.plot(x,y,color=color,marker=marker,label=l)
     # done loop over each element to plot
     # set legend
-    plt.legend(loc=info_legend[0],prop={'size':info_legend[1]})
+    if True:
+        plt.legend(loc=info_legend[0],prop={'size':info_legend[1]})
     # for each extension create a plot
     for extension in extensions.split(","):
         fileNameFull=outputFileName+"."+extension
