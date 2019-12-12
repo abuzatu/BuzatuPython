@@ -1,11 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from HelperPython import *
 
 total = len(sys.argv)
 # number of arguments plus 1
 if total!=1:
-    print "You need some arguments, will ABORT!"
-    print "Ex: ",sys.argv[0]," "
+    print("You need some arguments, will ABORT!")
+    print("Ex: ",sys.argv[0]," ")
     assert(False)
 # done if
 
@@ -22,14 +22,14 @@ list_option="A,B,C".split(",")
 
 def doItOne(option):
     if debug:
-        print "doItOne() with option",option
+        print("doItOne() with option",option)
     None
 # done function
 
 def doItAll():
     for option in list_option:
         if debug:
-            print "option",option
+            print("option",option)
         doItOne(option)
     None  
 # done function
@@ -44,6 +44,6 @@ doItAll()
 ################### Finished ####################################
 #################################################################
 
-print ""
-print ""
-print "Finished all in",sys.argv[0]
+print("")
+print("")
+print("Finished all in",sys.argv[0])
