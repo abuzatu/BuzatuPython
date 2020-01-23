@@ -213,7 +213,11 @@ def get_performanceText_values(list_list_varInfo,dict_varName_value,debug):
         print("Start get_performanceText_values()")
     performanceText=""
     for list_varInfo in list_list_varInfo:
+        if debug:
+            print("list_varInfo",list_varInfo)
         stringFormat=get_stringFormat(list_varInfo,"f")
+        if debug:
+            print("stringFormat",stringFormat)
         varName=list_varInfo[0]
         if debug:
             print("stringFormat",stringFormat,"varName",varName)

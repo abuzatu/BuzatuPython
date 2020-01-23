@@ -54,7 +54,8 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
     y_lim=info_y[1]
     y_lim_min=y_lim[0]
     y_lim_max=y_lim[1]
-    y_lim_scale=y_lim[2]
+    y_lim_scale_min=y_lim[2]
+    y_lim_scale_max=y_lim[3]
     if y_lim_min==-1 and y_lim_max==-1:
         y_set_lim=False
     else:
@@ -64,6 +65,8 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
         print("y_label",y_label,type(y_label))
         print("y_lim_min",y_lim_min,type(y_lim_min))
         print("y_lim_max",y_lim_max,type(y_lim_max))
+        print("y_lim_scale_min",y_lim_scale_min,type(y_lim_scale_min))
+        print("y_lim_scale_max",y_lim_scale_max,type(y_lim_scale_max))
         print("y_set_lim",y_set_lim,type(y_set_lim))
         print("y_scale",y_scale,type(y_scale))
     # find the maximum y value
@@ -95,7 +98,7 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
     else:
         if max_y>0 and min_y>0:
             # multiply by y_lim_scale upwards to give enough space for the legend and by 0.9 downwards
-            plt.ylim(min_y*0.9,max_y*y_lim_scale)
+            plt.ylim(min_y*y_lim_scale_min,max_y*y_lim_scale_max)
         # done if
     # done if
     plt.yscale(y_scale)
