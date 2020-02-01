@@ -9,6 +9,7 @@ import numpy as np
 # from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 # from matplotlib.figure import Figure
 # import matplotlib.gridspec as gridspec
+import copy
 
 # a general function to print the values and other properties of a numpy array
 # use to see the values of the numpy arrays in our code for debugging and understanding the code flow
@@ -321,7 +322,7 @@ def overlay_histogram_from_nparray_with_ratio(list_tupleArray,outputFileName="./
 
 # x=horizontal, y=vertical; nrBins=100, or nrBins=[0,1,2,3,4]
 def draw_histogram_2d(x,y,outputFileName="./output_histo_2D",extensions="png,pdf",nrBins=100,info_x=["x-axis"],info_y=["y-axis"],title="Title",plotColorBar=True,debug=False,verbose=False):
-    plt.hist2d(x,y,bins=nrBins)
+    plt.hist2d(x,y,bins=nrBins,cmin=1)
     if plotColorBar:
         plt.colorbar()
     # axes
