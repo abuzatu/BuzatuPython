@@ -2,6 +2,12 @@
 
 import numpy as np
 
+def print_numpy(name,array):
+  print("numpy_array: "+name)
+  print(array)
+  print("type",type(array),"len",len(array),"dtype",array.dtype,"shape",array.shape,"min",np.min(array),"max",np.max(array),"avg",np.mean(array))
+# done function
+
 def getValues(event,listVariables,debug=False):
   if debug:
       print("listVariables",listVariables)
