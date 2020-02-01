@@ -150,8 +150,9 @@ def calculate_euclidean_distance_deviation_from_point_clouds_with_same_order(pc_
         columns_max=np.max(pc_reference,0)
         print("columns_max",columns_max)
     #assert(False)
+    list_deviation=[]
     # loop over all points and for each calculate the euclidean distance
-    # support both cartesian and spherical, and S=0, 1, or 2. 
+    # support both cartesian and spherical, and S=0, 1, or 2.
     list_d_cartesian=[]
     list_d_spherical=[]
     list_r2=[]
@@ -173,7 +174,19 @@ def calculate_euclidean_distance_deviation_from_point_clouds_with_same_order(pc_
             elif S==2:
                 pass
             elif S==3:
-                pass
+                # read variables from point_current, assume order x, y, z
+                x2=point_current[0]
+                y2=point_current[1]
+                z2=point_current[2]
+                # read variables from point_reference, assume order x, y, z
+                x1=point_reference[0]
+                y1=point_reference[1]
+                z1=point_reference[2]
+                # calculate deviation
+                x2_x1=x2-x1
+                y2_y1=y2-y1
+                z2_z1=z2-z1
+                deviation=math.sqrt(x2_x1*x2_x1+y2_y1*y2_y1+z2_z1*z2_z1)
             else:
                 print("S",S,"not known. Choose 1, 2, 3. Will ABORT!!!")
             # done if
@@ -260,6 +273,9 @@ def calculate_euclidean_distance_deviation_from_point_clouds_with_same_order(pc_
                 list_r2.append(r2)
                 list_t2.append(t2)
                 list_p2.append(p2)
+
+                #
+                deviation=d_spherical
             else:
                 print("S",S,"not known. Choose 1, 2, 3. Will ABORT!!!")
             # done if
@@ -267,46 +283,49 @@ def calculate_euclidean_distance_deviation_from_point_clouds_with_same_order(pc_
             print("coordinateSystemType",coordinateSystemType,"not known. Choose Cartesian or Spherical. Will ABORT!!!")
             assert(False)
         # done if
+        # add deviation to list
+        list_deviation.append(deviation)
     # done loop over all points
     #
-    numpy_d_cartesian=np.array(list_d_cartesian)
-    numpy_d_spherical=np.array(list_d_spherical)
-    numpy_r1=np.array(list_r1)*0.01
-    numpy_t1=np.array(list_t1)#*180/np.pi
-    numpy_p1=np.array(list_p1)#*180/np.pi
-    numpy_r2=np.array(list_r2)*0.01
-    numpy_t2=np.array(list_t2)#*180/np.pi
-    numpy_p2=np.array(list_p2)#*180/np.pi
-    if True or debug:
-        print_numpy("numpy_d_cartesian",numpy_d_cartesian)
-        print_numpy("numpy_d_spherical",numpy_d_spherical)
-        print_numpy("numpy_r1",numpy_r1)
-        print_numpy("numpy_t1",numpy_t1)
-        print_numpy("numpy_p1",numpy_p1)
-        print_numpy("numpy_r2",numpy_r2)
-        print_numpy("numpy_t2",numpy_t2)
-        print_numpy("numpy_p2",numpy_p2)
-        # make plots
-        #binning_deviation=Peak-0.05+np.array(range(0,20))*(0.1/20.0)
-        binning_deviation=0.0+15.0*np.array(range(0,100))/100.0
-        draw_histogram_2d(numpy_d_cartesian,numpy_d_spherical,outputFileName="./output_histo_2D",extensions="png,pdf",nrBins=binning_deviation,info_x=["cartesian"],info_y=["spherical"],title="Title",plotColorBar=True,debug=False,verbose=False)
-        draw_histogram_2d(numpy_d_cartesian,numpy_r1,outputFileName="./output_histo_2D_cartesian_radius",extensions="png,pdf",nrBins=[binning_deviation,100],info_x=["cartesian"],info_y=["radius"],title="Title",plotColorBar=True,debug=False,verbose=False)
-        draw_histogram_2d(numpy_d_cartesian,numpy_t1,outputFileName="./output_histo_2D_cartesian_theta",extensions="png,pdf",nrBins=[binning_deviation,100],info_x=["cartesian"],info_y=["theta"],title="Title",plotColorBar=True,debug=False,verbose=False)
-        draw_histogram_2d(numpy_d_cartesian,numpy_p1,outputFileName="./output_histo_2D_cartesian_phi",extensions="png,pdf",nrBins=[binning_deviation,100],info_x=["cartesian"],info_y=["phi"],title="Title",plotColorBar=True,debug=False,verbose=False)
-
-        draw_histogram_2d(numpy_d_cartesian,np.cos(numpy_t1-numpy_t2),outputFileName="./output_histo_2D_cartesian_cos_theta",extensions="png,pdf",nrBins=[binning_deviation,100],info_x=["cartesian"],info_y=["cos theta"],title="Title",plotColorBar=True,debug=False,verbose=False)
-        draw_histogram_2d(numpy_d_cartesian,np.cos(numpy_p1-numpy_p2),outputFileName="./output_histo_2D_cartesian_cos_phi",extensions="png,pdf",nrBins=[binning_deviation,100],info_x=["cartesian"],info_y=["cos phi"],title="Title",plotColorBar=True,debug=False,verbose=False)
-
-
-        draw_histogram_2d(numpy_r1,numpy_r2,outputFileName="./output_histo_2D_r",extensions="png,pdf",nrBins=100,info_x=["r1"],info_y=["r2"],title="Title",plotColorBar=True,debug=False,verbose=False)
-        draw_histogram_2d(numpy_t1,numpy_t2,outputFileName="./output_histo_2D_t",extensions="png,pdf",nrBins=100,info_x=["t1"],info_y=["t2"],title="Title",plotColorBar=True,debug=False,verbose=False)
-        draw_histogram_2d(numpy_p1,numpy_p2,outputFileName="./output_histo_2D_p",extensions="png,pdf",nrBins=100,info_x=["p1"],info_y=["p2"],title="Title",plotColorBar=True,debug=False,verbose=False)
-        #
-        list_tupleArray=[]
-        list_tupleArray.append((numpy_d_cartesian,"Carthesian"))
-        list_tupleArray.append((numpy_d_spherical,"Spherical"))
-        overlay_histogram_from_nparray_with_ratio(list_tupleArray,outputFileName="./output_histo_from_nparray",extensions="png,pdf",nrBins=binning_deviation,histtype="step",info_x=["deviation"],info_y=["Number of points"],title="Title",text=None,info_legend=["best"],list_color="r,g,b,k,y".split(","),doAddRatioPad=False,debug=False,verbose=False)
-    # done if
+    numpy_deviation=np.array(list_deviation)
+    # do some more plots for spherical coordinates in 3D
+    if S==3 and coordinateSystemType=="Spherical":
+        numpy_d_cartesian=np.array(list_d_cartesian)
+        numpy_d_spherical=np.array(list_d_spherical)
+        numpy_r1=np.array(list_r1)*0.01
+        numpy_t1=np.array(list_t1)#*180/np.pi
+        numpy_p1=np.array(list_p1)#*180/np.pi
+        numpy_r2=np.array(list_r2)*0.01
+        numpy_t2=np.array(list_t2)#*180/np.pi
+        numpy_p2=np.array(list_p2)#*180/np.pi
+        if debug:
+            print_numpy("numpy_d_cartesian",numpy_d_cartesian)
+            print_numpy("numpy_d_spherical",numpy_d_spherical)
+            print_numpy("numpy_r1",numpy_r1)
+            print_numpy("numpy_t1",numpy_t1)
+            print_numpy("numpy_p1",numpy_p1)
+            print_numpy("numpy_r2",numpy_r2)
+            print_numpy("numpy_t2",numpy_t2)
+            print_numpy("numpy_p2",numpy_p2)
+            # make plots
+            # binning_deviation=Peak-0.05+np.array(range(0,20))*(0.1/20.0)
+            binning_deviation=0.0+15.0*np.array(range(0,100))/100.0
+            draw_histogram_2d(numpy_d_cartesian,numpy_d_spherical,outputFileName="./output_histo_2D",extensions="png,pdf",nrBins=binning_deviation,info_x=["cartesian"],info_y=["spherical"],title="Title",plotColorBar=True,debug=False,verbose=False)
+            draw_histogram_2d(numpy_d_cartesian,numpy_r1,outputFileName="./output_histo_2D_cartesian_radius",extensions="png,pdf",nrBins=[binning_deviation,100],info_x=["cartesian"],info_y=["radius"],title="Title",plotColorBar=True,debug=False,verbose=False)
+            draw_histogram_2d(numpy_d_cartesian,numpy_t1,outputFileName="./output_histo_2D_cartesian_theta",extensions="png,pdf",nrBins=[binning_deviation,100],info_x=["cartesian"],info_y=["theta"],title="Title",plotColorBar=True,debug=False,verbose=False)
+            draw_histogram_2d(numpy_d_cartesian,numpy_p1,outputFileName="./output_histo_2D_cartesian_phi",extensions="png,pdf",nrBins=[binning_deviation,100],info_x=["cartesian"],info_y=["phi"],title="Title",plotColorBar=True,debug=False,verbose=False)
+            draw_histogram_2d(numpy_d_cartesian,np.cos(numpy_t1-numpy_t2),outputFileName="./output_histo_2D_cartesian_cos_theta",extensions="png,pdf",nrBins=[binning_deviation,100],info_x=["cartesian"],info_y=["cos theta"],title="Title",plotColorBar=True,debug=False,verbose=False)
+            draw_histogram_2d(numpy_d_cartesian,np.cos(numpy_p1-numpy_p2),outputFileName="./output_histo_2D_cartesian_cos_phi",extensions="png,pdf",nrBins=[binning_deviation,100],info_x=["cartesian"],info_y=["cos phi"],title="Title",plotColorBar=True,debug=False,verbose=False)
+            draw_histogram_2d(numpy_r1,numpy_r2,outputFileName="./output_histo_2D_r",extensions="png,pdf",nrBins=100,info_x=["r1"],info_y=["r2"],title="Title",plotColorBar=True,debug=False,verbose=False)
+            draw_histogram_2d(numpy_t1,numpy_t2,outputFileName="./output_histo_2D_t",extensions="png,pdf",nrBins=100,info_x=["t1"],info_y=["t2"],title="Title",plotColorBar=True,debug=False,verbose=False)
+            draw_histogram_2d(numpy_p1,numpy_p2,outputFileName="./output_histo_2D_p",extensions="png,pdf",nrBins=100,info_x=["p1"],info_y=["p2"],title="Title",plotColorBar=True,debug=False,verbose=False)
+            #
+            list_tupleArray=[]
+            list_tupleArray.append((numpy_d_cartesian,"Carthesian"))
+            list_tupleArray.append((numpy_d_spherical,"Spherical"))
+            overlay_histogram_from_nparray_with_ratio(list_tupleArray,outputFileName="./output_histo_from_nparray",extensions="png,pdf",nrBins=binning_deviation,histtype="step",info_x=["deviation"],info_y=["Number of points"],title="Title",text=None,info_legend=["best"],list_color="r,g,b,k,y".split(","),doAddRatioPad=False,debug=False,verbose=False)
+        # done if
+    # done if coordinateSystemType
     # ready to return
-    return numpy_d_spherical
+    return numpy_deviation
 # done function
