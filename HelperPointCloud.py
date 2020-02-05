@@ -170,9 +170,24 @@ def calculate_euclidean_distance_deviation_from_point_clouds_with_same_order(pc_
             print("i",i,"point_current",point_current,"dtype",point_current.dtype,"point_reference",point_reference,"dtype",point_reference.dtype)
         if coordinateSystemType=="Cartesian":
             if S==1:
-                pass
+                # read variables from point_current, assume order x
+                x2=point_current[0]
+                # read variables from point_reference, assume order x
+                x1=point_reference[0]
+                # calculate deviation
+                x2_x1=x2-x1
+                deviation=math.sqrt(x2_x1*x2_x1)
             elif S==2:
-                pass
+                # read variables from point_current, assume order x, y
+                x2=point_current[0]
+                y2=point_current[1]
+                # read variables from point_reference, assume order x, y
+                x1=point_reference[0]
+                y1=point_reference[1]
+                # calculate deviation
+                x2_x1=x2-x1
+                y2_y1=y2-y1
+                deviation=math.sqrt(x2_x1*x2_x1+y2_y1*y2_y1)
             elif S==3:
                 # read variables from point_current, assume order x, y, z
                 x2=point_current[0]
