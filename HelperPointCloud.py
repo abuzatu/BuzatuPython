@@ -25,9 +25,9 @@ def get_nparray_from_structured_array_from_binary_file(inputFileName,expected_M=
         if debug:
             print("i",i,"axisName",axisName)
             print(axisName,structured_array[axisName],type(structured_array[axisName]),structured_array[axisName].dtype)
-            print(axisName,structured_array[axisName].astype('f4'),type(structured_array[axisName].astype('f4')),structured_array[axisName].astype('f4').dtype)
+            print(axisName,structured_array[axisName].astype('f8'),type(structured_array[axisName].astype('f8')),structured_array[axisName].astype('f8').dtype)
         # done if
-        temp_data.append(structured_array[axisName].astype('f4'))
+        temp_data.append(structured_array[axisName].astype('f8')) # need f8 to allow for indices large, as for number of points per cloud large as 130M or nore
     # done for loop
     if debug:
         print("temp_data")
@@ -64,10 +64,23 @@ def reorder_one_point_cloud_to_match_a_reference_with_last_element_an_id_new_way
     if debug:
         print("pc_current",type(pc_current))
         print(pc_current)
-        print("pc_current[:,1]",type(pc_current[:,1]))
-        print(pc_current[:,1])
-        print("[np.round(pc_current[:,1]).astype(np.uint32)",type(np.round(pc_current[:,1]).astype(np.uint32)))
-        print(np.round(pc_current[:,1]).astype(np.uint32))
+        a=pc_current[:,-1]
+        print("type",a.dtype,type(a))
+        print_nparray("a",a)
+        print("pc_current[:,-1]",type(pc_current[:,-1]))
+        print(pc_current[:,-1])
+        b=np.round(pc_current[:,-1]).astype(np.uint32)
+        print("[np.round(pc_current[:,-1]).astype(np.uint32)","len",len(b),"type",type(b),"min",np.min(b),"max",np.max(b))
+        print(b)
+        unique, counts = np.unique(b, return_counts=True)
+        d=dict(zip(unique, counts))
+        print("d")
+        for e in d:
+            if d[e]==0:
+                print("e",e,"d[e]",d[e])
+        b=np.where(a==35255288)
+        print("index of 35255288",b)
+    # done if
     # do the reordering
     pc_current_reordered[np.round(pc_current[:,-1]).astype(np.uint32),:]=1*pc_current
     if debug:
