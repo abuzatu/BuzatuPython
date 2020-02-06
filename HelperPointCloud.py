@@ -159,9 +159,11 @@ def calculate_euclidean_distance_deviation_from_point_clouds_with_same_order(pc_
         print("pc_reference","dtype",pc_reference.dtype)
         print(pc_reference)
         columns_max=np.max(pc_current,0)
-        print("columns_max",columns_max)
+        print("columns_max pc_current")
+        print(columns_max)
         columns_max=np.max(pc_reference,0)
-        print("columns_max",columns_max)
+        print("columns_max pc_reference")
+        print(columns_max)
     #assert(False)
     list_deviation=[]
     # loop over all points and for each calculate the euclidean distance
