@@ -169,10 +169,10 @@ def get_structured_numpy_array_from_dictionary_key_list_value(dict_key_list_valu
     if debug:
         print("list_tuple_value","type",type(list_tuple_value),"len",len(list_tuple_value),":")
         print(list_tuple_value)
-    numpy_structured_array=np.array(list_tuple_value,dtype=dtype)
+    nparray_structured_array=np.array(list_tuple_value,dtype=dtype)
     if debug:
-        print("numpy_structured_array","type",type(numpy_structured_array),"shape",numpy_structured_array.shape,":")
-        print(numpy_structured_array)
+        print("nparray_structured_array","type",type(nparray_structured_array),"shape",nparray_structured_array.shape,":")
+        print(nparray_structured_array)
     # all done, ready to return
-    return numpy_structured_array
+    return nparray_structured_array
 # done function
