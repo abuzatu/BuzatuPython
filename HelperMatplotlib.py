@@ -25,7 +25,7 @@ def print_nparray(name,nparray):
 # info_y: info_y=["Figure of merit of performance",[0.0,100000.0,-1]
 # info_y: info_y=["Figure of merit of performance",[-1,-1,1.5]
 
-def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf,png",info_x=["Procent of data reduced",[0.0,1.0],"linear"],info_y=["Figure of merit of performance",[0.0,100000.0,-1],"log"],info_legend=["best",6],title="Compared performance of 3D point cloud compression",debug=False):
+def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf,png",info_x=["Procent of data reduced",[0.0,1.0],"linear"],info_y=["Figure of merit of performance",[0.0,100000.0,-1],"log"],info_legend=["best",6],title="Compared performance of 3D point cloud compression",doShow=False,debug=False):
     if debug:
         print("Start overlayGraphsValues")
         print("outputFileName",outputFileName)
@@ -122,6 +122,8 @@ def overlayGraphsValues(list_tupleArray,outputFileName="overlay",extensions="pdf
     # set legend
     if True:
         plt.legend(loc=info_legend[0],prop={'size':info_legend[1]})
+    if doShow:
+        plt.show()
     # for each extension create a plot
     for extension in extensions.split(","):
         fileNameFull=outputFileName+"."+extension
