@@ -116,3 +116,63 @@ def read_file_with_values_in_numpy_array(fileName,debug):
     # ready to return
     return list_name,dict_name_nparray_value
 # done function
+
+# return a structured numpy array from a dictionary between keys and lists of values
+# example:
+# debug=False
+# dict_key_list_value={
+#     "a":[1.4,1.2,1.15,1.1,1.0,0.8,0.6,0.5],
+#     "b":[10.2,10.0,9.8,8.55,6.44,6.20,5.44,3.22],
+#     "c":[6,5,4.9,4.8,4.6,6.5,6.8,7.2],
+# }
+# numpy_structured_array=get_structured_numpy_array_from_dictionary_key_list_value(dict_key_list_value,'f8',debug)
+# np.save("a.npy",numpy_structured_array)
+# numpy_structured_array_2=np.load("a.npy")
+# print("numpy_structured_array_2","type",type(numpy_structured_array_2),"shape",numpy_structured_array_2.shape,":")
+# print(numpy_structured_array_2)
+def get_structured_numpy_array_from_dictionary_key_list_value(dict_key_list_value,format="f8",debug=False):
+    # first check that all the lists have the same number of elements, else crash
+    # then create the list of names and formats and append each key to that
+    list_name=[]
+    list_format=[]
+    for i,key in enumerate(sorted(dict_key_list_value.keys())):
+        list_value=dict_key_list_value[key]
+        len_list_value=len(list_value)
+        if i==0:
+            reference_key=key
+            reference_len_list_value=len_list_value
+        else:
+            # check if the current number of elements equals that of the list
+            if len_list_value != reference_len_list_value:
+                print("ERROR! In dictionary key(",key,") has",len_list_value,"elements, different from first key in alphabetical order (", reference_key, "), which has ",reference_len_list_value," elements. We will ABORT!!!")
+                assert(False)
+            # done if
+        # done if
+        list_name.append(key)
+        list_format.append(format)
+    # done for all elements in the dictionary
+    if debug:
+        print("list_name","type",type(list_name),"len",len(list_name),":")
+        print(list_name)
+        print("list_format","type",type(list_format),"len",len(list_format),":")
+        print(list_format)
+    #
+    # create the dtype of the dictionary
+    dtype=list(zip(list_name, list_format))
+    if debug:
+        print("dtype","type",type(dtype),"len",len(dtype),":")
+        print(dtype)
+    # create the data inside, as a list of tuples, where one tuples is one row
+    # meaning one value for each vertical axis, so for each name
+    # use a list comprehension that inside uses a list comprehension
+    list_tuple_value=[tuple([dict_key_list_value[name][i] for name in list_name]) for i in range(reference_len_list_value)]
+    if debug:
+        print("list_tuple_value","type",type(list_tuple_value),"len",len(list_tuple_value),":")
+        print(list_tuple_value)
+    numpy_structured_array=np.array(list_tuple_value,dtype=dtype)
+    if debug:
+        print("numpy_structured_array","type",type(numpy_structured_array),"shape",numpy_structured_array.shape,":")
+        print(numpy_structured_array)
+    # all done, ready to return
+    return numpy_structured_array
+# done function
