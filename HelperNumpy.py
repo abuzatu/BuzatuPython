@@ -8,6 +8,13 @@ def print_numpy(name,array):
   print("type",type(array),"len",len(array),"dtype",array.dtype,"shape",array.shape,"min",np.min(array),"max",np.max(array),"avg",np.mean(array))
 # done function
 
+def print_nparray(name,nparray):
+  print("Start nparray: "+name)
+  print(nparray)
+  print("type",type(nparray),"len",len(nparray),"dtype",nparray.dtype,"shape",nparray.shape,"min",np.min(nparray),"max",np.max(nparray),"avg",np.mean(nparray))
+  print("End   nparray: "+name)
+# done function
+
 def getValues(event,listVariables,debug=False):
   if debug:
       print("listVariables",listVariables)
