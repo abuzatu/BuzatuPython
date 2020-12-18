@@ -58,6 +58,7 @@ python --version
 Let's choose a version of Python `3.x.x` to install. To see all the versions of Python `3.x.x` that exist:
 ```
 pyenv install -l | grep -ow 3.[0-9].[0-9] | sort
+```
 
 Let's choose and install the latest, currenty Python `3.9.0`. We can also install others.
 ```
