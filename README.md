@@ -50,6 +50,13 @@ export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/bzip2/include"
 #export PKG_CONFIG_PATH="${PKG_CONFIG_PATH} /usr/local/opt/zlib/lib/pkgconfig"
 #export PKG_CONFIG_PATH="${PKG_CONFIG_PATH} /usr/local/opt/sqlite/lib/pkgconfig
 ```
+By the way, I find useful to also configure the Mac environment with a few more aliases
+```
+alias rm='rm -i'
+alias ls='ls -C -G -h'
+alias grep='grep --color=auto'
+alias j="jupyter notebook"
+```
 
 Start a new terminal. By default it is still the Python 2.7.
 ```
