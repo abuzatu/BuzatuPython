@@ -6,6 +6,8 @@ Below instuctions to set up a Python environment, from the beginning of having a
 
 It is a good practice to be able to have several Python versions installed, to choose for each project potentially another version of Python.
 
+Also to install emacs.
+
 # Steps
 
 Follow the steps from [here](https://www.chrisjmendez.com/2017/08/03/installing-multiple-versions-of-python-on-your-mac-using-homebrew/). For me on `MacOS` they look like this. First install [brew](https://brew.sh/)
@@ -15,6 +17,13 @@ Follow the steps from [here](https://www.chrisjmendez.com/2017/08/03/installing-
 If you have it installed, update it to the latest
 ```
 brew update
+
+Install emacs
+
+```
+brew install emacs
+```
+
 ```
 Install `pyenv`
 ```
